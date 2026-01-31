@@ -79,3 +79,14 @@
 - [ ] Test public lead capture flow
 - [ ] Test integration webhooks
 - [ ] Create final checkpoint
+
+## Bug Fixes
+- [ ] Fix OAuth callback authentication error
+- [ ] Ensure tenant creation works properly on first login
+- [ ] Test complete authentication flow
+
+## Guest Access Implementation
+- [x] Remove OAuth authentication requirement
+- [x] Create default guest tenant and user
+- [x] Update frontend to bypass authentication
+- [x] Allow direct access to all CRM features

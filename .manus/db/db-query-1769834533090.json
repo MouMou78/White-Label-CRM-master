@@ -1,0 +1,9 @@
+{
+  "query": "INSERT IGNORE INTO tenants (id, name, createdAt) VALUES ('guest-tenant-id', 'Guest Tenant', NOW());",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2QkRhwd4AVTLhHG.a0950ca1ba2f --database TQEsx2HByTQrcAiUBn2kww --execute INSERT IGNORE INTO tenants (id, name, createdAt) VALUES ('guest-tenant-id', 'Guest Tenant', NOW());",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 179
+}

@@ -1,6 +1,7 @@
 import type { CreateExpressContextOptions } from "@trpc/server/adapters/express";
 import type { User } from "../../drizzle/schema";
 import { sdk } from "./sdk";
+import { createGuestContext } from "./guest-context";
 
 export type TrpcContext = {
   req: CreateExpressContextOptions["req"];
@@ -11,6 +12,10 @@ export type TrpcContext = {
 export async function createContext(
   opts: CreateExpressContextOptions
 ): Promise<TrpcContext> {
+  // Use guest access for now (OAuth disabled)
+  return createGuestContext(opts.req, opts.res);
+  
+  /* Original OAuth flow - disabled for guest access
   let user: User | null = null;
 
   try {
@@ -25,4 +30,5 @@ export async function createContext(
     res: opts.res,
     user,
   };
+  */
 }

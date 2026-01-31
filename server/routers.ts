@@ -514,6 +514,26 @@ export const appRouter = router({
         });
         return { success: true };
       }),
+    
+    connectApollo: protectedProcedure
+      .input(z.object({ apiKey: z.string() }))
+      .mutation(async ({ input, ctx }) => {
+        const { connectApollo } = await import("./apollo");
+        return connectApollo(ctx.user.tenantId, input.apiKey);
+      }),
+    
+    syncApolloContacts: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const { syncApolloContacts } = await import("./apollo");
+        return syncApolloContacts(ctx.user.tenantId);
+      }),
+    
+    enrichPersonWithApollo: protectedProcedure
+      .input(z.object({ personId: z.string() }))
+      .mutation(async ({ input, ctx }) => {
+        const { enrichPersonWithApollo } = await import("./apollo");
+        return enrichPersonWithApollo(ctx.user.tenantId, input.personId);
+      }),
   }),
 });
 

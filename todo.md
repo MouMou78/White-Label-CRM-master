@@ -166,3 +166,18 @@
 - [x] Add text input for user questions
 - [x] Enable send button functionality
 - [x] Add WhatsApp integration to Integrations page
+
+## Project Renaming
+- [x] Update HTML title to "1twenty CRM"
+- [x] Update dashboard welcome message
+- [x] Update any other references to project name
+
+## Apollo.io Integration
+- [x] Add apollo to integrations provider enum in database
+- [x] Create Apollo.io integration backend module
+- [x] Build Apollo connection endpoint with API key
+- [x] Implement contact sync from Apollo
+- [x] Implement data enrichment for people
+- [ ] Add engagement tracking (emails, calls, sequences)
+- [x] Create Apollo integration card in UI
+- [ ] Test Apollo connection and sync

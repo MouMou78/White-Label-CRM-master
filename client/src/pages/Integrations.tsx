@@ -11,6 +11,7 @@ import { toast } from "sonner";
 export default function Integrations() {
   const { data: integrations, isLoading } = trpc.integrations.list.useQuery();
   const [amplemarketKey, setAmplemarketKey] = useState("");
+  const [apolloKey, setApolloKey] = useState("");
   
   const connectAmplemarket = trpc.integrations.connectAmplemarket.useMutation({
     onSuccess: () => {
@@ -21,6 +22,25 @@ export default function Integrations() {
       toast.error("Failed to connect Amplemarket");
     },
   });
+  
+  const connectApollo = trpc.integrations.connectApollo.useMutation({
+    onSuccess: () => {
+      toast.success("Apollo.io connected successfully");
+      setApolloKey("");
+    },
+    onError: () => {
+      toast.error("Failed to connect Apollo.io");
+    },
+  });
+  
+  const syncApolloContacts = trpc.integrations.syncApolloContacts.useMutation({
+    onSuccess: (data) => {
+      toast.success(`Synced ${data.syncedCount} contacts from Apollo.io`);
+    },
+    onError: () => {
+      toast.error("Failed to sync Apollo contacts");
+    },
+  });
 
   const handleConnectAmplemarket = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -28,10 +48,18 @@ export default function Integrations() {
     
     await connectAmplemarket.mutateAsync({ apiKey: amplemarketKey });
   };
+  
+  const handleConnectApollo = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!apolloKey.trim()) return;
+    
+    await connectApollo.mutateAsync({ apiKey: apolloKey });
+  };
 
   const googleIntegration = integrations?.find((i) => i.provider === "google");
   const amplemarketIntegration = integrations?.find((i) => i.provider === "amplemarket");
   const whatsappIntegration = integrations?.find((i) => i.provider === "whatsapp");
+  const apolloIntegration = integrations?.find((i) => i.provider === "apollo");
 
   return (
     <div className="space-y-6">
@@ -170,6 +198,78 @@ export default function Integrations() {
             </CardContent>
           </Card>
 
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle>Apollo.io</CardTitle>
+                  <CardDescription>Contact enrichment and sync</CardDescription>
+                </div>
+                {apolloIntegration?.status === "connected" ? (
+                  <Badge variant="default" className="gap-1">
+                    <CheckCircle2 className="w-3 h-3" />
+                    Connected
+                  </Badge>
+                ) : (
+                  <Badge variant="secondary" className="gap-1">
+                    <XCircle className="w-3 h-3" />
+                    Disconnected
+                  </Badge>
+                )}
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                <p className="text-sm text-muted-foreground">
+                  Sync contacts and enrich people data from Apollo.io.
+                </p>
+                
+                <div className="space-y-2">
+                  <p className="text-sm font-medium">Features:</p>
+                  <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                    <li>Contact sync from Apollo</li>
+                    <li>Data enrichment (title, company, phone)</li>
+                    <li>LinkedIn profile matching</li>
+                    <li>Engagement tracking</li>
+                  </ul>
+                </div>
+
+                {apolloIntegration?.status === "connected" ? (
+                  <Button 
+                    className="w-full" 
+                    onClick={() => syncApolloContacts.mutate()}
+                    disabled={syncApolloContacts.isPending}
+                  >
+                    {syncApolloContacts.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                    Sync Contacts
+                  </Button>
+                ) : (
+                  <form onSubmit={handleConnectApollo} className="space-y-3">
+                    <div>
+                      <Label htmlFor="apollo-key">API Key</Label>
+                      <Input
+                        id="apollo-key"
+                        type="password"
+                        placeholder="Enter your Apollo.io API key"
+                        value={apolloKey}
+                        onChange={(e) => setApolloKey(e.target.value)}
+                      />
+                    </div>
+                    <Button 
+                      type="submit" 
+                      className="w-full"
+                      disabled={connectApollo.isPending}
+                    >
+                      {connectApollo.isPending && <Loader2 className="w-4 h-4 mr-2 animate-spin" />}
+                      <LinkIcon className="w-4 h-4 mr-2" />
+                      Connect Apollo.io
+                    </Button>
+                  </form>
+                )}
+              </div>
+            </CardContent>
+          </Card>
+          
           <Card>
             <CardHeader>
               <div className="flex items-center justify-between">

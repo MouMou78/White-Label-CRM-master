@@ -12,6 +12,8 @@ import Events from "./pages/Events";
 import EventDetail from "./pages/EventDetail";
 import PublicLeadCapture from "./pages/PublicLeadCapture";
 import Integrations from "./pages/Integrations";
+import Funnel from "./pages/Funnel";
+import Analytics from "./pages/Analytics";
 import DashboardLayout from "./components/DashboardLayout";
 
 function Router() {
@@ -66,6 +68,18 @@ function Router() {
       <Route path="/integrations">
         <DashboardLayout>
           <Integrations />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/funnel">
+        <DashboardLayout>
+          <Funnel />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/analytics">
+        <DashboardLayout>
+          <Analytics />
         </DashboardLayout>
       </Route>
       

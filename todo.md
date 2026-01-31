@@ -125,10 +125,10 @@
 - [x] Implement funnel health analytics
 - [x] Implement follow-up discipline analytics
 - [x] Implement velocity analytics
-- [ ] Update rules engine with owner assignment on thread creation
-- [ ] Update rules engine with due_at auto-set for date triggers
-- [ ] Update rules engine to assign actions to thread owner
-- [ ] Create Funnel page with Kanban view
-- [ ] Create Analytics page with charts and metrics
+- [x] Update rules engine with owner assignment on thread creation
+- [x] Update rules engine with due_at auto-set for date triggers
+- [x] Update rules engine to assign actions to thread owner
+- [x] Create Funnel page with Kanban view
+- [x] Create Analytics page with charts and metrics
 - [ ] Add user scope toggle to Home page (me/team)
 - [ ] Implement thread access control based on visibility

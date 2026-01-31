@@ -121,12 +121,18 @@ async function executeAction(moment: Moment, action: string, params?: Record<str
       break;
     
     case "create_next_action":
+      // Get thread to assign action to owner
+      const thread = await db.getThreadById(moment.threadId);
+      const dueAt = params?.triggerValue ? parseTriggerDate(params.triggerValue) : null;
+      
       await db.createNextAction({
         tenantId: moment.tenantId,
         threadId: moment.threadId,
         actionType: params?.actionType || "follow_up",
         triggerType: params?.triggerType || "date",
         triggerValue: params?.triggerValue || "now",
+        assignedUserId: thread?.ownerUserId || null,
+        dueAt,
       });
       break;
     
@@ -150,12 +156,18 @@ async function createNextActionIfNoReply(moment: Moment, params?: Record<string,
   const hasReply = laterMoments.some(m => m.type === "reply_received");
   
   if (!hasReply) {
+    // Get thread to assign action to owner
+    const thread = await db.getThreadById(moment.threadId);
+    const dueAt = params?.triggerValue ? parseTriggerDate(params.triggerValue) : null;
+    
     await db.createNextAction({
       tenantId: moment.tenantId,
       threadId: moment.threadId,
       actionType: params?.actionType || "follow_up",
       triggerType: params?.triggerType || "date",
       triggerValue: params?.triggerValue || "now+4bd",
+      assignedUserId: thread?.ownerUserId || null,
+      dueAt,
     });
   }
 }

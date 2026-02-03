@@ -33,7 +33,7 @@ export default function Demo() {
       const result = await clearMutation.mutateAsync();
       setStatus({
         type: "success",
-        message: result.message || `Demo data cleared! Found ${result.peopleFound} contacts and ${result.threadsFound} deals.`,
+        message: result.message || `Demo data cleared! Deleted ${result.peopleDeleted} contacts and ${result.threadsDeleted} deals.`,
       });
     } catch (error: any) {
       setStatus({

@@ -515,6 +515,21 @@ export const appRouter = router({
       }),
   }),
   
+  amplemarket: router({ getAccountById: protectedProcedure
+      .input(z.object({ accountId: z.string() }))
+      .query(async ({ input, ctx }) => {
+        const accounts = await db.getAccountsByTenant(ctx.user.tenantId);
+        return accounts.find((a: any) => a.id === input.accountId) || null;
+      }),
+    
+    getContactsByAccount: protectedProcedure
+      .input(z.object({ accountId: z.string() }))
+      .query(async ({ input, ctx }) => {
+        const people = await db.getPeopleByTenant(ctx.user.tenantId);
+        return people.filter((p: any) => p.accountId === input.accountId);
+      }),
+  }),
+  
   integrations: router({
     list: protectedProcedure.query(async ({ ctx }) => {
       return db.getIntegrationsByTenant(ctx.user.tenantId);

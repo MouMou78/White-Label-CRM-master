@@ -5,6 +5,7 @@ import { Button } from "@/components/ui/button";
 import { Loader2, Search, Building2, MapPin, Users, DollarSign, Calendar } from "lucide-react";
 import { useState } from "react";
 import { Badge } from "@/components/ui/badge";
+import { Link } from "wouter";
 
 export default function AmplemarketAccounts() {
   const { data: accounts, isLoading, refetch } = trpc.integrations.listAmplemarketAccounts.useQuery();
@@ -66,7 +67,8 @@ export default function AmplemarketAccounts() {
           ) : filteredAccounts && filteredAccounts.length > 0 ? (
             <div className="space-y-3">
               {filteredAccounts.map((account) => (
-                <div key={account.id} className="p-4 border rounded-lg hover:bg-accent transition-colors">
+                <Link key={account.id} href={`/accounts/${account.id}`} className="block">
+                  <div className="p-4 border rounded-lg hover:bg-accent transition-colors cursor-pointer">
                   <div className="flex items-start justify-between">
                     <div className="flex-1 space-y-3">
                       <div className="flex items-center gap-3">
@@ -143,7 +145,8 @@ export default function AmplemarketAccounts() {
                       </div>
                     </div>
                   </div>
-                </div>
+                  </div>
+                </Link>
               ))}
             </div>
           ) : (

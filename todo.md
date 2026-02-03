@@ -260,3 +260,24 @@
 - [x] Add "Clear Demo Data" functionality
 - [x] Add tRPC endpoint to trigger demo data generation
 - [x] Create Demo page with generate and clear controls
+
+## Bug Fixes
+- [x] Fix demo data clear functionality (not working on mobile)
+- [x] Debug clearDemoData backend function
+- [ ] Test clear functionality on mobile and desktop
+
+## AI Assistant Streaming
+- [x] Implement streaming responses in AI Assistant backend
+- [x] Update frontend to handle streaming responses
+- [x] Add loading indicators for streaming state
+- [ ] Test streaming with various queries
+
+## Account Detail Page
+- [ ] Create AccountDetail.tsx page component
+- [ ] Add route for /accounts/:id
+- [ ] Design layout matching Amplemarket (sidebar + tabs)
+- [ ] Add Overview tab with company information
+- [ ] Add Performance section with metrics
+- [ ] Add Decision Makers table
+- [ ] Add Activity timeline
+- [ ] Link from Amplemarket Accounts list

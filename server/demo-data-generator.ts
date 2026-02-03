@@ -1,5 +1,7 @@
 import * as db from "./db";
 import { nanoid } from "nanoid";
+import { people, threads, moments, nextActions } from "../drizzle/schema";
+import { eq, and, like, inArray, sql } from "drizzle-orm";
 
 const DEMO_COMPANIES = [
   { name: "Acme Corp", domain: "acme.com", industry: "Technology", employees: "50-200", revenue: "$5M-$10M" },
@@ -154,23 +156,60 @@ export async function generateDemoData(tenantId: string) {
 
 export async function clearDemoData(tenantId: string) {
   console.log("[Demo] Clearing demo data for tenant:", tenantId);
-  console.log("[Demo] Note: Demo data clearing requires manual database cleanup or delete functions to be implemented");
   
-  // Get all demo-tagged items for counting
-  const people = await db.getPeopleBySource(tenantId, "demo");
-  const threads = await db.getThreadsByTenant(tenantId);
-  const demoThreads = threads.filter((t: any) => t.tags?.includes("demo-data"));
+  // Get all demo-tagged items for counting before deletion
+  const demoPeople = await db.getPeopleBySource(tenantId, "demo");
+  const allThreads = await db.getThreadsByTenant(tenantId);
+  const demoThreads = allThreads.filter((t: any) => t.tags?.includes("demo-data"));
   
   console.log("[Demo] Found demo data to clear:");
-  console.log(`[Demo] - ${people.length} people`);
+  console.log(`[Demo] - ${demoPeople.length} people`);
   console.log(`[Demo] - ${demoThreads.length} threads`);
   
-  // TODO: Implement delete functions in db.ts or use direct SQL
-  // For now, return counts without deleting
+  // Delete demo data using direct SQL
+  const database = await db.getDb();
+  
+  if (!database) {
+    throw new Error("Database connection not available");
+  }
+  
+  // Delete moments for demo threads
+  if (demoThreads.length > 0) {
+    const threadIds = demoThreads.map((t: any) => t.id);
+    await database.delete(moments).where(
+      and(
+        eq(moments.tenantId, tenantId),
+        inArray(moments.threadId, threadIds)
+      )
+    );
+  }
+  
+  // Delete next actions for demo threads
+  if (demoThreads.length > 0) {
+    const threadIds = demoThreads.map((t: any) => t.id);
+    await database.delete(nextActions).where(
+      and(
+        eq(nextActions.tenantId, tenantId),
+        inArray(nextActions.threadId, threadIds)
+      )
+    );
+  }
+  
+  // Delete demo threads (using tags JSON column - search for demo-data in array)
+  await database.execute(
+    sql`DELETE FROM threads WHERE tenantId = ${tenantId} AND JSON_CONTAINS(tags, '"demo-data"')`
+  );
+  
+  // Delete demo people (using source column)
+  await database.execute(
+    sql`DELETE FROM people WHERE tenantId = ${tenantId} AND source = 'demo'`
+  );
+  
+  console.log("[Demo] Successfully cleared demo data");
   
   return {
-    peopleFound: people.length,
-    threadsFound: demoThreads.length,
-    message: "Delete functions not yet implemented. Use database UI to clear demo data.",
+    peopleDeleted: demoPeople.length,
+    threadsDeleted: demoThreads.length,
+    message: `Successfully cleared ${demoPeople.length} contacts and ${demoThreads.length} deals.`,
   };
 }

@@ -402,3 +402,9 @@ export async function getPeopleBySource(tenantId: string, source: string): Promi
     ))
     .orderBy(desc(people.createdAt));
 }
+
+export async function getAccountsByTenant(tenantId: string) {
+  const database = await getDb();
+  if (!database) return [];
+  return database.select().from(accounts).where(eq(accounts.tenantId, tenantId));
+}

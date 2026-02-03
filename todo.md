@@ -225,3 +225,4 @@
 
 ## UI Improvements
 - [x] Increase 1twenty logo size in sidebar for better visibility
+- [x] Make logo significantly larger (h-20) for much better visibility

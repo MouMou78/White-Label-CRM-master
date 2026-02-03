@@ -15,6 +15,7 @@ import Integrations from "./pages/Integrations";
 import Funnel from "./pages/Funnel";
 import Analytics from "./pages/Analytics";
 import Assistant from "./pages/Assistant";
+import AIAssistant from "./pages/AIAssistant";
 import AmplemarketAccounts from "./pages/AmplemarketAccounts";
 import AmplemarketPeople from "./pages/AmplemarketPeople";
 import DashboardLayout from "./components/DashboardLayout";
@@ -101,6 +102,12 @@ function Router() {
       <Route path="/assistant">
         <DashboardLayout>
           <Assistant />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/ai-assistant">
+        <DashboardLayout>
+          <AIAssistant />
         </DashboardLayout>
       </Route>
       

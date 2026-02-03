@@ -226,3 +226,16 @@
 ## UI Improvements
 - [x] Increase 1twenty logo size in sidebar for better visibility
 - [x] Make logo significantly larger (h-20) for much better visibility
+
+## Testing & Integration Review
+- [x] Test all navigation links (Home, People, Funnel, Analytics, AI Assistant, Events, Integrations, Amplemarket pages)
+- [x] Check for 404 errors on all pages
+- [x] Review Google Workspace integration requirements
+- [x] Review Amplemarket integration requirements
+- [x] Review Apollo.io integration requirements
+- [x] Review WhatsApp Business integration requirements
+- [x] Document what's needed to make each integration live
+- [x] Fix AI Assistant 404 error (route not defined in App.tsx)
+  - [x] Create AIAssistant.tsx page
+  - [x] Add route to App.tsx
+  - [x] Test navigation

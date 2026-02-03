@@ -16,24 +16,27 @@ export default function AIAssistant() {
   const [input, setInput] = useState("");
   const [isLoading, setIsLoading] = useState(false);
 
+  const chatMutation = trpc.assistant.chat.useMutation();
+
   const handleSend = async () => {
     if (!input.trim() || isLoading) return;
 
     const userMessage = input.trim();
     setInput("");
-    setMessages(prev => [...prev, { role: "user", content: userMessage }]);
+    const newMessages = [...messages, { role: "user" as const, content: userMessage }];
+    setMessages(newMessages);
     setIsLoading(true);
 
     try {
-      // TODO: Implement actual AI assistant backend endpoint
-      // For now, show a placeholder response
-      await new Promise(resolve => setTimeout(resolve, 1000));
+      const result = await chatMutation.mutateAsync({
+        messages: newMessages,
+      });
       
       setMessages(prev => [...prev, {
         role: "assistant",
-        content: "I'm currently being set up to help you with your CRM data. Soon I'll be able to:\n\n- Search through your contacts\n- Analyze funnel performance\n- Track engagement metrics\n- Answer questions about deals and opportunities\n\nStay tuned for updates!"
+        content: result.response
       }]);
-    } catch (error) {
+    } catch (error: any) {
       setMessages(prev => [...prev, {
         role: "assistant",
         content: "Sorry, I encountered an error. Please try again."

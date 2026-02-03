@@ -483,14 +483,35 @@ export const appRouter = router({
   }),
   
   assistant: router({
-    query: protectedProcedure
-      .input(z.object({ query: z.string() }))
+    chat: protectedProcedure
+      .input(z.object({
+        messages: z.array(z.object({
+          role: z.enum(["system", "user", "assistant"]),
+          content: z.string(),
+        })),
+      }))
       .mutation(async ({ input, ctx }) => {
-        const { processAssistantQuery } = await import("./ai-assistant");
-        return processAssistantQuery(input.query, {
-          tenantId: ctx.user.tenantId,
-          userId: ctx.user.id,
+        const { queryAIAssistant } = await import("./aiAssistant");
+        const response = await queryAIAssistant({
+          tenantId: parseInt(ctx.user.tenantId),
+          userId: parseInt(ctx.user.id),
+          messages: input.messages,
         });
+        return { response };
+      }),
+  }),
+  
+  demo: router({
+    generate: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const { generateDemoData } = await import("./demo-data-generator");
+        return generateDemoData(ctx.user.tenantId);
+      }),
+    
+    clear: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const { clearDemoData } = await import("./demo-data-generator");
+        return clearDemoData(ctx.user.tenantId);
       }),
   }),
   

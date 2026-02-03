@@ -239,3 +239,24 @@
   - [x] Create AIAssistant.tsx page
   - [x] Add route to App.tsx
   - [x] Test navigation
+
+## AI Assistant Backend Implementation
+- [x] Create AI Assistant tRPC endpoint
+- [x] Integrate LLM for CRM data querying
+- [x] Add context about contacts, deals, funnel metrics
+- [ ] Implement streaming responses
+- [x] Connect frontend to backend endpoint
+- [x] Test AI Assistant page navigation and UI
+- [x] Test Demo Environment page and controls
+
+## Demo Environment
+- [x] Create demo data generator script
+- [x] Generate sample contacts (20+)
+- [x] Generate sample deals across all funnel stages
+- [x] Generate sample moments (emails, calls, meetings)
+- [x] Add demo mode toggle to database
+- [x] Create "Demo Environment" link in sidebar
+- [x] Implement demo data isolation from production
+- [x] Add "Clear Demo Data" functionality
+- [x] Add tRPC endpoint to trigger demo data generation
+- [x] Create Demo page with generate and clear controls

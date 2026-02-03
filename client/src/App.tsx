@@ -18,6 +18,7 @@ import Assistant from "./pages/Assistant";
 import AIAssistant from "./pages/AIAssistant";
 import AmplemarketAccounts from "./pages/AmplemarketAccounts";
 import AmplemarketPeople from "./pages/AmplemarketPeople";
+import Demo from "./pages/Demo";
 import DashboardLayout from "./components/DashboardLayout";
 
 function Router() {
@@ -84,6 +85,12 @@ function Router() {
       <Route path="/amplemarket/people">
         <DashboardLayout>
           <AmplemarketPeople />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/demo">
+        <DashboardLayout>
+          <Demo />
         </DashboardLayout>
       </Route>
       

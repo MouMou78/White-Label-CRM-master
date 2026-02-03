@@ -70,12 +70,15 @@ export default function People() {
                         </div>
                       </div>
                     </div>
-                    <div className="text-right">
+                    <div className="text-right space-y-1">
                       {person.companyName && (
                         <p className="text-sm font-medium">{person.companyName}</p>
                       )}
                       {person.roleTitle && (
                         <p className="text-sm text-muted-foreground">{person.roleTitle}</p>
+                      )}
+                      {person.location && (
+                        <p className="text-xs text-muted-foreground">{person.location}</p>
                       )}
                     </div>
                   </div>

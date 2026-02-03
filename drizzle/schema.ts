@@ -1,4 +1,4 @@
-import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, json, index, unique } from "drizzle-orm/mysql-core";
+import { int, mysqlEnum, mysqlTable, text, timestamp, varchar, json, index, unique, boolean } from "drizzle-orm/mysql-core";
 
 /**
  * Multi-tenant CRM schema for KompassCRM
@@ -32,15 +32,75 @@ export const users = mysqlTable("users", {
 export type User = typeof users.$inferSelect;
 export type InsertUser = typeof users.$inferInsert;
 
+export const accounts = mysqlTable("accounts", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  tenantId: varchar("tenantId", { length: 36 }).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  domain: varchar("domain", { length: 255 }),
+  industry: text("industry"),
+  employees: varchar("employees", { length: 50 }),
+  revenue: varchar("revenue", { length: 100 }),
+  technologies: json("technologies").$type<string[]>(),
+  headquarters: text("headquarters"),
+  foundingYear: int("foundingYear"),
+  lastFundingRound: varchar("lastFundingRound", { length: 100 }),
+  firstContacted: timestamp("firstContacted"),
+  linkedinUrl: varchar("linkedinUrl", { length: 500 }),
+  enrichmentSource: text("enrichmentSource"),
+  enrichmentSnapshot: json("enrichmentSnapshot").$type<Record<string, any>>(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  tenantDomainIdx: index("tenant_domain_idx").on(table.tenantId, table.domain),
+  tenantNameIdx: index("tenant_account_name_idx").on(table.tenantId, table.name),
+}));
+
+export type Account = typeof accounts.$inferSelect;
+export type InsertAccount = typeof accounts.$inferInsert;
+
 export const people = mysqlTable("people", {
   id: varchar("id", { length: 36 }).primaryKey(),
   tenantId: varchar("tenantId", { length: 36 }).notNull(),
+  accountId: varchar("accountId", { length: 36 }),
   fullName: text("fullName").notNull(),
+  firstName: varchar("firstName", { length: 100 }),
+  lastName: varchar("lastName", { length: 100 }),
   primaryEmail: varchar("primaryEmail", { length: 320 }).notNull(),
   secondaryEmails: json("secondaryEmails").$type<string[]>().default([]),
   companyName: text("companyName"),
+  companyDomain: varchar("companyDomain", { length: 255 }),
+  companySize: varchar("companySize", { length: 50 }),
   roleTitle: text("roleTitle"),
+  simplifiedTitle: text("simplifiedTitle"),
   phone: varchar("phone", { length: 50 }),
+  manuallyAddedNumber: varchar("manuallyAddedNumber", { length: 50 }),
+  manuallyAddedNumberDncStatus: varchar("manuallyAddedNumberDncStatus", { length: 20 }),
+  sourcedNumber: varchar("sourcedNumber", { length: 50 }),
+  sourcedNumberDncStatus: varchar("sourcedNumberDncStatus", { length: 20 }),
+  mobileNumber: varchar("mobileNumber", { length: 50 }),
+  mobileNumberDncStatus: varchar("mobileNumberDncStatus", { length: 20 }),
+  workNumber: varchar("workNumber", { length: 50 }),
+  workNumberDncStatus: varchar("workNumberDncStatus", { length: 20 }),
+  city: varchar("city", { length: 100 }),
+  state: varchar("state", { length: 100 }),
+  country: varchar("country", { length: 100 }),
+  location: text("location"),
+  linkedinUrl: varchar("linkedinUrl", { length: 500 }),
+  industry: text("industry"),
+  status: varchar("status", { length: 50 }),
+  numberOfOpens: int("numberOfOpens").default(0),
+  label: varchar("label", { length: 100 }),
+  meetingBooked: boolean("meetingBooked").default(false),
+  owner: varchar("owner", { length: 320 }),
+  sequenceName: text("sequenceName"),
+  sequenceTemplateName: text("sequenceTemplateName"),
+  savedSearchOrLeadListName: text("savedSearchOrLeadListName"),
+  mailbox: varchar("mailbox", { length: 320 }),
+  contactUrl: varchar("contactUrl", { length: 500 }),
+  replied: boolean("replied").default(false),
+  lastStageExecuted: int("lastStageExecuted"),
+  lastStageExecutedAt: timestamp("lastStageExecutedAt"),
+  notes: text("notes"),
   tags: json("tags").$type<string[]>().default([]),
   enrichmentSource: text("enrichmentSource"),
   enrichmentSnapshot: json("enrichmentSnapshot").$type<Record<string, any>>(),

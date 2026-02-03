@@ -1,0 +1,1 @@
+ALTER TABLE `accounts` MODIFY COLUMN `name` varchar(255) NOT NULL;

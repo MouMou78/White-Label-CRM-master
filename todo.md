@@ -186,3 +186,20 @@
 - [x] Create Apollo integration card in UI
 - [x] Test Apollo connection and sync
 - [x] Test engagement tracking with sample data
+
+## Amplemarket Schema Enhancement
+- [x] Create accounts table with company-level fields
+- [x] Add industry, employees, revenue, technologies, headquarters, founding_year fields
+- [x] Add last_funding_round, first_contacted, domain, linkedin_url fields
+- [x] Update people table with Amplemarket contact fields
+- [x] Add simplified_title, city, state, country, location fields to people
+- [x] Add company_size, status, number_of_opens, label, meeting_booked fields
+- [x] Add owner, sequence_name, sequence_template_name fields
+- [x] Add multiple phone number fields (manually_added, sourced, mobile, work)
+- [x] Add DNC status fields for each phone number type
+- [x] Add replied, last_stage_executed, last_stage_executed_at fields
+- [x] Link people to accounts via accountId foreign key
+- [ ] Update Amplemarket integration to sync accounts
+- [ ] Update Amplemarket integration to sync contacts with all fields
+- [ ] Create accounts UI page to display company information
+- [x] Update person detail page to show linked account information

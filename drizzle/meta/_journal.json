@@ -22,6 +22,20 @@
       "when": 1769849034224,
       "tag": "0002_fat_shape",
       "breakpoints": true
+    },
+    {
+      "idx": 3,
+      "version": "5",
+      "when": 1770150129128,
+      "tag": "0003_colossal_kid_colt",
+      "breakpoints": true
+    },
+    {
+      "idx": 4,
+      "version": "5",
+      "when": 1770150177451,
+      "tag": "0004_curved_iron_man",
+      "breakpoints": true
     }
   ]
 }

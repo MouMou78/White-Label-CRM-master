@@ -197,10 +197,20 @@ export default function Integrations() {
                 )}
 
                 {amplemarketIntegration?.status === "connected" && (
-                  <div className="p-3 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
-                    <p className="text-sm text-green-800 dark:text-green-200">
-                      Amplemarket is connected and syncing data.
-                    </p>
+                  <div className="space-y-3">
+                    <div className="p-3 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
+                      <p className="text-sm text-green-800 dark:text-green-200">
+                        Amplemarket is connected and syncing data.
+                      </p>
+                    </div>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button variant="outline" asChild className="w-full">
+                        <a href="/amplemarket/accounts">View Accounts</a>
+                      </Button>
+                      <Button variant="outline" asChild className="w-full">
+                        <a href="/amplemarket/people">View People</a>
+                      </Button>
+                    </div>
                   </div>
                 )}
               </div>

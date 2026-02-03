@@ -515,6 +515,30 @@ export const appRouter = router({
         return { success: true };
       }),
     
+    syncAmplemarket: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const { syncAmplemarket } = await import("./amplemarket");
+        const integrations = await db.getIntegrationsByTenant(ctx.user.tenantId);
+        const amplemarketIntegration = integrations.find((i: any) => i.provider === "amplemarket");
+        if (!amplemarketIntegration || amplemarketIntegration.status !== "connected") {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Amplemarket not connected" });
+        }
+        const apiKey = (amplemarketIntegration.config as any)?.apiKey;
+        if (!apiKey) throw new TRPCError({ code: "BAD_REQUEST", message: "Amplemarket API key not found" });
+        const dbInstance = await db.getDb();
+        return syncAmplemarket(dbInstance, ctx.user.tenantId, apiKey);
+      }),
+    
+    listAmplemarketAccounts: protectedProcedure
+      .query(async ({ ctx }) => {
+        return db.getAccountsBySource(ctx.user.tenantId, "amplemarket");
+      }),
+    
+    listAmplemarketPeople: protectedProcedure
+      .query(async ({ ctx }) => {
+        return db.getPeopleBySource(ctx.user.tenantId, "amplemarket");
+      }),
+    
     connectApollo: protectedProcedure
       .input(z.object({ apiKey: z.string() }))
       .mutation(async ({ input, ctx }) => {

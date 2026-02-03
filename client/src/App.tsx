@@ -15,6 +15,8 @@ import Integrations from "./pages/Integrations";
 import Funnel from "./pages/Funnel";
 import Analytics from "./pages/Analytics";
 import Assistant from "./pages/Assistant";
+import AmplemarketAccounts from "./pages/AmplemarketAccounts";
+import AmplemarketPeople from "./pages/AmplemarketPeople";
 import DashboardLayout from "./components/DashboardLayout";
 
 function Router() {
@@ -69,6 +71,18 @@ function Router() {
       <Route path="/integrations">
         <DashboardLayout>
           <Integrations />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/amplemarket/accounts">
+        <DashboardLayout>
+          <AmplemarketAccounts />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/amplemarket/people">
+        <DashboardLayout>
+          <AmplemarketPeople />
         </DashboardLayout>
       </Route>
       

@@ -203,3 +203,16 @@
 - [ ] Update Amplemarket integration to sync contacts with all fields
 - [ ] Create accounts UI page to display company information
 - [x] Update person detail page to show linked account information
+
+## Amplemarket Dedicated Pages
+- [x] Update Amplemarket backend to sync all account fields
+- [x] Update Amplemarket backend to sync all contact fields
+- [x] Create Amplemarket Accounts page with full field display
+- [x] Add filtering by industry, size, revenue on Accounts page
+- [x] Create Amplemarket People page with full field display
+- [x] Add filtering by status, sequence, location on People page
+- [x] Enhance person detail view with phone numbers section
+- [x] Add engagement metrics section to person detail
+- [x] Add linked account information to person detail
+- [x] Add navigation links to Amplemarket pages
+- [x] Test Amplemarket sync with all fields

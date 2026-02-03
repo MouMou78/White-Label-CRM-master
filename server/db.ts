@@ -3,6 +3,7 @@ import { drizzle } from "drizzle-orm/mysql2";
 import {
   tenants, Tenant, InsertTenant,
   users, User, InsertUser,
+  accounts, Account, InsertAccount,
   people, Person, InsertPerson,
   threads, Thread, InsertThread,
   moments, Moment, InsertMoment,
@@ -370,4 +371,34 @@ export async function getNextActionsByThread(tenantId: string, threadId: string)
     .from(nextActions)
     .where(and(eq(nextActions.tenantId, tenantId), eq(nextActions.threadId, threadId)))
     .orderBy(desc(nextActions.createdAt));
+}
+
+// ============ ACCOUNTS ============
+
+export async function getAccountsBySource(tenantId: string, source: string): Promise<any[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db
+    .select()
+    .from(accounts)
+    .where(and(
+      eq(accounts.tenantId, tenantId),
+      eq(accounts.enrichmentSource, source)
+    ))
+    .orderBy(desc(accounts.createdAt));
+}
+
+export async function getPeopleBySource(tenantId: string, source: string): Promise<Person[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db
+    .select()
+    .from(people)
+    .where(and(
+      eq(people.tenantId, tenantId),
+      eq(people.enrichmentSource, source)
+    ))
+    .orderBy(desc(people.createdAt));
 }

@@ -2,7 +2,7 @@ import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Mail, Phone, Building, Briefcase, Plus } from "lucide-react";
+import { Loader2, Mail, Phone, Building, Briefcase, Plus, MapPin, ExternalLink, TrendingUp, CheckCircle2 } from "lucide-react";
 import { Link } from "wouter";
 
 interface PersonDetailProps {
@@ -73,13 +73,91 @@ export default function PersonDetail({ personId }: PersonDetailProps) {
               <p className="text-sm text-muted-foreground">{person.primaryEmail}</p>
             </div>
             
-            {person.phone && (
+            {(person.phone || person.mobileNumber || person.workNumber || person.sourcedNumber) && (
+              <div>
+                <div className="flex items-center gap-2 text-sm font-medium mb-2">
+                  <Phone className="w-4 h-4" />
+                  Phone Numbers
+                </div>
+                <div className="space-y-1">
+                  {person.phone && (
+                    <p className="text-sm text-muted-foreground">Primary: {person.phone}</p>
+                  )}
+                  {person.mobileNumber && (
+                    <p className="text-sm text-muted-foreground">Mobile: {person.mobileNumber}</p>
+                  )}
+                  {person.workNumber && (
+                    <p className="text-sm text-muted-foreground">Work: {person.workNumber}</p>
+                  )}
+                  {person.sourcedNumber && (
+                    <p className="text-sm text-muted-foreground">Sourced: {person.sourcedNumber}</p>
+                  )}
+                </div>
+              </div>
+            )}
+
+            {person.location && (
               <div>
                 <div className="flex items-center gap-2 text-sm font-medium mb-1">
-                  <Phone className="w-4 h-4" />
-                  Phone
+                  <MapPin className="w-4 h-4" />
+                  Location
                 </div>
-                <p className="text-sm text-muted-foreground">{person.phone}</p>
+                <p className="text-sm text-muted-foreground">{person.location}</p>
+              </div>
+            )}
+
+            {person.linkedinUrl && (
+              <div>
+                <a
+                  href={person.linkedinUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="flex items-center gap-2 text-sm text-primary hover:underline"
+                >
+                  <ExternalLink className="w-4 h-4" />
+                  LinkedIn Profile
+                </a>
+              </div>
+            )}
+
+            {person.enrichmentSource === "amplemarket" && (
+              <div className="pt-4 border-t">
+                <div className="flex items-center gap-2 text-sm font-medium mb-3">
+                  <TrendingUp className="w-4 h-4" />
+                  Engagement Metrics
+                </div>
+                <div className="space-y-2">
+                  {person.status && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Status</span>
+                      <Badge variant="outline">{person.status}</Badge>
+                    </div>
+                  )}
+                  {person.numberOfOpens !== null && person.numberOfOpens !== undefined && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Email Opens</span>
+                      <span className="font-medium">{person.numberOfOpens}</span>
+                    </div>
+                  )}
+                  {person.replied && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Replied</span>
+                      <CheckCircle2 className="w-4 h-4 text-green-600" />
+                    </div>
+                  )}
+                  {person.meetingBooked && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Meeting Booked</span>
+                      <CheckCircle2 className="w-4 h-4 text-blue-600" />
+                    </div>
+                  )}
+                  {person.sequenceName && (
+                    <div className="flex justify-between text-sm">
+                      <span className="text-muted-foreground">Sequence</span>
+                      <span className="font-medium text-xs">{person.sequenceName}</span>
+                    </div>
+                  )}
+                </div>
               </div>
             )}
 

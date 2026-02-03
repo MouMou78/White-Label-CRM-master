@@ -21,7 +21,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { Home, LogOut, PanelLeft, Users, Calendar, Settings, BarChart3, TrendingUp, Sparkles, Building2, UserCircle, Database, Zap } from "lucide-react";
+import { Home, LogOut, PanelLeft, Users, Calendar, Settings, BarChart3, TrendingUp, Sparkles, Building2, UserCircle, Database, Zap, Mail, Sliders } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -33,9 +33,11 @@ const menuItems = [
   { icon: BarChart3, label: "Funnel", path: "/funnel" },
   { icon: TrendingUp, label: "Analytics", path: "/analytics" },
   { icon: Zap, label: "Automation", path: "/automation" },
+  { icon: Mail, label: "Sequences", path: "/sequences" },
   { icon: Sparkles, label: "AI Assistant", path: "/ai-assistant" },
   { icon: Calendar, label: "Events", path: "/events" },
   { icon: Settings, label: "Integrations", path: "/integrations" },
+  { icon: Sliders, label: "Custom Fields", path: "/custom-fields" },
   { icon: Building2, label: "Amplemarket Accounts", path: "/amplemarket/accounts" },
   { icon: UserCircle, label: "Amplemarket People", path: "/amplemarket/people" },
   { icon: Database, label: "Demo Environment", path: "/demo" },

@@ -90,28 +90,28 @@ export default function AmplemarketAccounts() {
                         </div>
                       </div>
 
-                      <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                      <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-4">
                         {account.industry && (
                           <div className="flex items-center gap-2 text-sm">
-                            <Badge variant="secondary">{account.industry}</Badge>
+                            <Badge variant="secondary" className="truncate">{account.industry}</Badge>
                           </div>
                         )}
                         {account.employees && (
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <Users className="w-4 h-4" />
-                            <span>{account.employees} employees</span>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground min-w-0">
+                            <Users className="w-4 h-4 flex-shrink-0" />
+                            <span className="truncate">{account.employees} employees</span>
                           </div>
                         )}
                         {account.revenue && (
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <DollarSign className="w-4 h-4" />
-                            <span>{account.revenue}</span>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground min-w-0">
+                            <DollarSign className="w-4 h-4 flex-shrink-0" />
+                            <span className="truncate">{account.revenue}</span>
                           </div>
                         )}
                         {account.headquarters && (
-                          <div className="flex items-center gap-2 text-sm text-muted-foreground">
-                            <MapPin className="w-4 h-4" />
-                            <span>{account.headquarters}</span>
+                          <div className="flex items-center gap-2 text-sm text-muted-foreground min-w-0">
+                            <MapPin className="w-4 h-4 flex-shrink-0" />
+                            <span className="truncate">{account.headquarters}</span>
                           </div>
                         )}
                       </div>

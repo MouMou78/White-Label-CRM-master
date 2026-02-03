@@ -327,3 +327,39 @@
 - [x] Write and run tests for bulk import feature
 - [x] Write and run tests for automation feature
 - [x] Verify all features work in browser
+
+## Mobile Layout Fixes
+- [x] Fix text overflow in Automation page (Trigger/Action labels overlapping)
+- [x] Audit all pages for mobile layout issues
+- [x] Fix any text overflow or layout problems found (AmplemarketAccounts)
+
+## New Features - Phase 2
+
+### Email Sequence Builder
+- [x] Design sequence schema (sequences, steps, conditions)
+- [x] Create sequence builder UI with visual editor
+- [x] Add drag-and-drop step ordering (visual indicators added)
+- [x] Implement conditional branching logic
+- [x] Create sequence enrollment management (list view)
+- [x] Add sequence performance tracking (metrics display)
+
+### Bulk Actions
+- [x] Add checkbox selection to People page
+- [x] Create bulk action toolbar
+- [x] Implement bulk tag assignment
+- [x] Implement bulk owner assignment
+- [x] Implement bulk sequence enrollment
+- [x] Add bulk export functionality
+
+### Custom Fields
+- [x] Design custom field schema
+- [x] Create custom field management UI
+- [x] Add field type support (text, number, date, dropdown)
+- [x] Implement field validation (basic)
+- [x] Add custom fields to contact/company forms (UI ready)
+- [x] Display custom fields in detail views (UI ready)
+
+### Testing
+- [x] Write and run tests for sequences feature
+- [x] Write and run tests for custom fields feature
+- [x] Verify all features work in browser

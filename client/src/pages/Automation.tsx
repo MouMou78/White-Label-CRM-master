@@ -113,17 +113,17 @@ export default function Automation() {
               </div>
             </CardHeader>
             <CardContent>
-              <div className="flex items-center gap-6 text-sm">
-                <div className="flex items-center gap-2">
-                  <TrendingUp className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Trigger:</span>
+              <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-6 text-sm">
+                <div className="flex items-center gap-2 flex-wrap">
+                  <TrendingUp className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                  <span className="text-muted-foreground whitespace-nowrap">Trigger:</span>
                   <Badge variant="outline" className="capitalize">
                     {rule.triggerType.replace(/_/g, " ")}
                   </Badge>
                 </div>
-                <div className="flex items-center gap-2">
-                  <Settings className="w-4 h-4 text-muted-foreground" />
-                  <span className="text-muted-foreground">Action:</span>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <Settings className="w-4 h-4 text-muted-foreground flex-shrink-0" />
+                  <span className="text-muted-foreground whitespace-nowrap">Action:</span>
                   <Badge variant="outline" className="capitalize">
                     {rule.actionType.replace(/_/g, " ")}
                   </Badge>

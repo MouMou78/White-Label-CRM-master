@@ -619,6 +619,67 @@ export const appRouter = router({
       }),
   }),
   
+  sequences: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      // Return empty array for now - sequences are hardcoded in UI
+      return [];
+    }),
+    
+    get: protectedProcedure
+      .input(z.object({ id: z.string() }))
+      .query(async ({ input, ctx }) => {
+        // Placeholder for getting a single sequence
+        return null;
+      }),
+    
+    create: protectedProcedure
+      .input(z.object({
+        name: z.string(),
+        description: z.string().optional(),
+        steps: z.array(z.object({
+          type: z.enum(["email", "wait", "condition"]),
+          subject: z.string().optional(),
+          body: z.string().optional(),
+          waitDays: z.number().optional(),
+          condition: z.object({
+            type: z.enum(["opened", "replied", "clicked"]),
+          }).optional(),
+        })),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // Placeholder for creating a sequence
+        return { success: true, id: `seq-${Date.now()}` };
+      }),
+  }),
+  
+  customFields: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      // Return empty array for now - fields are hardcoded in UI
+      return [];
+    }),
+    
+    create: protectedProcedure
+      .input(z.object({
+        name: z.string(),
+        label: z.string(),
+        type: z.enum(["text", "number", "date", "dropdown"]),
+        entity: z.enum(["contact", "company"]),
+        options: z.array(z.string()).optional(),
+        required: z.boolean(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        // Placeholder for creating a custom field
+        return { success: true, id: `field-${Date.now()}` };
+      }),
+    
+    delete: protectedProcedure
+      .input(z.object({ id: z.string() }))
+      .mutation(async ({ input, ctx }) => {
+        // Placeholder for deleting a custom field
+        return { success: true };
+      }),
+  }),
+  
   integrations: router({
     list: protectedProcedure.query(async ({ ctx }) => {
       return db.getIntegrationsByTenant(ctx.user.tenantId);

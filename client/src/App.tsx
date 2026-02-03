@@ -22,6 +22,9 @@ import AccountDetail from "./pages/AccountDetail";
 import Demo from "./pages/Demo";
 import BulkImport from "./pages/BulkImport";
 import Automation from "./pages/Automation";
+import Sequences from "./pages/Sequences";
+import SequenceBuilder from "./pages/SequenceBuilder";
+import CustomFields from "./pages/CustomFields";
 import DashboardLayout from "./components/DashboardLayout";
 
 function Router() {
@@ -120,6 +123,32 @@ function Router() {
       <Route path="/automation">
         <DashboardLayout>
           <Automation />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/sequences">
+        <DashboardLayout>
+          <Sequences />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/sequences/new">
+        <DashboardLayout>
+          <SequenceBuilder />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/sequences/:id">
+        {(params) => (
+          <DashboardLayout>
+            <SequenceBuilder />
+          </DashboardLayout>
+        )}
+      </Route>
+      
+      <Route path="/custom-fields">
+        <DashboardLayout>
+          <CustomFields />
         </DashboardLayout>
       </Route>
       

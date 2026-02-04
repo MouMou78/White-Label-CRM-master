@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { Home, LogOut, PanelLeft, Users, Calendar, Settings, BarChart3, TrendingUp, Sparkles, Building2, UserCircle, Zap, Mail, Sliders, Activity, Wand2, ChevronDown, Target } from "lucide-react";
+import { Home, LogOut, PanelLeft, Users, Calendar, Settings, BarChart3, TrendingUp, Sparkles, Building2, UserCircle, Zap, Mail, Sliders, Activity, Wand2, ChevronDown, Target, Send, LineChart } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -33,14 +33,20 @@ import { Button } from "./ui/button";
 const menuItems = [
   { icon: Home, label: "Home", path: "/" },
   { icon: Users, label: "People", path: "/people" },
+  { icon: Calendar, label: "Events", path: "/events" },
+  { icon: Sparkles, label: "AI Assistant", path: "/ai-assistant" },
+];
+
+const engagementItems = [
+  { icon: Mail, label: "Sequences", path: "/sequences" },
+  { icon: Wand2, label: "Email Generator", path: "/email-generator" },
+  { icon: Zap, label: "Automation", path: "/automation" },
+];
+
+const insightsItems = [
   { icon: BarChart3, label: "Funnel", path: "/funnel" },
   { icon: TrendingUp, label: "Analytics", path: "/analytics" },
   { icon: Activity, label: "Activity Feed", path: "/activity" },
-  { icon: Zap, label: "Automation", path: "/automation" },
-  { icon: Mail, label: "Sequences", path: "/sequences" },
-  { icon: Wand2, label: "Email Generator", path: "/email-generator" },
-  { icon: Sparkles, label: "AI Assistant", path: "/ai-assistant" },
-  { icon: Calendar, label: "Events", path: "/events" },
 ];
 
 const settingsItems = [
@@ -219,6 +225,62 @@ function DashboardLayoutContent({
                   </SidebarMenuItem>
                 );
               })}
+              
+              {/* Engagement Submenu */}
+              <SidebarMenuItem>
+                <details className="group/engagement">
+                  <summary className="flex items-center gap-2 h-10 px-2 rounded-md hover:bg-accent transition-colors cursor-pointer list-none">
+                    <Send className="h-4 w-4" />
+                    <span className="flex-1 font-normal">Engagement</span>
+                    <ChevronDown className="h-4 w-4 transition-transform group-open/engagement:rotate-180" />
+                  </summary>
+                  <SidebarMenuSub className="ml-4 mt-1">
+                    {engagementItems.map(item => {
+                      const isActive = location === item.path;
+                      return (
+                        <SidebarMenuSubItem key={item.path}>
+                          <SidebarMenuSubButton
+                            isActive={isActive}
+                            onClick={() => setLocation(item.path)}
+                            className="h-9"
+                          >
+                            <item.icon className={`h-4 w-4 ${isActive ? "text-primary" : ""}`} />
+                            <span>{item.label}</span>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      );
+                    })}
+                  </SidebarMenuSub>
+                </details>
+              </SidebarMenuItem>
+
+              {/* Insights Submenu */}
+              <SidebarMenuItem>
+                <details className="group/insights">
+                  <summary className="flex items-center gap-2 h-10 px-2 rounded-md hover:bg-accent transition-colors cursor-pointer list-none">
+                    <LineChart className="h-4 w-4" />
+                    <span className="flex-1 font-normal">Insights</span>
+                    <ChevronDown className="h-4 w-4 transition-transform group-open/insights:rotate-180" />
+                  </summary>
+                  <SidebarMenuSub className="ml-4 mt-1">
+                    {insightsItems.map(item => {
+                      const isActive = location === item.path;
+                      return (
+                        <SidebarMenuSubItem key={item.path}>
+                          <SidebarMenuSubButton
+                            isActive={isActive}
+                            onClick={() => setLocation(item.path)}
+                            className="h-9"
+                          >
+                            <item.icon className={`h-4 w-4 ${isActive ? "text-primary" : ""}`} />
+                            <span>{item.label}</span>
+                          </SidebarMenuSubButton>
+                        </SidebarMenuSubItem>
+                      );
+                    })}
+                  </SidebarMenuSub>
+                </details>
+              </SidebarMenuItem>
               
               {/* Amplemarket Submenu */}
               <SidebarMenuItem>

@@ -588,3 +588,11 @@
 - [x] Upload transparent logo to S3
 - [x] Update logo reference in DashboardLayout
 - [x] Test logo appearance on sidebar
+
+
+## Navigation Reorganization
+- [x] Analyze current sidebar structure and identify related sections
+- [x] Group Sequences, Email Generator, Automation into "Engagement" submenu
+- [x] Group Analytics, Funnel, Activity Feed into "Insights" submenu
+- [x] Keep People, Events, AI Assistant as top-level items
+- [x] Test all navigation links work correctly

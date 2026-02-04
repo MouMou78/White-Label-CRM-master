@@ -120,6 +120,20 @@
       "when": 1770228480744,
       "tag": "0016_living_turbo",
       "breakpoints": true
+    },
+    {
+      "idx": 17,
+      "version": "5",
+      "when": 1770231100940,
+      "tag": "0017_next_carlie_cooper",
+      "breakpoints": true
+    },
+    {
+      "idx": 18,
+      "version": "5",
+      "when": 1770231143244,
+      "tag": "0018_supreme_slipstream",
+      "breakpoints": true
     }
   ]
 }

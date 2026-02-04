@@ -13,6 +13,7 @@ const GUEST_USER = {
   backupCodes: null,
   passwordResetToken: null,
   passwordResetExpires: null,
+  disabled: false,
   createdAt: new Date(),
 };
 

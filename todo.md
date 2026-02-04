@@ -860,34 +860,34 @@
 ## Email Integration & Marketing Campaigns
 
 ### Personal Email Integration
-- [ ] Create email accounts connection page in Settings
-- [ ] Add Gmail OAuth flow for easy connection
-- [ ] Add manual SMTP/IMAP configuration option
-- [ ] Display connected email accounts list
-- [ ] Add set default email account option
-- [ ] Add disconnect email account option
-- [ ] Test email sending from personal accounts
+- [x] Create email accounts connection page in Settings
+- [ ] Add Gmail OAuth flow for easy connection (deferred)
+- [x] Add manual SMTP/IMAP configuration option
+- [x] Display connected email accounts list
+- [x] Add set default email account option
+- [x] Add disconnect email account option
+- [ ] Test email sending from personal accounts (deferred)
 
 ### Marketing Campaigns
-- [ ] Create campaigns list page
-- [ ] Add create new campaign button and form
-- [ ] Build email template editor with rich text
-- [ ] Add recipient selection (all contacts, filtered, manual)
-- [ ] Implement campaign scheduling
-- [ ] Add campaign preview before sending
-- [ ] Implement campaign sending logic
-- [ ] Create campaign analytics view (opens, clicks, bounces)
-- [ ] Add campaign status tracking (draft, scheduled, sending, sent)
+- [x] Create campaigns list page
+- [x] Add create new campaign button and form
+- [x] Build email template editor with rich text
+- [x] Add recipient selection (all contacts, filtered, manual)
+- [x] Implement campaign scheduling
+- [ ] Add campaign preview before sending (deferred)
+- [ ] Implement campaign sending logic (deferred)
+- [ ] Create campaign analytics view (opens, clicks, bounces) (deferred)
+- [x] Add campaign status tracking (draft, scheduled, sending, sent)
 
 ## User Management Dashboard
 
 ### Admin Dashboard
-- [ ] Create user management page (admin only)
-- [ ] Display all users list with roles
-- [ ] Add user search and filtering
-- [ ] Add edit user role functionality
-- [ ] Add disable/enable user account
-- [ ] Add reset user 2FA option
-- [ ] Display user activity logs
-- [ ] Add invite new user functionality
-- [ ] Show authentication statistics
+- [x] Create user management page (admin only)
+- [x] Display all users list with roles
+- [x] Add user search and filtering
+- [x] Add edit user role functionality
+- [x] Add disable/enable user account
+- [x] Add reset user 2FA option
+- [ ] Display user activity logs (deferred)
+- [ ] Add invite new user functionality (deferred)
+- [x] Show authentication statistics

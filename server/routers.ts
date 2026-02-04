@@ -1873,6 +1873,78 @@ Generate a subject line and email body. Format your response as JSON with "subje
         return { success: true };
       }),
   }),
+
+  campaigns: router({
+    list: protectedProcedure
+      .query(async ({ ctx }) => {
+        const campaigns = await db.getCampaignsByTenant(ctx.user.tenantId);
+        return campaigns;
+      }),
+    
+    create: protectedProcedure
+      .input(z.object({
+        subject: z.string(),
+        body: z.string(),
+        recipientType: z.string(),
+        scheduledFor: z.date().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const campaign = await db.createCampaign({
+          tenantId: ctx.user.tenantId,
+          userId: ctx.user.id,
+          ...input,
+        });
+        return campaign;
+      }),
+  }),
+
+  admin: router({
+    listUsers: protectedProcedure
+      .query(async ({ ctx }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+        }
+        const users = await db.getAllUsersByTenant(ctx.user.tenantId);
+        return users;
+      }),
+    
+    updateUserRole: protectedProcedure
+      .input(z.object({
+        userId: z.string(),
+        role: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+        }
+        await db.updateUserRole(input.userId, input.role);
+        return { success: true };
+      }),
+    
+    toggleUserStatus: protectedProcedure
+      .input(z.object({
+        userId: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+        }
+        await db.toggleUserStatus(input.userId);
+        return { success: true };
+      }),
+    
+    resetUser2FA: protectedProcedure
+      .input(z.object({
+        userId: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        if (ctx.user.role !== 'admin') {
+          throw new TRPCError({ code: 'FORBIDDEN', message: 'Admin access required' });
+        }
+        await db.resetUserTwoFactor(input.userId);
+        return { success: true };
+      }),
+  }),
 });
 
 export type AppRouter = typeof appRouter;

@@ -36,6 +36,8 @@ import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
 import ResetPassword from "./pages/ResetPassword";
 import EmailAccounts from "./pages/EmailAccounts";
+import Campaigns from "./pages/Campaigns";
+import UserManagement from "./pages/UserManagement";
 
 function Router() {
   return (
@@ -53,6 +55,16 @@ function Router() {
       <Route path="/settings/email-accounts">
         <DashboardLayout>
           <EmailAccounts />
+        </DashboardLayout>
+      </Route>
+      <Route path="/campaigns">
+        <DashboardLayout>
+          <Campaigns />
+        </DashboardLayout>
+      </Route>
+      <Route path="/admin/users">
+        <DashboardLayout>
+          <UserManagement />
         </DashboardLayout>
       </Route>
       

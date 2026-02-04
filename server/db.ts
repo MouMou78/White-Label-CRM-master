@@ -1563,3 +1563,96 @@ export async function setDefaultEmailAccount(userId: string, accountId: string):
     .set({ isDefault: true })
     .where(eq(emailAccounts.id, accountId));
 }
+
+
+// ============ CAMPAIGNS ============
+
+export async function createCampaign(data: {
+  tenantId: string;
+  userId: string;
+  subject: string;
+  body: string;
+  recipientType: string;
+  scheduledFor?: Date;
+}): Promise<any> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { marketingCampaigns } = await import("../drizzle/schema");
+  const id = nanoid();
+  
+  await db.insert(marketingCampaigns).values({
+    id,
+    name: data.subject, // Use subject as name
+    ...data,
+    status: data.scheduledFor ? "scheduled" : "draft",
+  });
+
+  const result = await db.select().from(marketingCampaigns)
+    .where(eq(marketingCampaigns.id, id))
+    .limit(1);
+  return result[0]!;
+}
+
+export async function getCampaignsByTenant(tenantId: string): Promise<any[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { marketingCampaigns } = await import("../drizzle/schema");
+  return db.select().from(marketingCampaigns)
+    .where(eq(marketingCampaigns.tenantId, tenantId))
+    .orderBy(desc(marketingCampaigns.createdAt));
+}
+
+
+// ============ ADMIN ============
+
+export async function getAllUsersByTenant(tenantId: string): Promise<any[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  return db.select({
+    id: users.id,
+    email: users.email,
+    name: users.name,
+    role: users.role,
+    twoFactorEnabled: users.twoFactorEnabled,
+    disabled: users.disabled,
+    createdAt: users.createdAt,
+  }).from(users)
+    .where(eq(users.tenantId, tenantId))
+    .orderBy(desc(users.createdAt));
+}
+
+export async function updateUserRole(userId: string, role: string): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(users)
+    .set({ role: role as any })
+    .where(eq(users.id, userId));
+}
+
+export async function toggleUserStatus(userId: string): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const user = await getUserById(userId);
+  if (!user) throw new Error("User not found");
+
+  await db.update(users)
+    .set({ disabled: !user.disabled })
+    .where(eq(users.id, userId));
+}
+
+export async function resetUserTwoFactor(userId: string): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  await db.update(users)
+    .set({ 
+      twoFactorEnabled: false,
+      twoFactorSecret: null,
+    })
+    .where(eq(users.id, userId));
+}

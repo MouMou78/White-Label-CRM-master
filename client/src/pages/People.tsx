@@ -10,6 +10,7 @@ import { Upload } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
+import { ListPageSkeleton } from "@/components/SkeletonLoaders";
 
 export default function People() {
   const { data: people, isLoading } = trpc.people.list.useQuery();
@@ -146,9 +147,7 @@ export default function People() {
           </div>
 
           {isLoading ? (
-            <div className="flex items-center justify-center py-12">
-              <Loader2 className="w-8 h-8 animate-spin text-muted-foreground" />
-            </div>
+            <ListPageSkeleton />
           ) : filteredPeople && filteredPeople.length > 0 ? (
             <div className="space-y-2">
               {filteredPeople.map((person) => (
@@ -173,14 +172,22 @@ export default function People() {
                             </span>
                           </div>
                           <div className="min-w-0 flex-1">
-                            <div className="flex items-center gap-2">
+                            <div className="flex items-center gap-2 flex-wrap">
                               <p className="font-medium truncate">{person.fullName}</p>
-                              {person.engagementScore != null && person.engagementScore > 0 && (
+                              {person.fitTier && (
                                 <Badge
-                                  variant={person.engagementScore >= 200 ? "destructive" : person.engagementScore >= 100 ? "default" : "secondary"}
+                                  variant={person.fitTier === "A" ? "default" : person.fitTier === "B" ? "secondary" : "outline"}
                                   className="text-xs"
                                 >
-                                  {person.engagementScore >= 200 ? "Hot" : person.engagementScore >= 100 ? "Warm" : "Active"}
+                                  Fit: {person.fitTier}
+                                </Badge>
+                              )}
+                              {person.intentTier && (
+                                <Badge
+                                  variant={person.intentTier === "Hot" ? "destructive" : person.intentTier === "Warm" ? "default" : "secondary"}
+                                  className="text-xs"
+                                >
+                                  {person.intentTier}
                                 </Badge>
                               )}
                             </div>

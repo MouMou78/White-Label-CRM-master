@@ -505,3 +505,21 @@
 - [x] Make Settings and Amplemarket submenus collapsed by default
 - [x] Fix database query error with new scoring fields
 - [x] Test all pages load correctly
+
+
+## Lead Scoring System Implementation
+- [x] Add scoring fields to database schema (fitScore, intentScore, combinedScore, fitTier, intentTier, scoreReasons, lifecycleStage, seniority, department, region)
+- [x] Generate and apply database migration
+- [x] Create lead-scoring.ts engine with fit and intent calculations
+- [x] Add scoring tRPC procedures (scoreContact, bulkScore, getScoreBreakdown)
+- [x] Display fit/intent badges in People list
+- [x] Write comprehensive tests for scoring engine (21 tests, all passing)
+- [ ] Show score breakdown on PersonDetail page
+- [ ] Add score-based filtering and sorting
+
+## Skeleton Loading Screens
+- [x] Verify SkeletonLoaders.tsx component exists
+- [x] Add ListPageSkeleton to People.tsx
+- [ ] Add DetailPageSkeleton to PersonDetail.tsx
+- [ ] Add skeleton loading to other key pages (Funnel, Analytics, Events)
+- [ ] Test all loading states appear correctly

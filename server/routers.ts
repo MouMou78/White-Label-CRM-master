@@ -9,6 +9,7 @@ import { TRPCError } from "@trpc/server";
 import { processMoment } from "./rules-engine";
 import { computeFunnelStage, groupThreadsByStage, computeVelocity } from "./funnel";
 import { calculateEngagementScore, getScoreBreakdown } from "./scoring";
+import { scoreContact } from "./lead-scoring";
 import { invokeLLM } from "./_core/llm";
 
 export const appRouter = router({
@@ -203,6 +204,73 @@ export const appRouter = router({
           linkClicks,
           lastActivityDate,
         });
+      }),
+    
+    calculateLeadScore: protectedProcedure
+      .input(z.object({ personId: z.string() }))
+      .mutation(async ({ input, ctx }) => {
+        const person = await db.getPersonById(input.personId);
+        if (!person || person.tenantId !== ctx.user.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND" });
+        }
+        
+        // Get account if exists
+        let account = null;
+        if (person.companyDomain) {
+          const accounts = await db.getAccountsByTenant(ctx.user.tenantId);
+          account = accounts.find(a => a.domain === person.companyDomain) || null;
+        }
+        
+        // Calculate scores (no event tracking yet, so intent score will be 0)
+        const scores = await scoreContact(person, account, []);
+        
+        // Update person with scores
+        await db.updatePerson(input.personId, {
+          fitScore: scores.fitScore,
+          intentScore: scores.intentScore,
+          combinedScore: scores.combinedScore,
+          fitTier: scores.fitTier,
+          intentTier: scores.intentTier,
+          scoreReasons: scores.scoreReasons,
+        });
+        
+        return scores;
+      }),
+    
+    bulkCalculateScores: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const people = await db.getPeopleByTenant(ctx.user.tenantId);
+        const accounts = await db.getAccountsByTenant(ctx.user.tenantId);
+        
+        let scored = 0;
+        for (const person of people) {
+          try {
+            // Get account if exists
+            let account = null;
+            if (person.companyDomain) {
+              account = accounts.find(a => a.domain === person.companyDomain) || null;
+            }
+            
+            // Calculate scores (no event tracking yet, so intent score will be 0)
+            const scores = await scoreContact(person, account, []);
+            
+            // Update person with scores
+            await db.updatePerson(person.id, {
+              fitScore: scores.fitScore,
+              intentScore: scores.intentScore,
+              combinedScore: scores.combinedScore,
+              fitTier: scores.fitTier,
+              intentTier: scores.intentTier,
+              scoreReasons: scores.scoreReasons,
+            });
+            
+            scored++;
+          } catch (error) {
+            console.error(`Failed to score person ${person.id}:`, error);
+          }
+        }
+        
+        return { scored, total: people.length };
       }),
     
     bulkImport: protectedProcedure

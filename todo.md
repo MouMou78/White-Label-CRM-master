@@ -965,3 +965,11 @@
 ## Bug Fixes
 
 - [x] Fix AddPersonDialog account query error when no accounts exist
+
+
+## Critical Bug Fixes - Accounts Query Error
+
+- [x] Investigate and fix accounts table database query failure
+- [x] Add empty state handling to account selector in AddPersonDialog
+- [x] Create seed data script for guest users with sample accounts and contacts
+- [x] Run seed script to populate guest tenant with demo data

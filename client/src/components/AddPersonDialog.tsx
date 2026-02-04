@@ -160,11 +160,17 @@ export function AddPersonDialog() {
                 </SelectTrigger>
                 <SelectContent>
                   <SelectItem value="none">No account</SelectItem>
-                  {accounts?.map((account: any) => (
-                    <SelectItem key={account.id} value={account.id}>
-                      {account.name}
-                    </SelectItem>
-                  ))}
+                  {accounts && accounts.length > 0 ? (
+                    accounts.map((account: any) => (
+                      <SelectItem key={account.id} value={account.id}>
+                        {account.name}
+                      </SelectItem>
+                    ))
+                  ) : (
+                    <div className="px-2 py-6 text-center text-sm text-muted-foreground">
+                      No accounts available. Create an account first from the Accounts page.
+                    </div>
+                  )}
                 </SelectContent>
               </Select>
             </div>

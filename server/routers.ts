@@ -257,7 +257,12 @@ export const appRouter = router({
   
   people: router({
     list: protectedProcedure.query(async ({ ctx }) => {
-      return db.getPeopleByTenant(ctx.user.tenantId);
+      const people = await db.getPeopleByTenant(ctx.user.tenantId);
+      // Add name field for frontend display
+      return people.map((p: any) => ({
+        ...p,
+        name: [p.firstName, p.lastName].filter(Boolean).join(' ') || 'Unknown'
+      }));
     }),
     
     get: protectedProcedure

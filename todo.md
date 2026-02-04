@@ -1182,5 +1182,5 @@
 
 ### Account Page Contact Display
 - [x] Fix contact names not displaying on Account Detail page (links work but names are blank)
-- [ ] Verify contact data is being fetched correctly
+- [x] Verify contact data is being fetched correctly
 - [ ] Test contact display on mobile and desktop

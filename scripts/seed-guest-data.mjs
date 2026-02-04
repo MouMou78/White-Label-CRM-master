@@ -129,12 +129,19 @@ async function seedGuestData() {
     // Create people linked to accounts
     for (const personData of samplePeople) {
       const accountId = accountMap.get(personData.companyName);
+      // Split fullName into firstName and lastName
+      const nameParts = personData.fullName.split(' ');
+      const firstName = nameParts[0] || '';
+      const lastName = nameParts.slice(1).join(' ') || '';
+      
       await db.insert(people).values({
         id: uuidv4(),
         tenantId: GUEST_TENANT_ID,
         fullName: personData.fullName,
+        firstName: firstName,
+        lastName: lastName,
         primaryEmail: personData.primaryEmail,
-        title: personData.title,
+        roleTitle: personData.title,
         companyName: personData.companyName,
         accountId: accountId || null,
         createdAt: new Date(),

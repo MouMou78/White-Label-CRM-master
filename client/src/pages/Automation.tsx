@@ -8,10 +8,10 @@ import { Loader2, Zap, Plus, Settings, TrendingUp } from "lucide-react";
 import { toast } from "sonner";
 
 export default function Automation() {
-  const { data: rules, isLoading, refetch } = trpc.automation.list.useQuery();
+  const { data: rules, isLoading, refetch } = trpc.automation.getRules.useQuery();
   const [togglingId, setTogglingId] = useState<string | null>(null);
 
-  const toggleMutation = trpc.automation.toggle.useMutation({
+  const toggleMutation = trpc.automation.updateRule.useMutation({
     onSuccess: () => {
       refetch();
       toast.success("Automation rule updated");
@@ -107,7 +107,7 @@ export default function Automation() {
                   <Switch
                     checked={rule.status === "active"}
                     onCheckedChange={() => handleToggle(rule.id, rule.status)}
-                    disabled={togglingId === rule.id || rule.isDefault}
+                    disabled={togglingId === rule.id}
                   />
                 </div>
               </div>

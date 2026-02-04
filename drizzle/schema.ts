@@ -779,3 +779,61 @@ export const leadScoringRules = mysqlTable("leadScoringRules", {
 
 export type LeadScoringRule = typeof leadScoringRules.$inferSelect;
 export type InsertLeadScoringRule = typeof leadScoringRules.$inferInsert;
+
+
+// Activity Feed
+export const activityFeed = mysqlTable("activityFeed", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  tenantId: varchar("tenantId", { length: 36 }).notNull(),
+  userId: varchar("userId", { length: 36 }).notNull(), // Who performed the action
+  actionType: mysqlEnum("actionType", [
+    "created_deal",
+    "updated_deal",
+    "moved_deal_stage",
+    "created_contact",
+    "updated_contact",
+    "sent_email",
+    "created_task",
+    "completed_task",
+    "added_note",
+    "created_account",
+    "updated_account"
+  ]).notNull(),
+  entityType: mysqlEnum("entityType", ["deal", "contact", "account", "task", "email"]),
+  entityId: varchar("entityId", { length: 36 }),
+  entityName: text("entityName"), // Denormalized for quick display
+  description: text("description"), // Human-readable description
+  metadata: json("metadata").$type<Record<string, any>>().default({}),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  tenantIdx: index("activity_tenant_idx").on(table.tenantId),
+  userIdx: index("activity_user_idx").on(table.userId),
+  entityIdx: index("activity_entity_idx").on(table.entityType, table.entityId),
+  createdIdx: index("activity_created_idx").on(table.createdAt),
+}));
+
+export type ActivityFeedItem = typeof activityFeed.$inferSelect;
+export type InsertActivityFeedItem = typeof activityFeed.$inferInsert;
+
+// Shared Views
+export const sharedViews = mysqlTable("sharedViews", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  tenantId: varchar("tenantId", { length: 36 }).notNull(),
+  name: varchar("name", { length: 255 }).notNull(),
+  viewType: mysqlEnum("viewType", ["deals", "contacts", "accounts", "tasks"]).notNull(),
+  filters: json("filters").$type<Record<string, any>>().default({}),
+  sortBy: varchar("sortBy", { length: 100 }),
+  sortOrder: mysqlEnum("sortOrder", ["asc", "desc"]).default("asc"),
+  createdById: varchar("createdById", { length: 36 }).notNull(),
+  isPublic: boolean("isPublic").default(false).notNull(), // If true, visible to all team members
+  sharedWithUserIds: json("sharedWithUserIds").$type<string[]>().default([]),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  tenantIdx: index("shared_views_tenant_idx").on(table.tenantId),
+  creatorIdx: index("shared_views_creator_idx").on(table.createdById),
+  typeIdx: index("shared_views_type_idx").on(table.viewType),
+}));
+
+export type SharedView = typeof sharedViews.$inferSelect;
+export type InsertSharedView = typeof sharedViews.$inferInsert;

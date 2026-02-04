@@ -1149,24 +1149,6 @@ export const appRouter = router({
       }),
   }),
   
-  automation: router({
-    list: protectedProcedure.query(async ({ ctx }) => {
-      // Return empty array for now - rules are hardcoded in UI
-      return [];
-    }),
-    
-    toggle: protectedProcedure
-      .input(z.object({
-        ruleId: z.string(),
-        status: z.enum(["active", "paused"]),
-      }))
-      .mutation(async ({ input, ctx }) => {
-        // For now, just return success
-        // In a real implementation, this would update the rule in the database
-        return { success: true };
-      }),
-  }),
-  
   sequences: router({
     list: protectedProcedure.query(async ({ ctx }) => {
       const sequences = await db.getEmailSequencesByTenant(ctx.user.tenantId);
@@ -2175,6 +2157,153 @@ Generate a subject line and email body. Format your response as JSON with "subje
       .query(async ({ input, ctx }) => {
         const { getForecastTrend } = await import("./forecasting");
         return getForecastTrend(ctx.user.tenantId, input.months);
+      }),
+  }),
+  
+  automation: router({
+    getRules: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getAutomationRules } = await import("./db-automation");
+        return getAutomationRules(ctx.user.tenantId);
+      }),
+    
+    getRule: protectedProcedure
+      .input(z.object({ ruleId: z.string() }))
+      .query(async ({ input }) => {
+        const { getAutomationRuleById } = await import("./db-automation");
+        return getAutomationRuleById(input.ruleId);
+      }),
+    
+    createRule: protectedProcedure
+      .input(z.object({
+        name: z.string(),
+        description: z.string().optional(),
+        triggerType: z.enum(["email_opened", "email_replied", "no_reply_after_days", "meeting_held", "stage_entered", "deal_value_threshold"]),
+        triggerConfig: z.record(z.string(), z.any()).optional(),
+        actionType: z.enum(["move_stage", "send_notification", "create_task", "enroll_sequence", "update_field"]),
+        actionConfig: z.record(z.string(), z.any()).optional(),
+        status: z.enum(["active", "paused"]).optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { createAutomationRule } = await import("./db-automation");
+        const ruleId = await createAutomationRule({
+          ...input,
+          tenantId: ctx.user.tenantId,
+        });
+        return { ruleId };
+      }),
+    
+    updateRule: protectedProcedure
+      .input(z.object({
+        ruleId: z.string(),
+        name: z.string().optional(),
+        description: z.string().optional(),
+        triggerConfig: z.record(z.string(), z.any()).optional(),
+        actionConfig: z.record(z.string(), z.any()).optional(),
+        status: z.enum(["active", "paused"]).optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { updateAutomationRule } = await import("./db-automation");
+        const { ruleId, ...data } = input;
+        await updateAutomationRule(ruleId, data);
+        return { success: true };
+      }),
+    
+    deleteRule: protectedProcedure
+      .input(z.object({ ruleId: z.string() }))
+      .mutation(async ({ input }) => {
+        const { deleteAutomationRule } = await import("./db-automation");
+        await deleteAutomationRule(input.ruleId);
+        return { success: true };
+      }),
+    
+    getExecutions: protectedProcedure
+      .input(z.object({ ruleId: z.string().optional() }))
+      .query(async ({ input, ctx }) => {
+        const { getAutomationExecutions } = await import("./db-automation");
+        return getAutomationExecutions(ctx.user.tenantId, input.ruleId);
+      }),
+  }),
+  
+  collaboration: router({
+    getActivityFeed: protectedProcedure
+      .input(z.object({ limit: z.number().optional() }))
+      .query(async ({ input, ctx }) => {
+        const { getActivityFeed } = await import("./db-collaboration");
+        return getActivityFeed(ctx.user.tenantId, input.limit);
+      }),
+    
+    getEntityActivity: protectedProcedure
+      .input(z.object({
+        entityType: z.enum(["deal", "contact", "account", "task", "email"]),
+        entityId: z.string(),
+        limit: z.number().optional(),
+      }))
+      .query(async ({ input, ctx }) => {
+        const { getEntityActivity } = await import("./db-collaboration");
+        return getEntityActivity(ctx.user.tenantId, input.entityType, input.entityId, input.limit);
+      }),
+    
+    getUserActivity: protectedProcedure
+      .input(z.object({
+        userId: z.string(),
+        limit: z.number().optional(),
+      }))
+      .query(async ({ input, ctx }) => {
+        const { getUserActivity } = await import("./db-collaboration");
+        return getUserActivity(ctx.user.tenantId, input.userId, input.limit);
+      }),
+    
+    getSharedViews: protectedProcedure
+      .input(z.object({ viewType: z.enum(["deals", "contacts", "accounts", "tasks"]).optional() }))
+      .query(async ({ input, ctx }) => {
+        const { getSharedViews } = await import("./db-collaboration");
+        return getSharedViews(ctx.user.tenantId, ctx.user.id, input.viewType);
+      }),
+    
+    createSharedView: protectedProcedure
+      .input(z.object({
+        name: z.string(),
+        viewType: z.enum(["deals", "contacts", "accounts", "tasks"]),
+        filters: z.record(z.string(), z.any()).optional(),
+        sortBy: z.string().optional(),
+        sortOrder: z.enum(["asc", "desc"]).optional(),
+        isPublic: z.boolean().optional(),
+        sharedWithUserIds: z.array(z.string()).optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { createSharedView } = await import("./db-collaboration");
+        const viewId = await createSharedView({
+          ...input,
+          tenantId: ctx.user.tenantId,
+          createdById: ctx.user.id,
+        });
+        return { viewId };
+      }),
+    
+    updateSharedView: protectedProcedure
+      .input(z.object({
+        viewId: z.string(),
+        name: z.string().optional(),
+        filters: z.record(z.string(), z.any()).optional(),
+        sortBy: z.string().optional(),
+        sortOrder: z.enum(["asc", "desc"]).optional(),
+        isPublic: z.boolean().optional(),
+        sharedWithUserIds: z.array(z.string()).optional(),
+      }))
+      .mutation(async ({ input }) => {
+        const { updateSharedView } = await import("./db-collaboration");
+        const { viewId, ...data } = input;
+        await updateSharedView(viewId, data);
+        return { success: true };
+      }),
+    
+    deleteSharedView: protectedProcedure
+      .input(z.object({ viewId: z.string() }))
+      .mutation(async ({ input }) => {
+        const { deleteSharedView } = await import("./db-collaboration");
+        await deleteSharedView(input.viewId);
+        return { success: true };
       }),
   }),
   

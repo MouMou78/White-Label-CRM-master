@@ -33,33 +33,34 @@ export default function PersonDetail({ personId }: PersonDetailProps) {
   const { person, threads } = data;
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-start justify-between">
-        <div className="flex items-start gap-4">
-          <div className="w-16 h-16 rounded-full bg-primary/10 flex items-center justify-center">
-            <span className="text-2xl font-medium text-primary">
+    <div className="space-y-4 md:space-y-6">
+      {/* Mobile-optimized header */}
+      <div className="flex flex-col md:flex-row md:items-start md:justify-between gap-4">
+        <div className="flex items-start gap-3 md:gap-4">
+          <div className="w-12 h-12 md:w-16 md:h-16 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
+            <span className="text-xl md:text-2xl font-medium text-primary">
               {person.fullName.charAt(0).toUpperCase()}
             </span>
           </div>
-          <div>
-            <h1 className="text-3xl font-bold tracking-tight">{person.fullName}</h1>
-            <div className="flex items-center gap-4 mt-2 text-muted-foreground">
+          <div className="min-w-0 flex-1">
+            <h1 className="text-2xl md:text-3xl font-bold tracking-tight truncate">{person.fullName}</h1>
+            <div className="flex flex-col sm:flex-row sm:items-center gap-1 sm:gap-4 mt-2 text-sm md:text-base text-muted-foreground">
               {person.companyName && (
                 <div className="flex items-center gap-1">
-                  <Building className="w-4 h-4" />
-                  <span>{person.companyName}</span>
+                  <Building className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" />
+                  <span className="truncate">{person.companyName}</span>
                 </div>
               )}
               {person.roleTitle && (
                 <div className="flex items-center gap-1">
-                  <Briefcase className="w-4 h-4" />
-                  <span>{person.roleTitle}</span>
+                  <Briefcase className="w-3.5 h-3.5 md:w-4 md:h-4 flex-shrink-0" />
+                  <span className="truncate">{person.roleTitle}</span>
                 </div>
               )}
             </div>
           </div>
         </div>
-        <div className="flex gap-2">
+        <div className="flex gap-2 flex-shrink-0 w-full md:w-auto">
           <Button
             variant="outline"
             onClick={async () => {
@@ -70,17 +71,20 @@ export default function PersonDetail({ personId }: PersonDetailProps) {
               setShowInsights(!showInsights);
             }}
             disabled={generateInsightsMutation.isPending}
+            className="flex-1 md:flex-none"
           >
             {generateInsightsMutation.isPending ? (
               <Loader2 className="w-4 h-4 mr-2 animate-spin" />
             ) : (
               <Sparkles className="w-4 h-4 mr-2" />
             )}
-            {insights ? (showInsights ? 'Hide' : 'Show') + ' AI Insights' : 'Generate AI Insights'}
+            <span className="hidden sm:inline">{insights ? (showInsights ? 'Hide' : 'Show') + ' AI Insights' : 'Generate AI Insights'}</span>
+            <span className="sm:hidden">Insights</span>
           </Button>
-          <Button>
+          <Button className="flex-1 md:flex-none">
             <Plus className="w-4 h-4 mr-2" />
-            New Thread
+            <span className="hidden sm:inline">New Thread</span>
+            <span className="sm:hidden">Thread</span>
           </Button>
         </div>
       </div>

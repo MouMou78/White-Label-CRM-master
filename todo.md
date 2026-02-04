@@ -1117,3 +1117,31 @@
 - [ ] Build forecasting dashboard UI
 - [x] Add scenario planning features (backend endpoints)
 - [ ] Test forecast accuracy with historical data
+
+
+## New Features - Workflow Automation, Mobile & Collaboration
+
+### Workflow Automation Builder
+- [x] Design workflow automation schema (triggers, conditions, actions)
+- [x] Create trigger types (deal value change, score threshold, time-based, status change)
+- [x] Implement action types (send email, create task, update stage, notify user)
+- [x] Build condition evaluation engine
+- [ ] Create visual workflow builder UI (backend endpoints ready)
+- [x] Add workflow execution logging
+- [ ] Test automation triggers and actions
+
+### Mobile-Responsive Contact Cards
+- [x] Redesign contact detail layout for mobile screens
+- [ ] Implement swipe gestures for quick actions
+- [x] Add collapsible sections for better information hierarchy
+- [x] Optimize touch targets for mobile interaction
+- [x] Test responsive design across different screen sizes
+- [x] Add mobile-specific navigation patterns
+
+### Team Collaboration Features
+- [x] Implement @mention parsing in notes and comments
+- [x] Create shared views for deals and contacts
+- [x] Build activity feed showing team member actions
+- [x] Add assignment notifications system (uses existing notifications)
+- [ ] Create team member presence indicators
+- [ ] Test collaboration features with multiple users

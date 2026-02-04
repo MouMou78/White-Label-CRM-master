@@ -19,7 +19,7 @@ import AIAssistant from "./pages/AIAssistant";
 import AmplemarketAccounts from "./pages/AmplemarketAccounts";
 import AmplemarketPeople from "./pages/AmplemarketPeople";
 import AccountDetail from "./pages/AccountDetail";
-import Demo from "./pages/Demo";
+
 import BulkImport from "./pages/BulkImport";
 import Automation from "./pages/Automation";
 import Sequences from "./pages/Sequences";
@@ -110,11 +110,6 @@ function Router() {
         )}
       </Route>
       
-      <Route path="/demo">
-        <DashboardLayout>
-          <Demo />
-        </DashboardLayout>
-      </Route>
       
       <Route path="/funnel">
         <DashboardLayout>

@@ -651,20 +651,6 @@ export const appRouter = router({
       }),
   }),
   
-  demo: router({
-    generate: protectedProcedure
-      .mutation(async ({ ctx }) => {
-        const { generateDemoData } = await import("./demo-data-generator");
-        return generateDemoData(ctx.user.tenantId);
-      }),
-    
-    clear: protectedProcedure
-      .mutation(async ({ ctx }) => {
-        const { clearDemoData } = await import("./demo-data-generator");
-        return clearDemoData(ctx.user.tenantId);
-      }),
-  }),
-  
   amplemarket: router({ getAccountById: protectedProcedure
       .input(z.object({ accountId: z.string() }))
       .query(async ({ input, ctx }) => {

@@ -440,3 +440,62 @@
 - [x] Add quick action suggestion pills (Analyze Pipeline, Find Hot Leads, Show Top Contacts, etc.)
 - [x] Make pills clickable to auto-fill questions
 - [x] Improve mobile layout with better spacing (rounded pill design)
+
+
+## Platform Audit & Improvements
+
+### Page Formatting & Links Audit
+- [ ] Check Home page for formatting issues
+- [ ] Check People page for formatting issues
+- [ ] Check Funnel page for formatting issues
+- [ ] Check Analytics page for formatting issues
+- [ ] Check Activity Feed for formatting issues
+- [ ] Check Automation page for formatting issues
+- [ ] Check Sequences page for formatting issues
+- [ ] Check Email Generator for formatting issues
+- [ ] Check AI Assistant for formatting issues
+- [ ] Check Events page for formatting issues
+- [ ] Check Amplemarket Accounts for formatting issues
+- [ ] Check Amplemarket People for formatting issues
+- [ ] Check Integrations page for formatting issues
+- [ ] Check Custom Fields page for formatting issues
+- [ ] Test all navigation links work correctly
+- [ ] Fix any broken links or 404 errors
+
+### Loading States & Skeletons
+- [ ] Add skeleton loading to Home page
+- [ ] Add skeleton loading to People list page
+- [ ] Add skeleton loading to Funnel page
+- [ ] Add skeleton loading to Analytics page
+- [ ] Add skeleton loading to Activity Feed
+- [ ] Add skeleton loading to Sequences page
+- [ ] Add skeleton loading to Amplemarket pages
+- [ ] Add loading states to all tRPC queries
+- [ ] Test loading states appear correctly
+
+### Data Cleanup
+- [x] Clear all remaining demo data from database
+- [x] Verify all tables are empty
+- [x] Remove Demo Environment from navigation
+- [x] Delete demo-related backend procedures
+- [x] Test app works with empty database
+
+### Advanced Lead Scoring System
+- [x] Add fit_score, intent_score, combined_score fields to people table
+- [x] Add fit_tier, intent_tier fields to people table
+- [x] Add score_reasons JSON field to people table
+- [x] Add lifecycle_stage field to people table
+- [x] Add seniority, department, region fields to people table
+- [x] Add scoring fields to accounts table
+- [x] Implement fit scoring engine (industry, size, seniority, region)
+- [x] Implement intent scoring engine with event tracking
+- [x] Implement score decay model (21-day half-life)
+- [x] Create combined score calculation (60% fit, 40% intent)
+- [x] Add tier calculation logic (A/B/C for fit, Hot/Warm/Cold for intent)
+- [ ] Add scoring tRPC procedures
+- [ ] Create skeleton loading components
+- [ ] Create scoring rules management UI
+- [ ] Display scores and tiers in People list
+- [ ] Show score breakdown on contact detail page
+- [ ] Add score-based filtering and sorting
+- [ ] Test scoring with various scenarios

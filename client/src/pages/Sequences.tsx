@@ -18,40 +18,7 @@ export default function Sequences() {
     );
   }
 
-  const mockSequences = [
-    {
-      id: "seq-1",
-      name: "Outbound Sales Sequence",
-      description: "5-step sequence for cold outreach",
-      status: "active",
-      stepCount: 5,
-      enrolledCount: 24,
-      openRate: 45,
-      replyRate: 12,
-    },
-    {
-      id: "seq-2",
-      name: "Product Demo Follow-up",
-      description: "3-step follow-up after demo",
-      status: "active",
-      stepCount: 3,
-      enrolledCount: 12,
-      openRate: 68,
-      replyRate: 28,
-    },
-    {
-      id: "seq-3",
-      name: "Re-engagement Campaign",
-      description: "Win back dormant leads",
-      status: "paused",
-      stepCount: 4,
-      enrolledCount: 8,
-      openRate: 32,
-      replyRate: 8,
-    },
-  ];
-
-  const allSequences = [...mockSequences, ...(sequences || [])];
+  const allSequences = sequences || [];
 
   return (
     <div className="space-y-6 p-4 md:p-0">
@@ -70,8 +37,22 @@ export default function Sequences() {
         </Link>
       </div>
 
-      <div className="grid gap-4">
-        {allSequences.map((sequence) => (
+      {allSequences.length === 0 ? (
+        <Card>
+          <CardContent className="py-12 text-center">
+            <Mail className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
+            <p className="text-muted-foreground mb-4">No email sequences yet</p>
+            <Link href="/sequences/new">
+              <Button>
+                <Plus className="w-4 h-4 mr-2" />
+                Create First Sequence
+              </Button>
+            </Link>
+          </CardContent>
+        </Card>
+      ) : (
+        <div className="grid gap-4">
+          {allSequences.map((sequence: any) => (
           <Card key={sequence.id}>
             <CardHeader>
               <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3">
@@ -141,22 +122,8 @@ export default function Sequences() {
               </div>
             </CardContent>
           </Card>
-        ))}
-      </div>
-
-      {allSequences.length === 0 && (
-        <Card>
-          <CardContent className="py-12 text-center">
-            <Mail className="w-12 h-12 mx-auto mb-4 text-muted-foreground opacity-50" />
-            <p className="text-muted-foreground mb-4">No email sequences yet</p>
-            <Link href="/sequences/new">
-              <Button>
-                <Plus className="w-4 h-4 mr-2" />
-                Create First Sequence
-              </Button>
-            </Link>
-          </CardContent>
-        </Card>
+          ))}
+        </div>
       )}
     </div>
   );

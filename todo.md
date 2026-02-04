@@ -939,3 +939,24 @@
 - [ ] Create new accounts automatically during import if company doesn't exist (pending)
 - [ ] Populate person fields from linked account (domain, industry, etc.) (pending)
 - [ ] Test auto-linking with sample data (pending)
+
+
+## Notification Bell & Theme Toggle
+
+### Notification Bell
+- [x] Add bell icon to header with unread count badge
+- [x] Create notifications dropdown panel
+- [x] Display unread messages from team chat
+- [x] Display @mentions notifications
+- [x] Display system notifications
+- [x] Add mark as read functionality
+- [ ] Add "View All" link to full notifications page (deferred)
+- [ ] Update unread count in real-time (deferred)
+
+### Theme Toggle
+- [x] Add light/dark mode toggle to Settings page
+- [x] Implement theme switching functionality
+- [x] Persist theme preference in localStorage
+- [x] Set default theme based on system preference
+- [ ] Ensure all UI elements work in both themes (pending testing)
+- [ ] Test readability across both themes (pending testing)

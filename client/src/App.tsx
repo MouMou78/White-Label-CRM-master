@@ -3,7 +3,7 @@ import { TooltipProvider } from "@/components/ui/tooltip";
 import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import ErrorBoundary from "./components/ErrorBoundary";
-import { ThemeProvider } from "./contexts/ThemeContext";
+import { ThemeProvider } from "./components/theme-provider";
 import Home from "./pages/Home";
 import People from "./pages/People";
 import PersonDetail from "./pages/PersonDetail";
@@ -40,6 +40,7 @@ import EmailAccounts from "./pages/EmailAccounts";
 import Campaigns from "./pages/Campaigns";
 import UserManagement from "./pages/UserManagement";
 import Accounts from "./pages/Accounts";
+import Settings from "./pages/Settings";
 
 function Router() {
   return (
@@ -48,6 +49,7 @@ function Router() {
       <Route path="/signup" component={Signup} />
       <Route path="/login" component={Login} />
       <Route path="/forgot-password" component={ForgotPassword} />
+      <Route path="/settings" component={Settings} />
       <Route path="/reset-password" component={ResetPassword} />
       
       {/* Public routes */}
@@ -241,7 +243,7 @@ function Router() {
 function App() {
   return (
     <ErrorBoundary>
-      <ThemeProvider defaultTheme="light">
+      <ThemeProvider defaultTheme="system">
         <TooltipProvider>
           <Toaster />
           <Router />

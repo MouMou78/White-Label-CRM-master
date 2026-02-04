@@ -30,6 +30,8 @@ export default function Chat() {
   const [showMembersPanel, setShowMembersPanel] = useState(false);
   const [viewMode, setViewMode] = useState<"channels" | "dms">("channels");
   const [selectedDmUserId, setSelectedDmUserId] = useState<string | null>(null);
+  const [isNewDmOpen, setIsNewDmOpen] = useState(false);
+  const [newDmUserId, setNewDmUserId] = useState("");
 
   // Fetch channels
   const { data: channels = [], refetch: refetchChannels } = trpc.chat.getChannels.useQuery();
@@ -214,6 +216,47 @@ export default function Chat() {
             </div>
           ) : (
             <div className="p-2 space-y-1">
+              <Dialog open={isNewDmOpen} onOpenChange={setIsNewDmOpen}>
+                <DialogTrigger asChild>
+                  <Button variant="outline" size="sm" className="w-full mb-2">
+                    <Plus className="mr-2 h-4 w-4" />
+                    New Message
+                  </Button>
+                </DialogTrigger>
+                <DialogContent>
+                  <DialogHeader>
+                    <DialogTitle>Start a Direct Message</DialogTitle>
+                    <DialogDescription>
+                      Select a user to start a conversation
+                    </DialogDescription>
+                  </DialogHeader>
+                  <div className="space-y-4 py-4">
+                    <div className="space-y-2">
+                      <Label htmlFor="dm-user">Select User</Label>
+                      <Input
+                        id="dm-user"
+                        placeholder="Enter user ID or email"
+                        value={newDmUserId}
+                        onChange={(e) => setNewDmUserId(e.target.value)}
+                      />
+                    </div>
+                  </div>
+                  <DialogFooter>
+                    <Button
+                      onClick={() => {
+                        if (newDmUserId.trim()) {
+                          setSelectedDmUserId(newDmUserId);
+                          setSelectedChannelId(null);
+                          setIsNewDmOpen(false);
+                          setNewDmUserId("");
+                        }
+                      }}
+                    >
+                      Start Conversation
+                    </Button>
+                  </DialogFooter>
+                </DialogContent>
+              </Dialog>
               {dmConversations.map((conv: any) => (
                 <button
                   key={conv.otherUserId}

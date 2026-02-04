@@ -659,8 +659,9 @@
 - [x] Add AI assistant avatar with distinct styling
 
 ### Direct Messages
-- [ ] Create DM section in sidebar
-- [ ] Implement 1-on-1 private conversations
+- [x] Create DM section in sidebar
+- [x] Implement 1-on-1 private conversations
+- [x] Add "New Message" button to start DM with user selection
 - [ ] Add unread message indicators
 - [ ] Show user online/offline status
 

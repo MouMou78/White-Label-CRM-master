@@ -523,3 +523,17 @@
 - [ ] Add DetailPageSkeleton to PersonDetail.tsx
 - [ ] Add skeleton loading to other key pages (Funnel, Analytics, Events)
 - [ ] Test all loading states appear correctly
+
+
+## Advanced Scoring Features
+- [x] Add score breakdown card to PersonDetail page showing fit/intent score details
+- [x] Display which criteria contributed to scores with point values
+- [x] Add score-based filtering to People list (by fit tier, intent tier, score ranges)
+- [x] Add score-based sorting options
+- [x] Create Scoring Management page in Settings area
+- [x] Allow configuration of target industries with point values
+- [x] Allow configuration of company size preferences
+- [x] Allow configuration of seniority levels and points
+- [x] Allow configuration of priority regions
+- [x] Allow configuration of tier thresholds (A/B/C, Hot/Warm/Cold)
+- [x] Test all scoring features work correctly

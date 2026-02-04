@@ -2,7 +2,7 @@ import { trpc } from "@/lib/trpc";
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 import { Button } from "@/components/ui/button";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Mail, Phone, Building, Briefcase, Plus, MapPin, ExternalLink, TrendingUp, CheckCircle2 } from "lucide-react";
+import { Loader2, Mail, Phone, Building, Briefcase, Plus, MapPin, ExternalLink, TrendingUp, CheckCircle2, Target, Flame } from "lucide-react";
 import { Link } from "wouter";
 import { EmailActivityTimeline } from "@/components/EmailActivityTimeline";
 
@@ -73,6 +73,103 @@ export default function PersonDetail({ personId }: PersonDetailProps) {
           })) || []
         )}
       />
+
+      {/* Lead Score Breakdown */}
+      {(person.fitScore !== null || person.intentScore !== null) && (
+        <Card>
+          <CardHeader>
+            <CardTitle className="flex items-center gap-2">
+              <Target className="w-5 h-5" />
+              Lead Score
+            </CardTitle>
+            <CardDescription>Fit and intent scoring breakdown</CardDescription>
+          </CardHeader>
+          <CardContent>
+            <div className="grid gap-6 md:grid-cols-2">
+              {/* Fit Score */}
+              {person.fitScore !== null && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Target className="w-4 h-4 text-muted-foreground" />
+                      <span className="font-medium">Fit Score</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl font-bold">{person.fitScore}</span>
+                      {person.fitTier && (
+                        <Badge
+                          variant={person.fitTier === "A" ? "default" : person.fitTier === "B" ? "secondary" : "outline"}
+                        >
+                          Tier {person.fitTier}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  {person.scoreReasons && Array.isArray(person.scoreReasons) && person.scoreReasons.filter((r: any) => r.category === 'fit').length > 0 && (
+                    <div className="space-y-2">
+                      <p className="text-xs text-muted-foreground font-medium">Contributing Factors:</p>
+                      {person.scoreReasons.filter((r: any) => r.category === 'fit').map((reason: any, i: number) => (
+                        <div key={i} className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">{reason.reason}</span>
+                          <span className="font-medium">+{reason.points}</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </div>
+              )}
+
+              {/* Intent Score */}
+              {person.intentScore !== null && (
+                <div className="space-y-3">
+                  <div className="flex items-center justify-between">
+                    <div className="flex items-center gap-2">
+                      <Flame className="w-4 h-4 text-muted-foreground" />
+                      <span className="font-medium">Intent Score</span>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <span className="text-2xl font-bold">{person.intentScore}</span>
+                      {person.intentTier && (
+                        <Badge
+                          variant={person.intentTier === "Hot" ? "destructive" : person.intentTier === "Warm" ? "default" : "secondary"}
+                        >
+                          {person.intentTier}
+                        </Badge>
+                      )}
+                    </div>
+                  </div>
+                  {person.scoreReasons && Array.isArray(person.scoreReasons) && person.scoreReasons.filter((r: any) => r.category === 'intent').length > 0 ? (
+                    <div className="space-y-2">
+                      <p className="text-xs text-muted-foreground font-medium">Recent Activity:</p>
+                      {person.scoreReasons.filter((r: any) => r.category === 'intent').map((reason: any, i: number) => (
+                        <div key={i} className="flex items-center justify-between text-sm">
+                          <span className="text-muted-foreground">{reason.reason}</span>
+                          <span className="font-medium">+{reason.points}</span>
+                        </div>
+                      ))}
+                    </div>
+                  ) : (
+                    <p className="text-xs text-muted-foreground">No recent intent signals</p>
+                  )}
+                </div>
+              )}
+            </div>
+
+            {/* Combined Score */}
+            {person.combinedScore !== null && (
+              <div className="mt-6 pt-6 border-t">
+                <div className="flex items-center justify-between">
+                  <span className="font-medium">Combined Score</span>
+                  <div className="flex items-center gap-2">
+                    <span className="text-xl font-bold">{person.combinedScore}</span>
+                    <span className="text-xs text-muted-foreground">(60% fit, 40% intent)</span>
+                  </div>
+                </div>
+              </div>
+            )}
+          </CardContent>
+        </Card>
+      )}
 
       <div className="grid gap-6 md:grid-cols-3">
         <Card className="md:col-span-1">

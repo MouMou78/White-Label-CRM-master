@@ -24,7 +24,7 @@ import {
 } from "@/components/ui/sidebar";
 import { getLoginUrl } from "@/const";
 import { useIsMobile } from "@/hooks/useMobile";
-import { Home, LogOut, PanelLeft, Users, Calendar, Settings, BarChart3, TrendingUp, Sparkles, Building2, UserCircle, Zap, Mail, Sliders, Activity, Wand2, ChevronDown } from "lucide-react";
+import { Home, LogOut, PanelLeft, Users, Calendar, Settings, BarChart3, TrendingUp, Sparkles, Building2, UserCircle, Zap, Mail, Sliders, Activity, Wand2, ChevronDown, Target } from "lucide-react";
 import { CSSProperties, useEffect, useRef, useState } from "react";
 import { useLocation } from "wouter";
 import { DashboardLayoutSkeleton } from './DashboardLayoutSkeleton';
@@ -46,6 +46,7 @@ const menuItems = [
 const settingsItems = [
   { icon: Settings, label: "Integrations", path: "/integrations" },
   { icon: Sliders, label: "Custom Fields", path: "/custom-fields" },
+  { icon: Target, label: "Lead Scoring", path: "/scoring-settings" },
 ];
 
 const amplemarketItems = [

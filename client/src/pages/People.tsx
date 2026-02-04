@@ -11,17 +11,35 @@ import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
 import { ListPageSkeleton } from "@/components/SkeletonLoaders";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export default function People() {
   const { data: people, isLoading } = trpc.people.list.useQuery();
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedIds, setSelectedIds] = useState<string[]>([]);
+  const [fitTierFilter, setFitTierFilter] = useState<string>("all");
+  const [intentTierFilter, setIntentTierFilter] = useState<string>("all");
+  const [sortBy, setSortBy] = useState<string>("recent");
 
-  const filteredPeople = people?.filter((person) =>
-    person.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    person.primaryEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
-    person.companyName?.toLowerCase().includes(searchQuery.toLowerCase())
-  );
+  const filteredPeople = people
+    ?.filter((person) =>
+      person.fullName.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      person.primaryEmail.toLowerCase().includes(searchQuery.toLowerCase()) ||
+      person.companyName?.toLowerCase().includes(searchQuery.toLowerCase())
+    )
+    .filter((person) => {
+      if (fitTierFilter !== "all" && person.fitTier !== fitTierFilter) return false;
+      if (intentTierFilter !== "all" && person.intentTier !== intentTierFilter) return false;
+      return true;
+    })
+    .sort((a, b) => {
+      if (sortBy === "fitScore") return (b.fitScore || 0) - (a.fitScore || 0);
+      if (sortBy === "intentScore") return (b.intentScore || 0) - (a.intentScore || 0);
+      if (sortBy === "combinedScore") return (b.combinedScore || 0) - (a.combinedScore || 0);
+      if (sortBy === "name") return a.fullName.localeCompare(b.fullName);
+      // Default: recent (by createdAt)
+      return new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime();
+    });
 
   const toggleSelection = (personId: string) => {
     setSelectedIds((prev) =>
@@ -134,15 +152,51 @@ export default function People() {
           </div>
         </CardHeader>
         <CardContent>
-          <div className="mb-4">
-            <div className="relative">
-              <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
+          <div className="mb-4 flex flex-col md:flex-row gap-2 flex-1">
+            <div className="relative flex-1">
+              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 text-muted-foreground w-4 h-4" />
               <Input
-                placeholder="Search by name, email, or company..."
+                placeholder="Search people..."
                 value={searchQuery}
                 onChange={(e) => setSearchQuery(e.target.value)}
                 className="pl-10"
               />
+            </div>
+            <div className="flex gap-2">
+              <Select value={fitTierFilter} onValueChange={setFitTierFilter}>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="Fit Tier" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Fit Tiers</SelectItem>
+                  <SelectItem value="A">Tier A</SelectItem>
+                  <SelectItem value="B">Tier B</SelectItem>
+                  <SelectItem value="C">Tier C</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={intentTierFilter} onValueChange={setIntentTierFilter}>
+                <SelectTrigger className="w-[140px]">
+                  <SelectValue placeholder="Intent" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="all">All Intent</SelectItem>
+                  <SelectItem value="Hot">Hot</SelectItem>
+                  <SelectItem value="Warm">Warm</SelectItem>
+                  <SelectItem value="Cold">Cold</SelectItem>
+                </SelectContent>
+              </Select>
+              <Select value={sortBy} onValueChange={setSortBy}>
+                <SelectTrigger className="w-[160px]">
+                  <SelectValue placeholder="Sort by" />
+                </SelectTrigger>
+                <SelectContent>
+                  <SelectItem value="recent">Recently Added</SelectItem>
+                  <SelectItem value="name">Name (A-Z)</SelectItem>
+                  <SelectItem value="combinedScore">Combined Score</SelectItem>
+                  <SelectItem value="fitScore">Fit Score</SelectItem>
+                  <SelectItem value="intentScore">Intent Score</SelectItem>
+                </SelectContent>
+              </Select>
             </div>
           </div>
 

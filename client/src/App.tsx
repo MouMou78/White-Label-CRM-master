@@ -27,6 +27,7 @@ import SequenceBuilder from "./pages/SequenceBuilder";
 import CustomFields from "./pages/CustomFields";
 import ActivityFeed from "./pages/ActivityFeed";
 import EmailGenerator from "./pages/EmailGenerator";
+import ScoringSettings from "./pages/ScoringSettings";
 import DashboardLayout from "./components/DashboardLayout";
 
 function Router() {
@@ -146,6 +147,12 @@ function Router() {
       <Route path="/custom-fields">
         <DashboardLayout>
           <CustomFields />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/scoring-settings">
+        <DashboardLayout>
+          <ScoringSettings />
         </DashboardLayout>
       </Route>
       

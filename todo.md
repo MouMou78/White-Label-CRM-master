@@ -1744,3 +1744,34 @@
 - [x] Add optional template sharing (make public to marketplace)
 - [x] Show template author and creation date for user templates
 - [x] Test custom template creation, editing, and sharing workflow
+
+
+## Template Marketplace Enhancements
+
+### Multi-Category Filtering and Search
+- [x] Add multi-select category filter to marketplace (allow selecting multiple categories)
+- [x] Implement search functionality across all tabs (Marketplace, My Templates, Community)
+- [x] Add search by template name, description, and tags
+- [x] Combine category filter with search for refined results
+- [x] Add "Clear Filters" button to reset all filters
+- [x] Test filtering and search across all tabs
+
+### Template Versioning System
+- [x] Add version field to userTemplates table (version number, changelog)
+- [x] Create templateVersions table to store version history
+- [x] Implement version increment on template updates (backend)
+- [ ] Add "View Version History" button in My Templates
+- [ ] Create version comparison UI showing changes between versions
+- [ ] Implement rollback functionality to restore previous versions (UI)
+- [ ] Add changelog input when saving template updates (UI)
+- [ ] Test versioning and rollback workflow
+
+### AI-Powered Template Recommendations
+- [ ] Analyze user's existing automation rules to identify patterns
+- [ ] Build recommendation algorithm based on triggers, actions, and conditions
+- [ ] Create backend procedure to generate personalized recommendations
+- [ ] Add "Recommended for You" section to marketplace homepage
+- [ ] Show recommendation reasoning (e.g., "Based on your email automation rules")
+- [ ] Implement recommendation scoring and ranking
+- [ ] Add "Not Interested" option to hide recommendations
+- [ ] Test recommendations with various user profiles

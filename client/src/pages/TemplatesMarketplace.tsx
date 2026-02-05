@@ -9,12 +9,13 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Badge } from "@/components/ui/badge";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Textarea } from "@/components/ui/textarea";
-import { Store, Search, Download, Check, Play, Zap, Filter, Star, TrendingUp, User, Edit, Trash2, Globe } from "lucide-react";
+import { Store, Search, Download, Check, Play, Zap, Filter, Star, TrendingUp, User, Edit, Trash2, Globe, X } from "lucide-react";
+import { Checkbox } from "@/components/ui/checkbox";
 import { toast } from "sonner";
 
 export default function TemplatesMarketplace() {
   const [activeTab, setActiveTab] = useState("marketplace");
-  const [selectedCategory, setSelectedCategory] = useState<string>("all");
+  const [selectedCategories, setSelectedCategories] = useState<string[]>([]);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState<any>(null);
   const [isPreviewOpen, setIsPreviewOpen] = useState(false);
@@ -77,14 +78,33 @@ export default function TemplatesMarketplace() {
     { value: "notifications", label: "Notifications" },
   ];
 
-  const filteredTemplates = templates?.filter((template: any) => {
-    const matchesCategory = selectedCategory === "all" || template.category === selectedCategory;
-    const matchesSearch = !searchQuery || 
-      template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      template.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
-      template.tags.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase()));
-    return matchesCategory && matchesSearch;
-  });
+  const toggleCategory = (category: string) => {
+    setSelectedCategories(prev => 
+      prev.includes(category) 
+        ? prev.filter(c => c !== category)
+        : [...prev, category]
+    );
+  };
+
+  const clearFilters = () => {
+    setSelectedCategories([]);
+    setSearchQuery("");
+  };
+
+  const filterTemplates = (templateList: any[]) => {
+    return templateList?.filter((template: any) => {
+      const matchesCategory = selectedCategories.length === 0 || selectedCategories.includes(template.category);
+      const matchesSearch = !searchQuery || 
+        template.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        template.description.toLowerCase().includes(searchQuery.toLowerCase()) ||
+        (template.tags && template.tags.some((tag: string) => tag.toLowerCase().includes(searchQuery.toLowerCase())));
+      return matchesCategory && matchesSearch;
+    });
+  };
+
+  const filteredTemplates = filterTemplates(templates || []);
+  const filteredMyTemplates = filterTemplates(myTemplates || []);
+  const filteredPublicTemplates = filterTemplates(publicUserTemplates || []);
 
   const isTemplateInstalled = (templateId: string) => {
     return installedRules?.some((rule: any) => 
@@ -314,29 +334,56 @@ export default function TemplatesMarketplace() {
 
         <TabsContent value="marketplace" className="space-y-6">
           {/* Filters */}
-          <div className="flex gap-4">
-            <div className="flex-1 relative">
-              <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
-              <Input
-                placeholder="Search templates..."
-                value={searchQuery}
-                onChange={(e) => setSearchQuery(e.target.value)}
-                className="pl-10"
-              />
+          <div className="space-y-4">
+            <div className="flex gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search templates by name, description, or tags..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              {(selectedCategories.length > 0 || searchQuery) && (
+                <Button variant="outline" onClick={clearFilters}>
+                  <X className="h-4 w-4 mr-2" />
+                  Clear Filters
+                </Button>
+              )}
             </div>
-            <Select value={selectedCategory} onValueChange={setSelectedCategory}>
-              <SelectTrigger className="w-[200px]">
-                <Filter className="h-4 w-4 mr-2" />
-                <SelectValue />
-              </SelectTrigger>
-              <SelectContent>
-                {categories.map((cat) => (
-                  <SelectItem key={cat.value} value={cat.value}>
-                    {cat.label}
-                  </SelectItem>
-                ))}
-              </SelectContent>
-            </Select>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Filter className="h-4 w-4" />
+                  Filter by Category
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-4">
+                  {categories.filter(c => c.value !== "all").map((category) => (
+                    <div key={category.value} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={category.value}
+                        checked={selectedCategories.includes(category.value)}
+                        onCheckedChange={() => toggleCategory(category.value)}
+                      />
+                      <label
+                        htmlFor={category.value}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      >
+                        {category.label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Results Count */}
+          <div className="text-sm text-muted-foreground">
+            Showing {filteredTemplates?.length || 0} template{filteredTemplates?.length !== 1 ? 's' : ''}
           </div>
 
           {/* Templates Grid */}
@@ -358,14 +405,61 @@ export default function TemplatesMarketplace() {
         </TabsContent>
 
         <TabsContent value="my-templates" className="space-y-6">
-          <div className="flex justify-between items-center">
-            <p className="text-muted-foreground">
-              Templates you've created from your automation rules
-            </p>
+          {/* Filters */}
+          <div className="space-y-4">
+            <div className="flex gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search your templates..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              {(selectedCategories.length > 0 || searchQuery) && (
+                <Button variant="outline" onClick={clearFilters}>
+                  <X className="h-4 w-4 mr-2" />
+                  Clear Filters
+                </Button>
+              )}
+            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Filter className="h-4 w-4" />
+                  Filter by Category
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-4">
+                  {categories.filter(c => c.value !== "all").map((category) => (
+                    <div key={category.value} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`my-${category.value}`}
+                        checked={selectedCategories.includes(category.value)}
+                        onCheckedChange={() => toggleCategory(category.value)}
+                      />
+                      <label
+                        htmlFor={`my-${category.value}`}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      >
+                        {category.label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Results Count */}
+          <div className="text-sm text-muted-foreground">
+            Showing {filteredMyTemplates?.length || 0} template{filteredMyTemplates?.length !== 1 ? 's' : ''}
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {myTemplates?.map((template: any) => (
+            {filteredMyTemplates?.map((template: any) => (
               <TemplateCard key={template.id} template={template} showActions isUserTemplate />
             ))}
           </div>
@@ -382,12 +476,61 @@ export default function TemplatesMarketplace() {
         </TabsContent>
 
         <TabsContent value="community" className="space-y-6">
-          <p className="text-muted-foreground">
-            Templates shared by the community
-          </p>
+          {/* Filters */}
+          <div className="space-y-4">
+            <div className="flex gap-4">
+              <div className="flex-1 relative">
+                <Search className="absolute left-3 top-1/2 transform -translate-y-1/2 h-4 w-4 text-muted-foreground" />
+                <Input
+                  placeholder="Search community templates..."
+                  value={searchQuery}
+                  onChange={(e) => setSearchQuery(e.target.value)}
+                  className="pl-10"
+                />
+              </div>
+              {(selectedCategories.length > 0 || searchQuery) && (
+                <Button variant="outline" onClick={clearFilters}>
+                  <X className="h-4 w-4 mr-2" />
+                  Clear Filters
+                </Button>
+              )}
+            </div>
+            <Card>
+              <CardHeader>
+                <CardTitle className="text-sm flex items-center gap-2">
+                  <Filter className="h-4 w-4" />
+                  Filter by Category
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex flex-wrap gap-4">
+                  {categories.filter(c => c.value !== "all").map((category) => (
+                    <div key={category.value} className="flex items-center space-x-2">
+                      <Checkbox
+                        id={`community-${category.value}`}
+                        checked={selectedCategories.includes(category.value)}
+                        onCheckedChange={() => toggleCategory(category.value)}
+                      />
+                      <label
+                        htmlFor={`community-${category.value}`}
+                        className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70 cursor-pointer"
+                      >
+                        {category.label}
+                      </label>
+                    </div>
+                  ))}
+                </div>
+              </CardContent>
+            </Card>
+          </div>
+
+          {/* Results Count */}
+          <div className="text-sm text-muted-foreground">
+            Showing {filteredPublicTemplates?.length || 0} template{filteredPublicTemplates?.length !== 1 ? 's' : ''}
+          </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-3">
-            {publicUserTemplates?.map((template: any) => (
+            {filteredPublicTemplates?.map((template: any) => (
               <TemplateCard key={template.id} template={template} isUserTemplate />
             ))}
           </div>

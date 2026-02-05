@@ -473,6 +473,8 @@ export const userTemplates = mysqlTable("userTemplates", {
   priority: int("priority").default(0).notNull(),
   isPublic: boolean("isPublic").default(false).notNull(),
   baseTemplateId: varchar("baseTemplateId", { length: 100 }),
+  version: int("version").default(1).notNull(),
+  changelog: text("changelog"),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
@@ -483,6 +485,51 @@ export const userTemplates = mysqlTable("userTemplates", {
 
 export type UserTemplate = typeof userTemplates.$inferSelect;
 export type InsertUserTemplate = typeof userTemplates.$inferInsert;
+
+// Template Version History
+export const templateVersions = mysqlTable("templateVersions", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  templateId: varchar("templateId", { length: 36 }).notNull(),
+  version: int("version").notNull(),
+  name: text("name").notNull(),
+  description: text("description"),
+  category: mysqlEnum("category", ["lead_nurturing", "deal_management", "task_automation", "notifications"]).notNull(),
+  triggerType: mysqlEnum("triggerType", [
+    "email_opened",
+    "email_replied",
+    "no_reply_after_days",
+    "meeting_held",
+    "stage_entered",
+    "deal_value_threshold",
+    "scheduled"
+  ]).notNull(),
+  triggerConfig: json("triggerConfig").$type<Record<string, any>>().default({}),
+  actionType: mysqlEnum("actionType", [
+    "move_stage",
+    "send_notification",
+    "create_task",
+    "enroll_sequence",
+    "update_field"
+  ]).notNull(),
+  actionConfig: json("actionConfig").$type<Record<string, any>>().default({}),
+  conditions: json("conditions").$type<{
+    logic: 'AND' | 'OR';
+    rules: Array<{
+      field: string;
+      operator: 'equals' | 'not_equals' | 'greater_than' | 'less_than' | 'contains' | 'not_contains' | 'is_empty' | 'is_not_empty';
+      value: any;
+    }>;
+  }>().default({ logic: 'AND', rules: [] }),
+  priority: int("priority").default(0).notNull(),
+  changelog: text("changelog"),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  templateIdx: index("template_idx").on(table.templateId),
+  versionIdx: index("version_idx").on(table.version),
+}));
+
+export type TemplateVersion = typeof templateVersions.$inferSelect;
+export type InsertTemplateVersion = typeof templateVersions.$inferInsert;
 
 // Tracking Events for Intent Scoring
 export const trackingEvents = mysqlTable("trackingEvents", {

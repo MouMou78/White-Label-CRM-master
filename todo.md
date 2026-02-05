@@ -97,6 +97,16 @@
 - [x] Apply color scheme to CSS variables
 - [x] Add logo to dashboard and branding
 - [x] Update page titles and metadata
+- [x] Complete rebranding from KompassCRM to 1twenty CRM across all files
+- [x] Update Onboarding.tsx welcome screen
+- [x] Update Signup.tsx and Login.tsx
+- [x] Update EmailAccounts.tsx
+- [x] Update email templates in email.ts
+- [x] Update OTP auth in auth.ts
+- [x] Update campaign and sequence URLs
+- [x] Update package.json project name
+- [x] Update guest user email
+- [x] Update rules-engine.ts comments
 
 ## Bug Fixes
 - [x] Fix "Add Person" button on People page
@@ -1277,3 +1287,11 @@
 - [ ] Mark user as onboarded in database
 - [ ] Skip welcome screen for returning users
 - [ ] Test welcome flow for new signups
+
+## Rebranding
+
+### Change Application Name
+- [ ] Update all "KompassCRM" references to "1twenty CRM"
+- [ ] Update welcome/onboarding screen branding
+- [ ] Update page titles and headers
+- [ ] Update any configuration or metadata files

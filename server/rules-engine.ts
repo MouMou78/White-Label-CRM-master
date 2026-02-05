@@ -1,5 +1,5 @@
 /**
- * Rules Engine for KompassCRM
+ * Rules Engine for 1twenty CRM
  * Handles automated workflow triggers based on moments
  */
 

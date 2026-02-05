@@ -4,7 +4,7 @@ import type { TrpcContext } from "./context";
 const GUEST_USER = {
   id: "guest-user-id",
   tenantId: "guest-tenant-id",
-  email: "guest@kompasscrm.demo",
+  email: "guest@1twentycrm.demo",
   passwordHash: "not-used",
   name: "Guest User",
   role: "owner" as const,

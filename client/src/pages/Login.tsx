@@ -145,7 +145,7 @@ export default function Login() {
       <Card className="w-full max-w-md">
         <CardHeader>
           <CardTitle>Welcome back</CardTitle>
-          <CardDescription>Log in to your KompassCRM account</CardDescription>
+          <CardDescription>Log in to your 1twenty CRM account</CardDescription>
         </CardHeader>
         <form onSubmit={handleLogin}>
           <CardContent className="space-y-4">

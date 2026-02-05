@@ -239,31 +239,31 @@ export default function AccountDetailPage() {
             
             {linkedContacts.length > 0 && (
               <div className="flex items-center gap-2 mt-4">
-                  {showBulkActions && (
-                    <>
-                      <span className="text-sm text-muted-foreground">
-                        {selectedContacts.size} selected
-                      </span>
-                      <Button size="sm" variant="outline" onClick={clearSelection}>
-                        Clear
-                      </Button>
-                      <Button size="sm" variant="outline">
-                        Add to Sequence
-                      </Button>
-                      <Button size="sm" variant="outline">
-                        Add to Campaign
-                      </Button>
-                    </>
-                  )}
-                  <Button 
-                    size="sm" 
-                    variant="ghost"
-                    onClick={selectedContacts.size === linkedContacts.length ? clearSelection : selectAll}
-                  >
-                    {selectedContacts.size === linkedContacts.length ? 'Deselect All' : 'Select All'}
-                  </Button>
-                </div>
-              )}
+                {showBulkActions && (
+                  <>
+                    <span className="text-sm text-muted-foreground">
+                      {selectedContacts.size} selected
+                    </span>
+                    <Button size="sm" variant="outline" onClick={clearSelection}>
+                      Clear
+                    </Button>
+                    <Button size="sm" variant="outline">
+                      Add to Sequence
+                    </Button>
+                    <Button size="sm" variant="outline">
+                      Add to Campaign
+                    </Button>
+                  </>
+                )}
+                <Button 
+                  size="sm" 
+                  variant="ghost"
+                  onClick={selectedContacts.size === linkedContacts.length ? clearSelection : selectAll}
+                >
+                  {selectedContacts.size === linkedContacts.length ? 'Deselect All' : 'Select All'}
+                </Button>
+              </div>
+            )}
             
             {linkedContacts.length === 0 ? (
               <p className="text-sm text-muted-foreground text-center py-8">

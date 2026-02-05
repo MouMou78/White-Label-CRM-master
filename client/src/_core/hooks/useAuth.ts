@@ -32,12 +32,19 @@ export function useAuth(options?: UseAuthOptions) {
         error instanceof TRPCClientError &&
         error.data?.code === "UNAUTHORIZED"
       ) {
-        return;
+        // Already logged out, proceed with cleanup
+      } else {
+        console.error('Logout error:', error);
       }
-      throw error;
     } finally {
+      // Clear auth state
       utils.auth.me.setData(undefined, null);
       await utils.auth.me.invalidate();
+      // Clear local storage
+      localStorage.removeItem('manus-runtime-user-info');
+      localStorage.removeItem('onboarding_completed');
+      // Redirect to login
+      window.location.href = getLoginUrl();
     }
   }, [logoutMutation, utils]);
 

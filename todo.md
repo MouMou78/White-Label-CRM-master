@@ -1954,3 +1954,16 @@
 - [x] Build manual enrichment button in contact detail page
 - [x] Add enrichment status indicators in UI
 - [x] Test enrichment with sample contacts
+
+## Real Enrichment API Integration
+- [x] Research and select enrichment API provider (Clearbit, Hunter.io, Apollo.io, or ZoomInfo)
+- [x] Add API key configuration via webdev_request_secrets
+- [x] Replace mock enrichment with real API calls
+- [x] Test enrichment with real API
+- [x] Handle API rate limits and errors
+
+## Production Deployment
+- [ ] Create final checkpoint before publishing
+- [ ] Publish to 1twentyinternal.com domain
+- [ ] Verify production deployment
+- [ ] Test all features in production

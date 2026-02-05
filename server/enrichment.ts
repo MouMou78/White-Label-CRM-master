@@ -15,19 +15,29 @@ interface EnrichmentResult {
   error?: string;
 }
 
+interface HunterEnrichmentResponse {
+  data?: {
+    first_name?: string;
+    last_name?: string;
+    email?: string;
+    position?: string;
+    company?: string;
+    city?: string;
+    state?: string;
+    country?: string;
+    linkedin?: string;
+    twitter?: string;
+    phone_number?: string;
+  };
+  errors?: Array<{ id: string; details: string }>;
+}
+
 /**
- * Enrich contact data using email lookup
- * This is a mock implementation - in production, integrate with services like:
- * - Clearbit API
- * - Hunter.io
- * - Apollo.io
- * - ZoomInfo
+ * Enrich contact data using Hunter.io API
  */
 export async function enrichContact(personId: string, email: string): Promise<EnrichmentResult> {
   try {
-    // Mock enrichment data based on email domain
-    const domain = email.split('@')[1];
-    const enrichedData = await mockEnrichmentAPI(email, domain);
+    const enrichedData = await hunterEnrichmentAPI(email);
     
     if (!enrichedData) {
       return {
@@ -64,7 +74,7 @@ export async function enrichContact(personId: string, email: string): Promise<En
 
     if (Object.keys(updateData).length > 0) {
       updateData.enrichmentLastSyncedAt = new Date();
-      updateData.enrichmentSource = 'auto';
+      updateData.enrichmentSource = 'hunter';
       updateData.enrichmentSnapshot = enrichedData;
       
       const db = await getDb();
@@ -103,52 +113,70 @@ export async function enrichContact(personId: string, email: string): Promise<En
 }
 
 /**
- * Mock enrichment API - replace with real API integration
+ * Call Hunter.io Email Enrichment API
  */
-async function mockEnrichmentAPI(email: string, domain: string): Promise<any> {
-  // Simulate API delay
-  await new Promise(resolve => setTimeout(resolve, 500));
-
-  // Mock data based on common domains
-  const mockDatabase: Record<string, any> = {
-    'google.com': {
-      roleTitle: 'Software Engineer',
-      companyName: 'Google',
-      linkedinUrl: 'https://linkedin.com/in/example',
-      location: 'Mountain View, CA',
-    },
-    'microsoft.com': {
-      roleTitle: 'Product Manager',
-      companyName: 'Microsoft',
-      linkedinUrl: 'https://linkedin.com/in/example',
-      location: 'Redmond, WA',
-    },
-    'apple.com': {
-      roleTitle: 'Senior Designer',
-      companyName: 'Apple',
-      linkedinUrl: 'https://linkedin.com/in/example',
-      location: 'Cupertino, CA',
-    },
-    'amazon.com': {
-      roleTitle: 'Solutions Architect',
-      companyName: 'Amazon',
-      linkedinUrl: 'https://linkedin.com/in/example',
-      location: 'Seattle, WA',
-    },
-  };
-
-  // Return mock data if domain matches
-  if (mockDatabase[domain]) {
-    return mockDatabase[domain];
+async function hunterEnrichmentAPI(email: string): Promise<any> {
+  const apiKey = process.env.HUNTER_API_KEY;
+  
+  if (!apiKey) {
+    throw new Error('HUNTER_API_KEY not configured');
   }
 
-  // Generate generic mock data for unknown domains
-  const companyName = domain.split('.')[0];
-  return {
-    roleTitle: 'Professional',
-    companyName: companyName.charAt(0).toUpperCase() + companyName.slice(1),
-    location: 'United States',
-  };
+  try {
+    const url = `https://api.hunter.io/v2/email-enrichment?email=${encodeURIComponent(email)}&api_key=${apiKey}`;
+    const response = await fetch(url);
+    
+    if (!response.ok) {
+      const errorText = await response.text();
+      throw new Error(`Hunter.io API error: ${response.status} - ${errorText}`);
+    }
+
+    const data: HunterEnrichmentResponse = await response.json();
+    
+    // Check for API errors
+    if (data.errors && data.errors.length > 0) {
+      throw new Error(`Hunter.io API error: ${data.errors[0].details}`);
+    }
+
+    if (!data.data) {
+      return null;
+    }
+
+    // Transform Hunter.io response to our format
+    const enrichedData: any = {};
+
+    if (data.data.position) {
+      enrichedData.roleTitle = data.data.position;
+    }
+
+    if (data.data.company) {
+      enrichedData.companyName = data.data.company;
+    }
+
+    if (data.data.linkedin) {
+      enrichedData.linkedinUrl = data.data.linkedin;
+    }
+
+    // Combine location fields
+    const locationParts = [
+      data.data.city,
+      data.data.state,
+      data.data.country
+    ].filter(Boolean);
+    
+    if (locationParts.length > 0) {
+      enrichedData.location = locationParts.join(', ');
+    }
+
+    if (data.data.phone_number) {
+      enrichedData.phone = data.data.phone_number;
+    }
+
+    return Object.keys(enrichedData).length > 0 ? enrichedData : null;
+  } catch (error) {
+    console.error('Hunter.io API call failed:', error);
+    throw error;
+  }
 }
 
 /**
@@ -199,8 +227,8 @@ export async function batchEnrichContacts(personIds: string[]): Promise<{
       failed++;
     }
 
-    // Rate limiting - wait between requests
-    await new Promise(resolve => setTimeout(resolve, 100));
+    // Rate limiting - wait between requests to respect Hunter.io rate limits
+    await new Promise(resolve => setTimeout(resolve, 1000));
   }
 
   return {

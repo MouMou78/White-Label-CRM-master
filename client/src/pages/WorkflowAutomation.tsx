@@ -9,6 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Switch } from "@/components/ui/switch";
 import { Plus, Zap, Play, Pause, Trash2, History, Lightbulb, TestTube } from "lucide-react";
 import { toast } from "sonner";
+import { ConditionBuilder, type ConditionGroup } from "@/components/ConditionBuilder";
 
 export default function WorkflowAutomation() {
   const [isCreateOpen, setIsCreateOpen] = useState(false);
@@ -19,6 +20,7 @@ export default function WorkflowAutomation() {
     triggerConfig: Record<string, any>;
     actionType: "move_stage" | "send_notification" | "create_task" | "enroll_sequence" | "update_field";
     actionConfig: Record<string, any>;
+    conditions: ConditionGroup;
   }>({
     name: "",
     description: "",
@@ -26,6 +28,7 @@ export default function WorkflowAutomation() {
     triggerConfig: {},
     actionType: "move_stage",
     actionConfig: {},
+    conditions: { logic: 'AND', rules: [] },
   });
 
   const { data: rules, isLoading, refetch } = trpc.automation.getRules.useQuery();
@@ -45,6 +48,7 @@ export default function WorkflowAutomation() {
         triggerConfig: {},
         actionType: "move_stage",
         actionConfig: {},
+        conditions: { logic: 'AND', rules: [] },
       });
       toast.success("Automation rule created");
     },
@@ -347,6 +351,13 @@ export default function WorkflowAutomation() {
                   />
                 </div>
               )}
+
+              <div className="border-t pt-4">
+                <ConditionBuilder
+                  value={formData.conditions}
+                  onChange={(conditions) => setFormData({ ...formData, conditions })}
+                />
+              </div>
 
               <Button onClick={handleCreate} className="w-full" disabled={createMutation.isPending}>
                 {createMutation.isPending ? "Creating..." : "Create Rule"}

@@ -1648,3 +1648,16 @@
 - [x] Create sample automation rules (Move to Proposal after Meeting, Follow-up task after email)
 - [x] Add "Test Rule" button with dry-run mode to preview actions without executing
 - [x] Test navigation, sample rules, and test mode functionality
+
+
+## Advanced Conditional Logic Builder
+- [x] Design condition schema with field, operator, value structure
+- [x] Update automationRules schema to support conditions array with AND/OR logic
+- [x] Create ConditionBuilder component with add/remove condition functionality
+- [x] Implement condition field selector (deal value, stage, contact score, etc.)
+- [x] Add operator selector (equals, greater than, less than, contains, etc.)
+- [x] Build value input with type-aware validation
+- [x] Add AND/OR toggle between condition groups
+- [x] Integrate condition builder into rule creation dialog
+- [x] Update rule display to show conditions in readable format
+- [x] Test complex multi-condition rules

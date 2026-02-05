@@ -360,6 +360,14 @@ export const automationRules = mysqlTable("automationRules", {
     "update_field"
   ]).notNull(),
   actionConfig: json("actionConfig").$type<Record<string, any>>().default({}),
+  conditions: json("conditions").$type<{
+    logic: 'AND' | 'OR';
+    rules: Array<{
+      field: string;
+      operator: 'equals' | 'not_equals' | 'greater_than' | 'less_than' | 'contains' | 'not_contains' | 'is_empty' | 'is_not_empty';
+      value: any;
+    }>;
+  }>().default({ logic: 'AND', rules: [] }),
   status: mysqlEnum("status", ["active", "paused"]).default("active").notNull(),
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),

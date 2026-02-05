@@ -2421,6 +2421,14 @@ Generate a subject line and email body. Format your response as JSON with "subje
         triggerConfig: z.record(z.string(), z.any()).optional(),
         actionType: z.enum(["move_stage", "send_notification", "create_task", "enroll_sequence", "update_field"]),
         actionConfig: z.record(z.string(), z.any()).optional(),
+        conditions: z.object({
+          logic: z.enum(['AND', 'OR']),
+          rules: z.array(z.object({
+            field: z.string(),
+            operator: z.enum(['equals', 'not_equals', 'greater_than', 'less_than', 'contains', 'not_contains', 'is_empty', 'is_not_empty']),
+            value: z.any(),
+          })),
+        }).optional(),
         status: z.enum(["active", "paused"]).optional(),
       }))
       .mutation(async ({ input, ctx }) => {

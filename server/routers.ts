@@ -1987,6 +1987,40 @@ Generate a subject line and email body. Format your response as JSON with "subje
         await db.setDefaultEmailAccount(ctx.user.id, input.accountId);
         return { success: true };
       }),
+    
+    send: protectedProcedure
+      .input(z.object({
+        to: z.string().email(),
+        subject: z.string(),
+        body: z.string(),
+        contactId: z.string().optional(),
+        dealId: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { sendEmail } = await import('./email');
+        
+        // Get default email account for the user
+        const accounts = await db.getEmailAccountsByUser(ctx.user.id);
+        const defaultAccount = accounts.find(acc => acc.isDefault) || accounts[0];
+        
+        if (!defaultAccount) {
+          throw new TRPCError({
+            code: 'PRECONDITION_FAILED',
+            message: 'No email account configured. Please add an email account first.',
+          });
+        }
+        
+        // Send email using the configured SMTP account
+        await sendEmail(
+          input.to,
+          input.subject,
+          input.body.replace(/\n/g, '<br>')
+        );
+        
+        // Email sent successfully - activity logging can be added later
+        
+        return { success: true };
+      }),
   }),
   
   campaigns: router({

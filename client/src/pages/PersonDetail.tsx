@@ -9,6 +9,7 @@ import { Link } from "wouter";
 import { EmailActivityTimeline } from "@/components/EmailActivityTimeline";
 import Notes from "@/components/Notes";
 import { AIEmailAssistant } from "@/components/AIEmailAssistant";
+import { toast } from "sonner";
 
 interface PersonDetailProps {
   personId: string;
@@ -19,6 +20,7 @@ export default function PersonDetail({ personId }: PersonDetailProps) {
   const [insights, setInsights] = useState<{ insights: string; generatedAt: string } | null>(null);
   const [showInsights, setShowInsights] = useState(false);
   const generateInsightsMutation = trpc.assistant.generateContactInsights.useMutation();
+  const sendEmailMutation = trpc.email.send.useMutation();
 
   if (isLoading) {
     return (
@@ -394,8 +396,27 @@ export default function PersonDetail({ personId }: PersonDetailProps) {
             <AIEmailAssistant
               contactId={personId}
               onApply={(subject: string, body: string) => {
-                // Email sending logic would go here
-                console.log('Sending email:', { subject, body });
+                if (!person?.primaryEmail) {
+                  toast.error("This contact doesn't have an email address.");
+                  return;
+                }
+                
+                sendEmailMutation.mutate(
+                  {
+                    to: person.primaryEmail,
+                    subject,
+                    body,
+                    contactId: personId,
+                  },
+                  {
+                    onSuccess: () => {
+                      toast.success(`Email sent successfully to ${person.primaryEmail}`);
+                    },
+                    onError: (error) => {
+                      toast.error(`Failed to send email: ${error.message}`);
+                    },
+                  }
+                );
               }}
             />
           </CardContent>

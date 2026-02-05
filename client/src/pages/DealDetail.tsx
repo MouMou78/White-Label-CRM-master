@@ -7,6 +7,7 @@ import { ArrowLeft, DollarSign, Calendar, User, Building2 } from "lucide-react";
 import Notes from "@/components/Notes";
 import { AIEmailAssistant } from "@/components/AIEmailAssistant";
 import { format } from "date-fns";
+import { toast } from "sonner";
 
 export default function DealDetail() {
   const params = useParams();
@@ -14,6 +15,7 @@ export default function DealDetail() {
   const [, setLocation] = useLocation();
 
   const { data: deal, isLoading } = trpc.deals.get.useQuery({ dealId });
+  const sendEmailMutation = trpc.email.send.useMutation();
 
   if (isLoading) {
     return (
@@ -158,8 +160,12 @@ export default function DealDetail() {
             <AIEmailAssistant
               dealId={dealId}
               onApply={(subject: string, body: string) => {
-                // Email sending logic would go here
-                console.log('Sending email:', { subject, body });
+                // For deals, we need to get the primary contact's email
+                // This is a simplified implementation - in production you'd want to select from multiple contacts
+                toast.info("Email composition ready. In production, this would send to the deal's primary contact.");
+                
+                // Placeholder for actual email sending
+                // sendEmailMutation.mutate({ to: contactEmail, subject, body, dealId });
               }}
             />
           </CardContent>

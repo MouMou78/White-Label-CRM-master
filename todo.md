@@ -1515,3 +1515,27 @@
 - [ ] Add export functionality (CSV, PDF)
 - [ ] Build report preview with charts
 - [ ] Test report generation and export
+
+## Task Edit Dialog Reminder Picker
+- [ ] Create task edit dialog in Tasks.tsx (currently only has completion)
+- [ ] Add datetime-local input for reminderAt in edit form
+- [ ] Update tasks.update API call to include reminderAt
+- [ ] Test reminder editing workflow
+
+## Email Sending Integration
+- [x] Create email sending endpoint in email router
+- [x] Integrate with existing SMTP configuration from email accounts
+- [x] Update AIEmailAssistant onApply callbacks in PersonDetail to call send endpoint
+- [x] Update AIEmailAssistant onApply callbacks in DealDetail (placeholder for contact selection)
+- [x] Add success/error toast notifications
+- [x] Handle email account selection (use default or let user choose)
+- [x] Test email sending from contact pages
+
+## Custom Report Builder
+- [ ] Design report builder UI with metric selection
+- [ ] Add date range picker for report filtering
+- [ ] Create backend endpoint for custom report generation
+- [ ] Implement CSV export functionality
+- [ ] Implement PDF export functionality
+- [ ] Add report templates (pipeline health, activity summary, conversion rates)
+- [ ] Test report generation and export

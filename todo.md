@@ -1946,3 +1946,11 @@
 - [x] Add OAuth credential configuration UI to Settings
 - [x] Implement OAuth callback handling (backend scaffold complete)
 - [ ] Test calendar sync with real Google account (requires user's Google Cloud Console setup)
+
+## Contact Enrichment Service
+- [x] Create enrichment service backend with API integration
+- [x] Add database fields for enrichment status and metadata
+- [x] Implement automatic enrichment on contact creation
+- [x] Build manual enrichment button in contact detail page
+- [x] Add enrichment status indicators in UI
+- [x] Test enrichment with sample contacts

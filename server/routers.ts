@@ -356,10 +356,21 @@ export const appRouter = router({
           });
         }
         
-        return db.createPerson({
+        const person = await db.createPerson({
           tenantId: ctx.user.tenantId,
           ...input,
         });
+        
+        // Auto-enrich new contact if missing key fields
+        const { needsEnrichment, enrichContact } = await import("./enrichment");
+        if (needsEnrichment(person)) {
+          // Trigger enrichment asynchronously (don't wait for it)
+          enrichContact(person.id, person.primaryEmail).catch(err => {
+            console.error(`Auto-enrichment failed for person ${person.id}:`, err);
+          });
+        }
+        
+        return person;
       }),
     
     updateScore: protectedProcedure
@@ -616,6 +627,41 @@ export const appRouter = router({
         }
         
         return contacts;
+      }),
+    
+    enrich: protectedProcedure
+      .input(z.object({ personId: z.string() }))
+      .mutation(async ({ input, ctx }) => {
+        const person = await db.getPersonById(input.personId);
+        if (!person || person.tenantId !== ctx.user.tenantId) {
+          throw new TRPCError({ code: "NOT_FOUND" });
+        }
+        
+        if (!person.primaryEmail) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Contact must have an email address" });
+        }
+        
+        const { enrichContact } = await import("./enrichment");
+        const result = await enrichContact(input.personId, person.primaryEmail);
+        
+        return result;
+      }),
+    
+    batchEnrich: protectedProcedure
+      .input(z.object({ personIds: z.array(z.string()) }))
+      .mutation(async ({ input, ctx }) => {
+        // Verify all persons belong to tenant
+        for (const personId of input.personIds) {
+          const person = await db.getPersonById(personId);
+          if (!person || person.tenantId !== ctx.user.tenantId) {
+            throw new TRPCError({ code: "NOT_FOUND", message: `Person ${personId} not found` });
+          }
+        }
+        
+        const { batchEnrichContacts } = await import("./enrichment");
+        const result = await batchEnrichContacts(input.personIds);
+        
+        return result;
       }),
   }),
   

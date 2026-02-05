@@ -1935,3 +1935,8 @@
 ## Theme Toggle Icon Fix
 - [x] Update theme toggle button to use sun/moon icons instead of system settings icon
 - [x] Test theme toggle clarity in browser
+
+## Logo Dark Mode Fix
+- [x] Find logo component in DashboardLayout
+- [x] Increase contrast for "CONSULTANCY" text in dark mode
+- [x] Test logo visibility in both themes

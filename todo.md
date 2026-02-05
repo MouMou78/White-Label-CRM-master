@@ -1840,3 +1840,11 @@
 - [ ] Create usage trend charts (daily/weekly/monthly)
 - [ ] Display ROI metrics (time saved, tasks automated)
 - [ ] Test insights with sample usage data
+
+
+## Database Migration Fix for Missing Columns
+- [x] Check automationRules table for missing columns (conditions, priority, schedule, timezone, nextRunAt)
+- [x] Check userTemplates table for missing columns (conditions, priority, version, changelog)
+- [x] Generate migration SQL for all missing columns
+- [x] Apply migration SQL via webdev_execute_sql
+- [x] Verify tables have all required columns

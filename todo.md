@@ -1848,3 +1848,7 @@
 - [x] Generate migration SQL for all missing columns
 - [x] Apply migration SQL via webdev_execute_sql
 - [x] Verify tables have all required columns
+
+## Critical Bug Fixes (Pre-Publishing)
+- [x] Fix Activity Feed 404 error - implement missing page
+- [x] Fix New Thread button functionality - ensure dialog opens correctly

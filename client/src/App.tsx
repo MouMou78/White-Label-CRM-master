@@ -259,6 +259,12 @@ function Router() {
         </DashboardLayout>
       </Route>
       
+      <Route path="/activity-feed">
+        <DashboardLayout>
+          <ActivityFeed />
+        </DashboardLayout>
+      </Route>
+      
       <Route path="/email-generator">
         <DashboardLayout>
           <EmailGenerator />

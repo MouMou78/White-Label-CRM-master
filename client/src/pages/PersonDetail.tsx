@@ -10,6 +10,10 @@ import { EmailActivityTimeline } from "@/components/EmailActivityTimeline";
 import Notes from "@/components/Notes";
 import { AIEmailAssistant } from "@/components/AIEmailAssistant";
 import { toast } from "sonner";
+import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Textarea } from "@/components/ui/textarea";
 
 interface PersonDetailProps {
   personId: string;
@@ -19,8 +23,13 @@ export default function PersonDetail({ personId }: PersonDetailProps) {
   const { data, isLoading } = trpc.people.get.useQuery({ id: personId });
   const [insights, setInsights] = useState<{ insights: string; generatedAt: string } | null>(null);
   const [showInsights, setShowInsights] = useState(false);
+  const [isNewThreadOpen, setIsNewThreadOpen] = useState(false);
+  const [threadTitle, setThreadTitle] = useState("");
+  const [threadNotes, setThreadNotes] = useState("");
   const generateInsightsMutation = trpc.assistant.generateContactInsights.useMutation();
   const sendEmailMutation = trpc.email.send.useMutation();
+  const createThreadMutation = trpc.threads.create.useMutation();
+  const utils = trpc.useUtils();
 
   if (isLoading) {
     return (
@@ -85,11 +94,85 @@ export default function PersonDetail({ personId }: PersonDetailProps) {
             <span className="hidden sm:inline">{insights ? (showInsights ? 'Hide' : 'Show') + ' AI Insights' : 'Generate AI Insights'}</span>
             <span className="sm:hidden">Insights</span>
           </Button>
-          <Button className="flex-1 md:flex-none">
-            <Plus className="w-4 h-4 mr-2" />
-            <span className="hidden sm:inline">New Thread</span>
-            <span className="sm:hidden">Thread</span>
-          </Button>
+          <Dialog open={isNewThreadOpen} onOpenChange={setIsNewThreadOpen}>
+            <DialogTrigger asChild>
+              <Button className="flex-1 md:flex-none">
+                <Plus className="w-4 h-4 mr-2" />
+                <span className="hidden sm:inline">New Thread</span>
+                <span className="sm:hidden">Thread</span>
+              </Button>
+            </DialogTrigger>
+            <DialogContent>
+              <DialogHeader>
+                <DialogTitle>Create New Thread</DialogTitle>
+                <DialogDescription>
+                  Start a new conversation thread with {person.fullName}
+                </DialogDescription>
+              </DialogHeader>
+              <div className="space-y-4 py-4">
+                <div className="space-y-2">
+                  <Label htmlFor="thread-title">Thread Title</Label>
+                  <Input
+                    id="thread-title"
+                    placeholder="e.g., Q1 2026 Partnership Discussion"
+                    value={threadTitle}
+                    onChange={(e) => setThreadTitle(e.target.value)}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <Label htmlFor="thread-notes">Initial Notes (Optional)</Label>
+                  <Textarea
+                    id="thread-notes"
+                    placeholder="Add any initial context or notes..."
+                    value={threadNotes}
+                    onChange={(e) => setThreadNotes(e.target.value)}
+                    rows={4}
+                  />
+                </div>
+              </div>
+              <div className="flex justify-end gap-2">
+                <Button
+                  variant="outline"
+                  onClick={() => {
+                    setIsNewThreadOpen(false);
+                    setThreadTitle("");
+                    setThreadNotes("");
+                  }}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  onClick={async () => {
+                    if (!threadTitle.trim()) {
+                      toast.error("Please enter a thread title");
+                      return;
+                    }
+                    try {
+                      const result = await createThreadMutation.mutateAsync({
+                        personId: personId,
+                        source: "manual",
+                        intent: "outbound",
+                        title: threadTitle,
+                      });
+                      toast.success("Thread created successfully");
+                      setIsNewThreadOpen(false);
+                      setThreadTitle("");
+                      setThreadNotes("");
+                      utils.people.get.invalidate({ id: personId });
+                    } catch (error) {
+                      toast.error("Failed to create thread");
+                    }
+                  }}
+                  disabled={createThreadMutation.isPending}
+                >
+                  {createThreadMutation.isPending && (
+                    <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                  )}
+                  Create Thread
+                </Button>
+              </div>
+            </DialogContent>
+          </Dialog>
         </div>
       </div>
 

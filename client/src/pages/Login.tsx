@@ -16,24 +16,18 @@ export default function Login() {
   const [useBackupCode, setUseBackupCode] = useState(false);
   const [, setLocation] = useLocation();
 
-  const loginMutation = trpc.auth.login.useMutation({
+  const loginMutation = trpc.customAuth.login.useMutation({
     onSuccess: (data) => {
-      setUserId(data.userId);
-      setStep("2fa");
+      if ('requires2FA' in data && data.requires2FA) {
+        setUserId(data.userId);
+        setStep("2fa");
+      } else if ('authenticated' in data && data.authenticated) {
+        // Login successful, redirect to dashboard
+        window.location.href = "/";
+      }
     },
     onError: (error) => {
       alert(`Login failed: ${error.message}`);
-    },
-  });
-
-  const verifyMutation = trpc.auth.verifyLogin.useMutation({
-    onSuccess: () => {
-      // Reload to get authenticated state
-      window.location.href = "/";
-    },
-    onError: (error) => {
-      alert(`Verification failed: ${error.message}`);
-      setToken("");
     },
   });
 
@@ -44,10 +38,11 @@ export default function Login() {
 
   const handleVerify = (e: React.FormEvent) => {
     e.preventDefault();
-    verifyMutation.mutate({
-      userId,
-      token,
-      isBackupCode: useBackupCode,
+    // Re-submit login with 2FA code
+    loginMutation.mutate({
+      email,
+      password,
+      twoFactorCode: token,
     });
   };
 
@@ -87,9 +82,9 @@ export default function Login() {
                   <Button
                     type="submit"
                     className="w-full"
-                    disabled={verifyMutation.isPending || token.length !== 6}
+                    disabled={loginMutation.isPending || token.length !== 6}
                   >
-                    {verifyMutation.isPending ? "Verifying..." : "Verify"}
+                    {loginMutation.isPending ? "Verifying..." : "Verify"}
                   </Button>
                 </form>
               </TabsContent>
@@ -115,9 +110,9 @@ export default function Login() {
                   <Button
                     type="submit"
                     className="w-full"
-                    disabled={verifyMutation.isPending || token.length === 0}
+                    disabled={loginMutation.isPending || token.length === 0}
                   >
-                    {verifyMutation.isPending ? "Verifying..." : "Verify with Backup Code"}
+                    {loginMutation.isPending ? "Verifying..." : "Verify with Backup Code"}
                   </Button>
                 </form>
               </TabsContent>
@@ -165,7 +160,7 @@ export default function Login() {
             <div className="space-y-2">
               <div className="flex items-center justify-between">
                 <Label htmlFor="password">Password</Label>
-                <Link href="/forgot-password" className="text-sm text-primary hover:underline">
+                <Link href="/forgot-password" className="text-primary hover:underline text-sm">
                   Forgot password?
                 </Link>
               </div>

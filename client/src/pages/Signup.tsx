@@ -21,19 +21,23 @@ export default function Signup() {
   const [, setLocation] = useLocation();
 
 
-  const signupMutation = trpc.auth.signup.useMutation({
-    onSuccess: (data) => {
-      setUserId(data.userId);
-      setQrCodeUrl(data.qrCodeUrl);
-      setBackupCodes(data.backupCodes);
-      setStep("verify");
-    },
+  const signupMutation = trpc.customAuth.signup.useMutation({
     onError: (error) => {
       alert(`Signup failed: ${error.message}`);
     },
   });
 
-  const verifyMutation = trpc.auth.verifySignup.useMutation({
+  const setup2FAMutation = trpc.customAuth.setup2FA.useMutation({
+    onSuccess: (data) => {
+      setQrCodeUrl(data.qrCodeUrl);
+      setBackupCodes(data.backupCodes);
+    },
+    onError: (error) => {
+      alert(`2FA setup failed: ${error.message}`);
+    },
+  });
+
+  const verifyMutation = trpc.customAuth.verify2FASetup.useMutation({
     onSuccess: () => {
       alert("Account created! You can now log in.");
       setLocation("/login");
@@ -45,12 +49,22 @@ export default function Signup() {
 
   const handleSignup = (e: React.FormEvent) => {
     e.preventDefault();
-    signupMutation.mutate({ email, password, name });
+    signupMutation.mutate(
+      { email, password, name },
+      {
+        onSuccess: (data) => {
+          setUserId(data.userId);
+          // Trigger 2FA setup
+          setup2FAMutation.mutate({ userId: data.userId });
+          setStep('verify');
+        },
+      }
+    );
   };
 
   const handleVerify = (e: React.FormEvent) => {
     e.preventDefault();
-    verifyMutation.mutate({ userId, token });
+    verifyMutation.mutate({ userId, code: token });
   };
 
   const copyBackupCodes = () => {

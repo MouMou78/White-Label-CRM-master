@@ -1981,3 +1981,24 @@
 - [x] Disable guest login feature completely
 - [x] Force proper authentication for all users
 - [x] Fix logout functionality
+
+## Fix App Title
+- [ ] Change VITE_APP_TITLE from "KompassCRM" to "1twenty CRM"
+- [ ] Update all references to KompassCRM in code
+
+## Custom Email/Password Authentication with 2FA
+- [x] Design database schema for users, sessions, and 2FA secrets
+- [x] Install authentication dependencies (bcrypt, speakeasy for TOTP)
+- [x] Create user registration endpoint with email/password
+- [x] Implement password hashing and validation
+- [x] Build 2FA setup flow (generate TOTP secret, show QR code)
+- [x] Create 2FA verification endpoint
+- [x] Build login flow with 2FA challenge
+- [x] Implement session management and JWT tokens
+- [ ] Create password reset flow with email verification (backend ready, needs frontend)
+- [x] Build frontend signup form
+- [x] Build frontend login form with 2FA input
+- [x] Build 2FA setup UI with QR code display
+- [ ] Create password reset request and confirmation pages (needs implementation)
+- [x] Test complete authentication flow
+- [x] Replace Manus OAuth with custom authentication

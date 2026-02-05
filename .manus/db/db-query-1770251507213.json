@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE `notes` (\n\t`id` varchar(36) NOT NULL,\n\t`tenantId` varchar(36) NOT NULL,\n\t`content` text NOT NULL,\n\t`entityType` enum('contact','account','deal','task','thread') NOT NULL,\n\t`entityId` varchar(36) NOT NULL,\n\t`createdBy` varchar(36) NOT NULL,\n\t`createdByName` varchar(255) NOT NULL,\n\t`updatedBy` varchar(36),\n\t`updatedByName` varchar(255),\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\t`updatedAt` timestamp DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `notes_id` PRIMARY KEY(`id`)\n);\n\nCREATE INDEX `notes_tenant_idx` ON `notes` (`tenantId`);\nCREATE INDEX `notes_entity_idx` ON `notes` (`entityType`,`entityId`);\nCREATE INDEX `notes_created_by_idx` ON `notes` (`createdBy`);\nCREATE INDEX `notes_created_at_idx` ON `notes` (`createdAt`);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2QkRhwd4AVTLhHG.a0950ca1ba2f --database TQEsx2HByTQrcAiUBn2kww --execute CREATE TABLE `notes` (\n\t`id` varchar(36) NOT NULL,\n\t`tenantId` varchar(36) NOT NULL,\n\t`content` text NOT NULL,\n\t`entityType` enum('contact','account','deal','task','thread') NOT NULL,\n\t`entityId` varchar(36) NOT NULL,\n\t`createdBy` varchar(36) NOT NULL,\n\t`createdByName` varchar(255) NOT NULL,\n\t`updatedBy` varchar(36),\n\t`updatedByName` varchar(255),\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\t`updatedAt` timestamp DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `notes_id` PRIMARY KEY(`id`)\n);\n\nCREATE INDEX `notes_tenant_idx` ON `notes` (`tenantId`);\nCREATE INDEX `notes_entity_idx` ON `notes` (`entityType`,`entityId`);\nCREATE INDEX `notes_created_by_idx` ON `notes` (`createdBy`);\nCREATE INDEX `notes_created_at_idx` ON `notes` (`createdAt`);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 3638
+}

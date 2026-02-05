@@ -32,6 +32,7 @@ import ScoringSettings from "./pages/ScoringSettings";
 import Chat from "./pages/Chat";
 import DashboardLayout from "./components/DashboardLayout";
 import FloatingAIChat from "./components/FloatingAIChat";
+import { KeyboardShortcuts } from "./components/KeyboardShortcuts";
 import Signup from "./pages/Signup";
 import Login from "./pages/Login";
 import ForgotPassword from "./pages/ForgotPassword";
@@ -42,6 +43,7 @@ import UserManagement from "./pages/UserManagement";
 import Accounts from "./pages/Accounts";
 import Settings from "./pages/Settings";
 import Onboarding from "./pages/Onboarding";
+import ContactMerge from "./pages/ContactMerge";
 
 function Router() {
   return (
@@ -102,6 +104,12 @@ function Router() {
       <Route path="/people/import">
         <DashboardLayout>
           <BulkImport />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/people/merge">
+        <DashboardLayout>
+          <ContactMerge />
         </DashboardLayout>
       </Route>
       
@@ -250,6 +258,7 @@ function App() {
           <Toaster />
           <Router />
           <FloatingAIChat />
+          <KeyboardShortcuts />
         </TooltipProvider>
       </ThemeProvider>
     </ErrorBoundary>

@@ -6,7 +6,7 @@ import { Link } from "wouter";
 import { useState } from "react";
 import { AddPersonDialog } from "@/components/AddPersonDialog";
 import { Button } from "@/components/ui/button";
-import { Upload } from "lucide-react";
+import { Upload, GitMerge } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
 import { Badge } from "@/components/ui/badge";
 import { toast } from "sonner";
@@ -89,6 +89,12 @@ export default function People() {
           </p>
         </div>
         <div className="flex gap-2">
+          <Link href="/people/merge">
+            <Button variant="outline">
+              <GitMerge className="w-4 h-4 mr-2" />
+              Merge
+            </Button>
+          </Link>
           <Link href="/people/import">
             <Button variant="outline">
               <Upload className="w-4 h-4 mr-2" />

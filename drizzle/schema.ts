@@ -839,6 +839,28 @@ export const sharedViews = mysqlTable("sharedViews", {
 export type SharedView = typeof sharedViews.$inferSelect;
 export type InsertSharedView = typeof sharedViews.$inferInsert;
 
+// Notes with full audit trail
+export const notes = mysqlTable("notes", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  tenantId: varchar("tenantId", { length: 36 }).notNull(),
+  content: text("content").notNull(),
+  entityType: mysqlEnum("entityType", ["contact", "account", "deal", "task", "thread"]).notNull(),
+  entityId: varchar("entityId", { length: 36 }).notNull(),
+  createdBy: varchar("createdBy", { length: 36 }).notNull(), // userId
+  createdByName: varchar("createdByName", { length: 255 }).notNull(),
+  updatedBy: varchar("updatedBy", { length: 36 }),
+  updatedByName: varchar("updatedByName", { length: 255 }),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow(),
+}, (table) => ({
+  tenantIdx: index("notes_tenant_idx").on(table.tenantId),
+  entityIdx: index("notes_entity_idx").on(table.entityType, table.entityId),
+  createdByIdx: index("notes_created_by_idx").on(table.createdBy),
+  createdAtIdx: index("notes_created_at_idx").on(table.createdAt),
+}));
+
+export type Note = typeof notes.$inferSelect;
+export type InsertNote = typeof notes.$inferInsert;
 
 // Calendar Integration
 export const calendarIntegrations = mysqlTable("calendarIntegrations", {

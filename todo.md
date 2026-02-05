@@ -1295,3 +1295,52 @@
 - [ ] Update welcome/onboarding screen branding
 - [ ] Update page titles and headers
 - [ ] Update any configuration or metadata files
+
+## Enhanced Note Tracking
+- [x] Add createdBy (userId) and createdByName fields to notes
+- [x] Add updatedAt and updatedBy fields for edit tracking
+- [x] Update notes schema in database
+- [x] Modify note creation endpoints to capture user info
+- [x] Display timestamps and author names in note UI
+- [x] Add "edited" indicator for modified notes
+- [x] Create dedicated notes table with full audit trail
+- [x] Implement notes CRUD API endpoints
+- [x] Build reusable Notes component
+- [x] Add Notes component to Contact detail page
+- [x] Add Notes component to Account detail page
+- [x] Test note tracking across all note types (contact notes, deal notes, account notes)
+
+## Keyboard Shortcuts for Power Users
+- [x] Design keyboard shortcut system architecture
+- [x] Implement global shortcut listener component
+- [x] Add Cmd/Ctrl+K for quick search/command palette
+- [x] Add C shortcut for create new contact
+- [x] Add D shortcut for create new deal
+- [x] Add A shortcut for create new account
+- [x] Add Esc to close modals/dialogs
+- [x] Create keyboard shortcuts help modal (?)
+- [x] Integrate KeyboardShortcuts component into App
+- [x] Test shortcuts across different browsers
+
+## Contact Merge Tool
+- [x] Design merge UI with side-by-side comparison
+- [x] Create merge endpoint in backend
+- [x] Implement field selection logic (choose left/right/combine)
+- [x] Merge activity history from both contacts
+- [x] Update all references (deals, tasks, notes) to merged contact
+- [x] Handle account associations during merge
+- [x] Add merge confirmation dialog with preview
+- [x] Create dedicated merge page at /people/merge
+- [x] Add merge button to People page
+- [x] Test merge with complex contact relationships
+
+## Saved Filters System
+- [x] Use existing sharedViews table in database
+- [x] Add filter name, criteria (JSON), entity type, userId fields
+- [x] Implement save filter endpoint
+- [x] Implement load filter endpoint
+- [x] Implement delete filter endpoint
+- [x] Create reusable SavedFilters component
+- [x] Add filter sharing capability (team filters with isPublic flag)
+- [x] Implement filter management UI (save, load, delete)
+- [x] Test saved filters across contacts, accounts, deals

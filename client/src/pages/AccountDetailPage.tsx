@@ -15,6 +15,7 @@ import {
 } from "@/components/ui/select";
 import { useState } from "react";
 import { Link, useParams } from "wouter";
+import Notes from "@/components/Notes";
 
 // Helper function to format relative time
 function formatRelativeTime(date: Date | null): string {
@@ -380,6 +381,9 @@ export default function AccountDetailPage() {
               </div>
             </Card>
           )}
+          
+          {/* Notes Section */}
+          <Notes entityType="account" entityId={accountId} />
         </div>
       </div>
     </div>

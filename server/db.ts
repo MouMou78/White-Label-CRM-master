@@ -1,4 +1,4 @@
-import { eq, and, desc, asc, sql } from "drizzle-orm";
+import { eq, and, or, desc, asc, sql } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/mysql2";
 import {
   tenants, Tenant, InsertTenant,
@@ -1688,4 +1688,273 @@ export async function resetUserTwoFactor(userId: string): Promise<void> {
       twoFactorSecret: null,
     })
     .where(eq(users.id, userId));
+}
+
+// ============ NOTES ============
+
+export async function createNote(data: {
+  tenantId: string;
+  content: string;
+  entityType: "contact" | "account" | "deal" | "task" | "thread";
+  entityId: string;
+  createdBy: string;
+  createdByName: string;
+}): Promise<any> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { notes } = await import("../drizzle/schema");
+  const id = nanoid();
+  
+  await db.insert(notes).values({
+    id,
+    ...data,
+  });
+  
+  const result = await db.select().from(notes)
+    .where(eq(notes.id, id))
+    .limit(1);
+  return result[0]!;
+}
+
+export async function updateNote(
+  noteId: string,
+  content: string,
+  updatedBy: string,
+  updatedByName: string
+): Promise<any> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { notes } = await import("../drizzle/schema");
+  
+  await db.update(notes)
+    .set({ 
+      content, 
+      updatedBy, 
+      updatedByName,
+      updatedAt: new Date()
+    })
+    .where(eq(notes.id, noteId));
+  
+  const result = await db.select().from(notes)
+    .where(eq(notes.id, noteId))
+    .limit(1);
+  return result[0];
+}
+
+export async function getNotesByEntity(
+  tenantId: string,
+  entityType: "contact" | "account" | "deal" | "task" | "thread",
+  entityId: string
+): Promise<any[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { notes } = await import("../drizzle/schema");
+  
+  return db.select().from(notes)
+    .where(
+      and(
+        eq(notes.tenantId, tenantId),
+        eq(notes.entityType, entityType),
+        eq(notes.entityId, entityId)
+      )
+    )
+    .orderBy(desc(notes.createdAt));
+}
+
+export async function deleteNote(noteId: string, tenantId: string): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { notes } = await import("../drizzle/schema");
+  
+  await db.delete(notes)
+    .where(
+      and(
+        eq(notes.id, noteId),
+        eq(notes.tenantId, tenantId)
+      )
+    );
+}
+
+// ============ CONTACT MERGE ============
+
+export async function mergeContacts(data: {
+  tenantId: string;
+  sourceContactId: string;
+  targetContactId: string;
+  mergedFields: Record<string, any>;
+}): Promise<any> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { people, threads, moments, notes: notesTable } = await import("../drizzle/schema");
+  
+  // Update the target contact with merged fields
+  await db.update(people)
+    .set(data.mergedFields)
+    .where(
+      and(
+        eq(people.id, data.targetContactId),
+        eq(people.tenantId, data.tenantId)
+      )
+    );
+  
+  // Update all threads to point to target contact
+  await db.update(threads)
+    .set({ personId: data.targetContactId })
+    .where(
+      and(
+        eq(threads.personId, data.sourceContactId),
+        eq(threads.tenantId, data.tenantId)
+      )
+    );
+  
+  // Update all moments to point to target contact
+  await db.update(moments)
+    .set({ personId: data.targetContactId })
+    .where(
+      and(
+        eq(moments.personId, data.sourceContactId),
+        eq(moments.tenantId, data.tenantId)
+      )
+    );
+  
+  // Update all notes to point to target contact
+  await db.update(notesTable)
+    .set({ entityId: data.targetContactId })
+    .where(
+      and(
+        eq(notesTable.entityId, data.sourceContactId),
+        eq(notesTable.entityType, "contact"),
+        eq(notesTable.tenantId, data.tenantId)
+      )
+    );
+  
+  // Delete the source contact
+  await db.delete(people)
+    .where(
+      and(
+        eq(people.id, data.sourceContactId),
+        eq(people.tenantId, data.tenantId)
+      )
+    );
+  
+  // Return the updated target contact
+  const result = await db.select().from(people)
+    .where(
+      and(
+        eq(people.id, data.targetContactId),
+        eq(people.tenantId, data.tenantId)
+      )
+    )
+    .limit(1);
+  
+  return result[0];
+}
+
+// ============ SAVED FILTERS (SHARED VIEWS) ============
+
+export async function createSavedFilter(data: {
+  tenantId: string;
+  name: string;
+  viewType: "deals" | "contacts" | "accounts" | "tasks";
+  filters: Record<string, any>;
+  sortBy?: string;
+  sortOrder?: "asc" | "desc";
+  createdById: string;
+  isPublic?: boolean;
+  sharedWithUserIds?: string[];
+}): Promise<any> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { sharedViews } = await import("../drizzle/schema");
+  const id = nanoid();
+  
+  await db.insert(sharedViews).values({
+    id,
+    ...data,
+  });
+  
+  const result = await db.select().from(sharedViews)
+    .where(eq(sharedViews.id, id))
+    .limit(1);
+  return result[0]!;
+}
+
+export async function getSavedFilters(
+  tenantId: string,
+  userId: string,
+  viewType?: "deals" | "contacts" | "accounts" | "tasks"
+): Promise<any[]> {
+  const db = await getDb();
+  if (!db) return [];
+  
+  const { sharedViews } = await import("../drizzle/schema");
+  
+  const conditions = [
+    eq(sharedViews.tenantId, tenantId),
+    or(
+      eq(sharedViews.createdById, userId),
+      eq(sharedViews.isPublic, true)
+    )
+  ];
+  
+  if (viewType) {
+    conditions.push(eq(sharedViews.viewType, viewType));
+  }
+  
+  return db.select().from(sharedViews)
+    .where(and(...conditions))
+    .orderBy(desc(sharedViews.createdAt));
+}
+
+export async function updateSavedFilter(
+  filterId: string,
+  tenantId: string,
+  data: {
+    name?: string;
+    filters?: Record<string, any>;
+    sortBy?: string;
+    sortOrder?: "asc" | "desc";
+    isPublic?: boolean;
+    sharedWithUserIds?: string[];
+  }
+): Promise<any> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { sharedViews } = await import("../drizzle/schema");
+  
+  await db.update(sharedViews)
+    .set(data)
+    .where(
+      and(
+        eq(sharedViews.id, filterId),
+        eq(sharedViews.tenantId, tenantId)
+      )
+    );
+  
+  const result = await db.select().from(sharedViews)
+    .where(eq(sharedViews.id, filterId))
+    .limit(1);
+  return result[0];
+}
+
+export async function deleteSavedFilter(filterId: string, tenantId: string): Promise<void> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+  
+  const { sharedViews } = await import("../drizzle/schema");
+  
+  await db.delete(sharedViews)
+    .where(
+      and(
+        eq(sharedViews.id, filterId),
+        eq(sharedViews.tenantId, tenantId)
+      )
+    );
 }

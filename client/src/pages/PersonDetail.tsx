@@ -7,6 +7,7 @@ import { useState } from "react";
 import { Streamdown } from "streamdown";
 import { Link } from "wouter";
 import { EmailActivityTimeline } from "@/components/EmailActivityTimeline";
+import Notes from "@/components/Notes";
 
 interface PersonDetailProps {
   personId: string;
@@ -381,6 +382,9 @@ export default function PersonDetail({ personId }: PersonDetailProps) {
             )}
           </CardContent>
         </Card>
+
+        {/* Notes Section */}
+        <Notes entityType="contact" entityId={personId} />
       </div>
     </div>
   );

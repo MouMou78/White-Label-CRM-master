@@ -557,6 +557,21 @@ export const appRouter = router({
         
         return { success, failed, duplicates, errors };
       }),
+    
+    merge: protectedProcedure
+      .input(z.object({
+        sourceContactId: z.string(),
+        targetContactId: z.string(),
+        mergedFields: z.record(z.string(), z.any()),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        return db.mergeContacts({
+          tenantId: ctx.user.tenantId,
+          sourceContactId: input.sourceContactId,
+          targetContactId: input.targetContactId,
+          mergedFields: input.mergedFields,
+        });
+      }),
   }),
   
   threads: router({
@@ -3080,6 +3095,115 @@ Generate a subject line and email body. Format your response as JSON with "subje
       .mutation(async ({ ctx }) => {
         const { initializeDefaultStages } = await import("./db-deals");
         return initializeDefaultStages(ctx.user.tenantId);
+      }),
+  }),
+  
+  notes: router({
+    create: protectedProcedure
+      .input(z.object({
+        content: z.string(),
+        entityType: z.enum(["contact", "account", "deal", "task", "thread"]),
+        entityId: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        return db.createNote({
+          tenantId: ctx.user.tenantId,
+          content: input.content,
+          entityType: input.entityType,
+          entityId: input.entityId,
+          createdBy: ctx.user.id,
+          createdByName: ctx.user.name || ctx.user.email,
+        });
+      }),
+    
+    update: protectedProcedure
+      .input(z.object({
+        noteId: z.string(),
+        content: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        return db.updateNote(
+          input.noteId,
+          input.content,
+          ctx.user.id,
+          ctx.user.name || ctx.user.email
+        );
+      }),
+    
+    list: protectedProcedure
+      .input(z.object({
+        entityType: z.enum(["contact", "account", "deal", "task", "thread"]),
+        entityId: z.string(),
+      }))
+      .query(async ({ input, ctx }) => {
+        return db.getNotesByEntity(
+          ctx.user.tenantId,
+          input.entityType,
+          input.entityId
+        );
+      }),
+    
+    delete: protectedProcedure
+      .input(z.object({ noteId: z.string() }))
+      .mutation(async ({ input, ctx }) => {
+        const { requireDeletePermission } = await import("./permissions");
+        requireDeletePermission(ctx.user.role);
+        await db.deleteNote(input.noteId, ctx.user.tenantId);
+        return { success: true };
+      }),
+  }),
+  
+  savedFilters: router({
+    create: protectedProcedure
+      .input(z.object({
+        name: z.string(),
+        viewType: z.enum(["deals", "contacts", "accounts", "tasks"]),
+        filters: z.record(z.string(), z.any()),
+        sortBy: z.string().optional(),
+        sortOrder: z.enum(["asc", "desc"]).optional(),
+        isPublic: z.boolean().optional(),
+        sharedWithUserIds: z.array(z.string()).optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        return db.createSavedFilter({
+          tenantId: ctx.user.tenantId,
+          createdById: ctx.user.id,
+          ...input,
+        });
+      }),
+    
+    list: protectedProcedure
+      .input(z.object({
+        viewType: z.enum(["deals", "contacts", "accounts", "tasks"]).optional(),
+      }))
+      .query(async ({ input, ctx }) => {
+        return db.getSavedFilters(
+          ctx.user.tenantId,
+          ctx.user.id,
+          input.viewType
+        );
+      }),
+    
+    update: protectedProcedure
+      .input(z.object({
+        filterId: z.string(),
+        name: z.string().optional(),
+        filters: z.record(z.string(), z.any()).optional(),
+        sortBy: z.string().optional(),
+        sortOrder: z.enum(["asc", "desc"]).optional(),
+        isPublic: z.boolean().optional(),
+        sharedWithUserIds: z.array(z.string()).optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const { filterId, ...data } = input;
+        return db.updateSavedFilter(filterId, ctx.user.tenantId, data);
+      }),
+    
+    delete: protectedProcedure
+      .input(z.object({ filterId: z.string() }))
+      .mutation(async ({ input, ctx }) => {
+        await db.deleteSavedFilter(input.filterId, ctx.user.tenantId);
+        return { success: true };
       }),
   }),
   

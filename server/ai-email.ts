@@ -94,12 +94,30 @@ export async function generateEmail(params: {
     }
   }
 
-  // Get best practice examples if provided
+  // Get best practice examples to learn from
   let bestPracticesContext = "";
-  // TODO: Implement email examples table and learning system
-  // if (params.bestPracticeExamples && params.bestPracticeExamples.length > 0) {
-  //   Load and include best practice examples
-  // }
+  const { getEmailExamples } = await import("./db");
+  
+  // Get user's email examples (we'll use userId from context in the router)
+  // For now, we'll fetch examples by category if provided
+  // The router will need to pass userId
+  if (params.bestPracticeExamples && params.bestPracticeExamples.length > 0) {
+    const { emailExamples } = await import("../drizzle/schema");
+    const examples = await db.select().from(emailExamples)
+      .where(eq(emailExamples.id, params.bestPracticeExamples[0]))
+      .limit(3);
+    
+    if (examples.length > 0) {
+      bestPracticesContext = `\n\nBest Practice Examples (learn from these successful emails):\n`;
+      examples.forEach((example, idx) => {
+        bestPracticesContext += `\nExample ${idx + 1}:\nSubject: ${example.subject}\nBody: ${example.body}\n`;
+        if (example.context) {
+          bestPracticesContext += `Context: ${example.context}\n`;
+        }
+      });
+      bestPracticesContext += `\nUse these examples as inspiration for tone, structure, and style, but personalize for the current context.\n`;
+    }
+  }
 
   // Build AI prompt
   const systemPrompt = `You are an expert email copywriter for a CRM system. Your job is to write effective, professional emails that get responses.

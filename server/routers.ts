@@ -4,6 +4,7 @@ import { systemRouter } from "./_core/systemRouter";
 import { publicProcedure, protectedProcedure, router } from "./_core/trpc";
 import { z } from "zod";
 import * as db from "./db";
+import { getEmailExamples, createEmailExample, deleteEmailExample } from "./db";
 import { hashPassword, verifyPassword, parseTriggerDate } from "./utils";
 import { TRPCError } from "@trpc/server";
 import { processMoment } from "./rules-engine";
@@ -1303,8 +1304,7 @@ export const appRouter = router({
   
   emailGenerator: router({
     listExamples: protectedProcedure.query(async ({ ctx }) => {
-      // Return stored examples (would be in database in production)
-      return [];
+      return await getEmailExamples(ctx.user.id);
     }),
     
     getStylePreferences: protectedProcedure.query(async ({ ctx }) => {
@@ -1317,17 +1317,23 @@ export const appRouter = router({
         subject: z.string(),
         body: z.string(),
         context: z.string().optional(),
+        category: z.string().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
-        // Store example (would be in database in production)
-        return { success: true, id: `example-${Date.now()}` };
+        const result = await createEmailExample({
+          userId: ctx.user.id,
+          subject: input.subject,
+          body: input.body,
+          context: input.context,
+          category: input.category,
+        });
+        return { success: true, id: result.id };
       }),
     
     deleteExample: protectedProcedure
       .input(z.object({ id: z.string() }))
       .mutation(async ({ input, ctx }) => {
-        // Delete example (would be in database in production)
-        return { success: true };
+        return await deleteEmailExample(input.id, ctx.user.id);
       }),
     
     updateStylePreferences: protectedProcedure

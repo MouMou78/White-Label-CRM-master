@@ -1451,13 +1451,26 @@
 - [x] Generate and apply database migration
 - [x] Backend API endpoints exist (stub implementation in emailGenerator router)
 - [x] Email examples management page exists (EmailGenerator.tsx)
-- [ ] Update backend to actually store/retrieve from database
-- [ ] Update AI email generation to include user's best practice examples
-- [ ] Test learning system with sample emails
+- [x] Connect emailGenerator router to emailExamples database
+- [x] Implement actual CRUD operations for email examples
+- [x] Update AI email generation to fetch and learn from user examples
+- [x] Add database helper functions (createEmailExample, getEmailExamples, deleteEmailExample)
+- [x] Test learning system with sample emails
+
+## AI Assistant in Contact/Deal Workflows
+- [ ] Add AI Email Assistant to PersonDetail page
+- [ ] Add AI Email Assistant to DealDetail page
+- [ ] Ensure proper context passing (contact/deal info)
+- [ ] Test email generation from contact and deal pages
 
 ## Task Reminders & Notifications
 - [ ] Check existing tasks table schema for reminder fields
-- [ ] Add reminderAt and reminderSent fields if needed
+- [ ] Add reminderAt and reminderSent fields to tasks table
+- [ ] Generate and apply database migration
+- [ ] Create backend endpoint for checking due/overdue tasks
+- [ ] Implement notification sending logic (email/desktop)
+- [ ] Add UI for setting task reminders
+- [ ] Test reminder notifications
 - [ ] Create background job to check for upcoming task reminders
 - [ ] Implement desktop notification API integration
 - [ ] Implement email notification for task reminders

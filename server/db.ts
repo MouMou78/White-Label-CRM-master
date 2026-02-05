@@ -2074,3 +2074,49 @@ export async function getContextualNotes(params: {
     new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime()
   );
 }
+
+
+// ============ EMAIL EXAMPLES ============
+
+export async function createEmailExample(data: {
+  userId: string;
+  subject: string;
+  body: string;
+  context?: string;
+  category?: string;
+  performanceMetrics?: any;
+}) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { emailExamples } = await import("../drizzle/schema");
+  const id = nanoid();
+  await db.insert(emailExamples).values({
+    id,
+    ...data,
+  });
+  return { id };
+}
+
+export async function getEmailExamples(userId: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { emailExamples } = await import("../drizzle/schema");
+  return await db
+    .select()
+    .from(emailExamples)
+    .where(eq(emailExamples.userId, userId))
+    .orderBy(desc(emailExamples.createdAt));
+}
+
+export async function deleteEmailExample(id: string, userId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { emailExamples } = await import("../drizzle/schema");
+  await db
+    .delete(emailExamples)
+    .where(and(eq(emailExamples.id, id), eq(emailExamples.userId, userId)));
+  return { success: true };
+}

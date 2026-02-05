@@ -139,6 +139,11 @@ export const people = mysqlTable("people", {
   enrichmentSource: text("enrichmentSource"),
   enrichmentSnapshot: json("enrichmentSnapshot").$type<Record<string, any>>(),
   enrichmentLastSyncedAt: timestamp("enrichmentLastSyncedAt"),
+  
+  // Assignment tracking
+  assignedToUserId: varchar("assignedToUserId", { length: 36 }),
+  assignedAt: timestamp("assignedAt"),
+  
   createdAt: timestamp("createdAt").defaultNow().notNull(),
   updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
 }, (table) => ({
@@ -148,6 +153,51 @@ export const people = mysqlTable("people", {
 
 export type Person = typeof people.$inferSelect;
 export type InsertPerson = typeof people.$inferInsert;
+
+// Tags for categorizing people and accounts
+export const tags = mysqlTable("tags", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  tenantId: varchar("tenantId", { length: 36 }).notNull(),
+  name: varchar("name", { length: 100 }).notNull(),
+  color: varchar("color", { length: 7 }).default("#3b82f6"), // Hex color code
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  tenantNameIdx: unique("tenant_tag_name_unique").on(table.tenantId, table.name),
+}));
+
+export type Tag = typeof tags.$inferSelect;
+export type InsertTag = typeof tags.$inferInsert;
+
+// Junction table for many-to-many relationship between people and tags
+export const personTags = mysqlTable("person_tags", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  personId: varchar("personId", { length: 36 }).notNull(),
+  tagId: varchar("tagId", { length: 36 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  personTagIdx: unique("person_tag_unique").on(table.personId, table.tagId),
+  personIdx: index("person_idx").on(table.personId),
+  tagIdx: index("tag_idx").on(table.tagId),
+}));
+
+export type PersonTag = typeof personTags.$inferSelect;
+export type InsertPersonTag = typeof personTags.$inferInsert;
+
+// Junction table for many-to-many relationship between accounts and tags
+export const accountTags = mysqlTable("account_tags", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  accountId: varchar("accountId", { length: 36 }).notNull(),
+  tagId: varchar("tagId", { length: 36 }).notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  accountTagIdx: unique("account_tag_unique").on(table.accountId, table.tagId),
+  accountIdx: index("account_idx").on(table.accountId),
+  tagIdx: index("tag_idx").on(table.tagId),
+}));
+
+export type AccountTag = typeof accountTags.$inferSelect;
+export type InsertAccountTag = typeof accountTags.$inferInsert;
 
 export const threads = mysqlTable("threads", {
   id: varchar("id", { length: 36 }).primaryKey(),

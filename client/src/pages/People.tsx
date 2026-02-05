@@ -5,6 +5,9 @@ import { Loader2, Search, Tag, UserPlus, Mail, X } from "lucide-react";
 import { Link } from "wouter";
 import { useState } from "react";
 import { AddPersonDialog } from "@/components/AddPersonDialog";
+import { TagManagementDialog } from "@/components/TagManagementDialog";
+import { AssignmentDialog } from "@/components/AssignmentDialog";
+import { SequenceEnrollmentDialog } from "@/components/SequenceEnrollmentDialog";
 import { Button } from "@/components/ui/button";
 import { Upload, GitMerge } from "lucide-react";
 import { Checkbox } from "@/components/ui/checkbox";
@@ -20,6 +23,9 @@ export default function People() {
   const [fitTierFilter, setFitTierFilter] = useState<string>("all");
   const [intentTierFilter, setIntentTierFilter] = useState<string>("all");
   const [sortBy, setSortBy] = useState<string>("recent");
+  const [isTagDialogOpen, setIsTagDialogOpen] = useState(false);
+  const [isAssignDialogOpen, setIsAssignDialogOpen] = useState(false);
+  const [isSequenceDialogOpen, setIsSequenceDialogOpen] = useState(false);
 
   const filteredPeople = people
     ?.filter((person) =>
@@ -60,21 +66,15 @@ export default function People() {
   };
 
   const handleBulkTag = () => {
-    // TODO: Implement tag dialog
-    toast.success(`Added tags to ${selectedIds.length} contacts`);
-    clearSelection();
+    setIsTagDialogOpen(true);
   };
 
   const handleBulkAssign = () => {
-    // TODO: Implement assign dialog
-    toast.success(`Assigned ${selectedIds.length} contacts`);
-    clearSelection();
+    setIsAssignDialogOpen(true);
   };
 
   const handleBulkEnroll = () => {
-    // TODO: Implement sequence enrollment dialog
-    toast.success(`Enrolled ${selectedIds.length} contacts in sequence`);
-    clearSelection();
+    setIsSequenceDialogOpen(true);
   };
 
   const handleBulkExport = () => {
@@ -309,6 +309,28 @@ export default function People() {
           )}
         </CardContent>
       </Card>
+
+      <TagManagementDialog
+        open={isTagDialogOpen}
+        onOpenChange={setIsTagDialogOpen}
+        selectedIds={selectedIds}
+        entityType="people"
+        onSuccess={clearSelection}
+      />
+
+      <AssignmentDialog
+        open={isAssignDialogOpen}
+        onOpenChange={setIsAssignDialogOpen}
+        selectedIds={selectedIds}
+        onSuccess={clearSelection}
+      />
+
+      <SequenceEnrollmentDialog
+        open={isSequenceDialogOpen}
+        onOpenChange={setIsSequenceDialogOpen}
+        selectedIds={selectedIds}
+        onSuccess={clearSelection}
+      />
     </div>
   );
 }

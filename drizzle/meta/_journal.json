@@ -246,6 +246,13 @@
       "when": 1770294719336,
       "tag": "0034_fat_mach_iv",
       "breakpoints": true
+    },
+    {
+      "idx": 35,
+      "version": "5",
+      "when": 1770306487132,
+      "tag": "0035_fantastic_squadron_sinister",
+      "breakpoints": true
     }
   ]
 }

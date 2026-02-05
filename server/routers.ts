@@ -1384,6 +1384,16 @@ export const appRouter = router({
         
         return { success: true, id: sequence.id };
       }),
+
+    enrollPeople: protectedProcedure
+      .input(z.object({
+        personIds: z.array(z.string()),
+        sequenceId: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        await db.enrollPeopleInSequence(input.personIds, input.sequenceId, ctx.user.tenantId);
+        return { success: true };
+      }),
   }),
   
   emailGenerator: router({
@@ -3672,6 +3682,109 @@ Generate a subject line and email body. Format your response as JSON with "subje
           accounts: accounts.slice(0, 5),
           threads: threads.slice(0, 5),
         };
+      }),
+  }),
+
+  assignment: router({
+    getTeamMembers: protectedProcedure.query(async ({ ctx }) => {
+      return db.getTeamMembers(ctx.user.tenantId);
+    }),
+
+    assignPeople: protectedProcedure
+      .input(z.object({
+        personIds: z.array(z.string()),
+        userId: z.string(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        await db.assignPeopleToUser(input.personIds, input.userId, ctx.user.tenantId);
+        return { success: true };
+      }),
+
+    unassignPeople: protectedProcedure
+      .input(z.object({
+        personIds: z.array(z.string()),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        await db.unassignPeople(input.personIds, ctx.user.tenantId);
+        return { success: true };
+      }),
+  }),
+
+  tags: router({
+    list: protectedProcedure.query(async ({ ctx }) => {
+      return db.getAllTags(ctx.user.tenantId);
+    }),
+
+    create: protectedProcedure
+      .input(z.object({
+        name: z.string().min(1).max(100),
+        color: z.string().regex(/^#[0-9A-Fa-f]{6}$/).optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        return db.createTag(ctx.user.tenantId, input.name, input.color);
+      }),
+
+    delete: protectedProcedure
+      .input(z.object({ tagId: z.string() }))
+      .mutation(async ({ input, ctx }) => {
+        await db.deleteTag(input.tagId, ctx.user.tenantId);
+        return { success: true };
+      }),
+
+    addToPeople: protectedProcedure
+      .input(z.object({
+        personIds: z.array(z.string()),
+        tagId: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        for (const personId of input.personIds) {
+          await db.addTagToPerson(personId, input.tagId);
+        }
+        return { success: true };
+      }),
+
+    removeFromPerson: protectedProcedure
+      .input(z.object({
+        personId: z.string(),
+        tagId: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.removeTagFromPerson(input.personId, input.tagId);
+        return { success: true };
+      }),
+
+    getPersonTags: protectedProcedure
+      .input(z.object({ personId: z.string() }))
+      .query(async ({ input }) => {
+        return db.getPersonTags(input.personId);
+      }),
+
+    addToAccounts: protectedProcedure
+      .input(z.object({
+        accountIds: z.array(z.string()),
+        tagId: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        for (const accountId of input.accountIds) {
+          await db.addTagToAccount(accountId, input.tagId);
+        }
+        return { success: true };
+      }),
+
+    removeFromAccount: protectedProcedure
+      .input(z.object({
+        accountId: z.string(),
+        tagId: z.string(),
+      }))
+      .mutation(async ({ input }) => {
+        await db.removeTagFromAccount(input.accountId, input.tagId);
+        return { success: true };
+      }),
+
+    getAccountTags: protectedProcedure
+      .input(z.object({ accountId: z.string() }))
+      .query(async ({ input }) => {
+        return db.getAccountTags(input.accountId);
       }),
   }),
 

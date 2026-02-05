@@ -2201,3 +2201,238 @@ export async function searchThreads(tenantId: string, query: string) {
     )
     .limit(10);
 }
+
+// ==================== Tag Management ====================
+
+export async function getAllTags(tenantId: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { tags } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+
+  return await db
+    .select()
+    .from(tags)
+    .where(eq(tags.tenantId, tenantId))
+    .orderBy(tags.name);
+}
+
+export async function createTag(tenantId: string, name: string, color?: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  const { tags } = await import("../drizzle/schema");
+  const { randomUUID } = await import("crypto");
+
+  const newTag = {
+    id: randomUUID(),
+    tenantId,
+    name,
+    color: color || "#3b82f6",
+  };
+
+  await db.insert(tags).values(newTag);
+  return newTag;
+}
+
+export async function deleteTag(tagId: string, tenantId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  const { tags, personTags, accountTags } = await import("../drizzle/schema");
+  const { eq, and } = await import("drizzle-orm");
+
+  // Delete all associations first
+  await db.delete(personTags).where(eq(personTags.tagId, tagId));
+  await db.delete(accountTags).where(eq(accountTags.tagId, tagId));
+
+  // Delete the tag
+  await db.delete(tags).where(and(eq(tags.id, tagId), eq(tags.tenantId, tenantId)));
+}
+
+export async function addTagToPerson(personId: string, tagId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  const { personTags } = await import("../drizzle/schema");
+  const { randomUUID } = await import("crypto");
+
+  await db.insert(personTags).values({
+    id: randomUUID(),
+    personId,
+    tagId,
+  }).onDuplicateKeyUpdate({ set: { personId, tagId } });
+}
+
+export async function removeTagFromPerson(personId: string, tagId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  const { personTags } = await import("../drizzle/schema");
+  const { eq, and } = await import("drizzle-orm");
+
+  await db.delete(personTags).where(
+    and(eq(personTags.personId, personId), eq(personTags.tagId, tagId))
+  );
+}
+
+export async function getPersonTags(personId: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { personTags, tags } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+
+  return await db
+    .select({ tag: tags })
+    .from(personTags)
+    .innerJoin(tags, eq(personTags.tagId, tags.id))
+    .where(eq(personTags.personId, personId));
+}
+
+export async function addTagToAccount(accountId: string, tagId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  const { accountTags } = await import("../drizzle/schema");
+  const { randomUUID } = await import("crypto");
+
+  await db.insert(accountTags).values({
+    id: randomUUID(),
+    accountId,
+    tagId,
+  }).onDuplicateKeyUpdate({ set: { accountId, tagId } });
+}
+
+export async function removeTagFromAccount(accountId: string, tagId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  const { accountTags } = await import("../drizzle/schema");
+  const { eq, and } = await import("drizzle-orm");
+
+  await db.delete(accountTags).where(
+    and(eq(accountTags.accountId, accountId), eq(accountTags.tagId, tagId))
+  );
+}
+
+export async function getAccountTags(accountId: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { accountTags, tags } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+
+  return await db
+    .select({ tag: tags })
+    .from(accountTags)
+    .innerJoin(tags, eq(accountTags.tagId, tags.id))
+    .where(eq(accountTags.accountId, accountId));
+}
+
+// ==================== User Assignment ====================
+
+export async function assignPeopleToUser(personIds: string[], userId: string, tenantId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  const { people } = await import("../drizzle/schema");
+  const { eq, inArray, and } = await import("drizzle-orm");
+
+  await db
+    .update(people)
+    .set({
+      assignedToUserId: userId,
+      assignedAt: new Date(),
+    })
+    .where(
+      and(
+        eq(people.tenantId, tenantId),
+        inArray(people.id, personIds)
+      )
+    );
+}
+
+export async function unassignPeople(personIds: string[], tenantId: string) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  const { people } = await import("../drizzle/schema");
+  const { eq, inArray, and } = await import("drizzle-orm");
+
+  await db
+    .update(people)
+    .set({
+      assignedToUserId: null,
+      assignedAt: null,
+    })
+    .where(
+      and(
+        eq(people.tenantId, tenantId),
+        inArray(people.id, personIds)
+      )
+    );
+}
+
+export async function getTeamMembers(tenantId: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { users } = await import("../drizzle/schema");
+  const { eq } = await import("drizzle-orm");
+
+  return await db
+    .select({
+      id: users.id,
+      name: users.name,
+      email: users.email,
+      role: users.role,
+    })
+    .from(users)
+    .where(eq(users.tenantId, tenantId));
+}
+
+// ==================== Sequence Enrollment ====================
+
+export async function getAllSequences(tenantId: string) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { emailSequences } = await import("../drizzle/schema");
+  const { eq, ne } = await import("drizzle-orm");
+
+  return await db
+    .select()
+    .from(emailSequences)
+    .where(
+      and(
+        eq(emailSequences.tenantId, tenantId),
+        ne(emailSequences.status, "archived")
+      )
+    )
+    .orderBy(emailSequences.name);
+}
+
+export async function enrollPeopleInSequence(
+  personIds: string[],
+  sequenceId: string,
+  tenantId: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database connection failed");
+
+  const { emailSequenceEnrollments } = await import("../drizzle/schema");
+  const { randomUUID } = await import("crypto");
+
+  const enrollments = personIds.map((personId) => ({
+    id: randomUUID(),
+    tenantId,
+    sequenceId,
+    personId,
+    currentStep: 0,
+    status: "active" as const,
+  }));
+
+  await db.insert(emailSequenceEnrollments).values(enrollments);
+}

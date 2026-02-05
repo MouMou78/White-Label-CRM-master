@@ -1882,3 +1882,14 @@
 - [x] Add bulk actions to Accounts page (bulk operations)
 - [ ] Implement dashboard customization with pinnable widgets (deferred - requires significant development time)
 - [x] Test all new features
+
+## Bulk Actions Implementation
+- [x] Create database schema for tags (tags table, person_tags junction table)
+- [x] Create database schema for assignments (update people table with assignedTo field)
+- [x] Implement tag CRUD operations (create, list, assign, remove)
+- [x] Build tag management dialog UI for bulk tag action
+- [x] Implement user assignment tRPC procedures
+- [x] Build user assignment dialog UI for bulk assign action
+- [x] Implement sequence enrollment tRPC procedures
+- [x] Build sequence enrollment wizard UI
+- [x] Test all bulk action features end-to-end

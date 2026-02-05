@@ -15,6 +15,7 @@ import Integrations from "./pages/Integrations";
 import Funnel from "./pages/Funnel";
 import Analytics from "./pages/Analytics";
 import Dashboard from "./pages/Dashboard";
+import Reports from "./pages/Reports";
 import Assistant from "./pages/Assistant";
 import AIAssistant from "./pages/AIAssistant";
 import AmplemarketAccounts from "./pages/AmplemarketAccounts";
@@ -246,6 +247,12 @@ function Router() {
       <Route path="/analytics">
         <DashboardLayout>
           <Dashboard />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/reports">
+        <DashboardLayout>
+          <Reports />
         </DashboardLayout>
       </Route>
       

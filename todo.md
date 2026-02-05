@@ -1539,3 +1539,10 @@
 - [ ] Implement PDF export functionality
 - [ ] Add report templates (pipeline health, activity summary, conversion rates)
 - [ ] Test report generation and export
+
+## Contact Selector for Deal Emails
+- [ ] Design contact selector UI for DealDetail email section
+- [ ] Fetch all contacts associated with the deal
+- [ ] Add multi-select dropdown or checkbox list for contact selection
+- [ ] Update email sending to support multiple recipients
+- [ ] Test email sending to multiple contacts from deal page

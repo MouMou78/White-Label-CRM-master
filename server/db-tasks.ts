@@ -13,6 +13,7 @@ export async function createTask(data: {
   createdById: string;
   linkedEntityType?: "deal" | "contact" | "account";
   linkedEntityId?: string;
+  reminderAt?: Date;
 }) {
   const db = await getDb();
   if (!db) throw new Error("Database not available");

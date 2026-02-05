@@ -45,12 +45,16 @@ export function Tasks() {
     description: "",
     priority: "medium" as "low" | "medium" | "high" | "urgent",
     dueDate: "",
+    reminderAt: "",
   });
 
   const handleCreate = () => {
     createMutation.mutate({
-      ...formData,
+      title: formData.title,
+      description: formData.description,
+      priority: formData.priority,
       dueDate: formData.dueDate ? new Date(formData.dueDate) : undefined,
+      reminderAt: formData.reminderAt ? new Date(formData.reminderAt) : undefined,
     });
   };
 
@@ -152,6 +156,19 @@ export function Tasks() {
                   value={formData.dueDate}
                   onChange={(e) => setFormData({ ...formData, dueDate: e.target.value })}
                 />
+              </div>
+
+              <div>
+                <Label htmlFor="reminderAt">Reminder</Label>
+                <Input
+                  id="reminderAt"
+                  type="datetime-local"
+                  value={formData.reminderAt}
+                  onChange={(e) => setFormData({ ...formData, reminderAt: e.target.value })}
+                />
+                <p className="text-sm text-muted-foreground mt-1">
+                  Set a reminder to get notified via email
+                </p>
               </div>
 
               <Button onClick={handleCreate} className="w-full">

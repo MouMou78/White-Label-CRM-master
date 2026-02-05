@@ -1498,6 +1498,14 @@
 - [ ] Pass proper context (contact/deal info) to AI
 - [ ] Test email generation from contact and deal pages
 
+## Task Reminder UI
+- [x] Add date/time picker component to task creation dialog
+- [x] Update tasks.create API to accept reminderAt parameter
+- [x] Update createTask function to support reminderAt
+- [ ] Add date/time picker to task edit dialog
+- [ ] Display upcoming reminders in task list
+- [ ] Test reminder UI workflow
+
 ## Custom Report Builder
 - [ ] Design report builder UI with metric selection
 - [ ] Create backend endpoint for custom report generation

@@ -2895,6 +2895,7 @@ Generate a subject line and email body. Format your response as JSON with "subje
         assignedToId: z.string().optional(),
         linkedEntityType: z.enum(["deal", "contact", "account"]).optional(),
         linkedEntityId: z.string().optional(),
+        reminderAt: z.date().optional(),
       }))
       .mutation(async ({ input, ctx }) => {
         const { createTask } = await import("./db-tasks");

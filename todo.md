@@ -2039,3 +2039,6 @@
 ## Visual Sequence Builder Fixes
 - [x] Fix mini-map in visual sequence builder - not displaying node thumbnails properly
 - [x] Add connection handles to nodes so users can drag arrows to connect them
+- [x] Add edge labels to show connection types (Yes/No, Variant A/B, Goal Met/Not Met)
+- [x] Add connection validation to prevent invalid connections and circular loops
+- [x] Add auto-layout button to automatically arrange nodes in clean, readable layout

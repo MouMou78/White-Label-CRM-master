@@ -14,6 +14,7 @@ import ReactFlow, {
   Handle,
   Position,
 } from 'reactflow';
+import dagre from 'dagre';
 import 'reactflow/dist/style.css';
 import { Button } from '@/components/ui/button';
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card';
@@ -65,17 +66,70 @@ export default function SequenceFlowBuilder({
 
   const onConnect = useCallback(
     (params: Connection) => {
+      // Validation: prevent invalid connections
+      const sourceNode = nodes.find((n) => n.id === params.source);
+      const targetNode = nodes.find((n) => n.id === params.target);
+      
+      if (!sourceNode || !targetNode) return;
+      
+      // Prevent connecting from Exit node
+      if (sourceNode.type === 'exit') {
+        alert('Exit nodes cannot connect to other nodes');
+        return;
+      }
+      
+      // Prevent self-connections
+      if (params.source === params.target) {
+        alert('Cannot connect a node to itself');
+        return;
+      }
+      
+      // Check for circular dependencies (simple check)
+      const wouldCreateCycle = (sourceId: string, targetId: string): boolean => {
+        const visited = new Set<string>();
+        const queue = [targetId];
+        
+        while (queue.length > 0) {
+          const current = queue.shift()!;
+          if (current === sourceId) return true;
+          if (visited.has(current)) continue;
+          visited.add(current);
+          
+          edges.forEach((edge) => {
+            if (edge.source === current) {
+              queue.push(edge.target);
+            }
+          });
+        }
+        return false;
+      };
+      
+      if (params.source && params.target && wouldCreateCycle(params.source, params.target)) {
+        alert('Cannot create circular connections');
+        return;
+      }
+      
+      // Determine edge label based on source handle
+      let label = '';
+      if (params.sourceHandle === 'yes') label = 'Yes';
+      else if (params.sourceHandle === 'no') label = 'No';
+      else if (params.sourceHandle === 'variant-a') label = 'Variant A';
+      else if (params.sourceHandle === 'variant-b') label = 'Variant B';
+      else if (params.sourceHandle === 'goal-met') label = 'Goal Met';
+      else if (params.sourceHandle === 'goal-not-met') label = 'Not Met';
+      
       const edge = {
         ...params,
         type: 'smoothstep',
         animated: true,
+        label,
         markerEnd: {
           type: MarkerType.ArrowClosed,
         },
       };
       setEdges((eds) => addEdge(edge, eds));
     },
-    [setEdges]
+    [setEdges, nodes, edges]
   );
 
   const addNode = (type: string) => {
@@ -131,6 +185,35 @@ export default function SequenceFlowBuilder({
       onSave(nodes, edges);
     }
   };
+
+  const onLayout = useCallback(() => {
+    const dagreGraph = new dagre.graphlib.Graph();
+    dagreGraph.setDefaultEdgeLabel(() => ({}));
+    dagreGraph.setGraph({ rankdir: 'TB', nodesep: 100, ranksep: 150 });
+
+    nodes.forEach((node) => {
+      dagreGraph.setNode(node.id, { width: 200, height: 80 });
+    });
+
+    edges.forEach((edge) => {
+      dagreGraph.setEdge(edge.source, edge.target);
+    });
+
+    dagre.layout(dagreGraph);
+
+    const layoutedNodes = nodes.map((node) => {
+      const nodeWithPosition = dagreGraph.node(node.id);
+      return {
+        ...node,
+        position: {
+          x: nodeWithPosition.x - 100,
+          y: nodeWithPosition.y - 40,
+        },
+      };
+    });
+
+    setNodes(layoutedNodes);
+  }, [nodes, edges, setNodes]);
 
   return (
     <div className="h-[calc(100vh-12rem)] w-full">
@@ -230,7 +313,11 @@ export default function SequenceFlowBuilder({
           </Card>
         </Panel>
 
-        <Panel position="top-right" className="space-x-2">
+        <Panel position="top-right" className="flex gap-2">
+          <Button variant="outline" onClick={onLayout}>
+            <Play className="w-4 h-4 mr-2" />
+            Auto Layout
+          </Button>
           <Button onClick={handleSave}>
             <Save className="w-4 h-4 mr-2" />
             Save Sequence

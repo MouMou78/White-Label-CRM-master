@@ -11,6 +11,8 @@ import ReactFlow, {
   useEdgesState,
   MarkerType,
   Panel,
+  Handle,
+  Position,
 } from 'reactflow';
 import 'reactflow/dist/style.css';
 import { Button } from '@/components/ui/button';
@@ -361,6 +363,7 @@ export default function SequenceFlowBuilder({
 function EmailNode({ data }: { data: any }) {
   return (
     <div className="px-4 py-3 shadow-md rounded-md bg-white border-2 border-blue-500 min-w-[200px]">
+      <Handle type="target" position={Position.Top} className="w-3 h-3" />
       <div className="flex items-center gap-2">
         <Mail className="w-4 h-4 text-blue-500" />
         <div className="font-bold text-sm">{data.label}</div>
@@ -368,6 +371,7 @@ function EmailNode({ data }: { data: any }) {
       {data.subject && (
         <div className="text-xs text-gray-500 mt-1 truncate">{data.subject}</div>
       )}
+      <Handle type="source" position={Position.Bottom} className="w-3 h-3" />
     </div>
   );
 }
@@ -375,11 +379,13 @@ function EmailNode({ data }: { data: any }) {
 function WaitNode({ data }: { data: any }) {
   return (
     <div className="px-4 py-3 shadow-md rounded-md bg-white border-2 border-orange-500 min-w-[200px]">
+      <Handle type="target" position={Position.Top} className="w-3 h-3" />
       <div className="flex items-center gap-2">
         <Clock className="w-4 h-4 text-orange-500" />
         <div className="font-bold text-sm">{data.label}</div>
       </div>
       <div className="text-xs text-gray-500 mt-1">Wait {data.waitDays} day(s)</div>
+      <Handle type="source" position={Position.Bottom} className="w-3 h-3" />
     </div>
   );
 }
@@ -387,6 +393,7 @@ function WaitNode({ data }: { data: any }) {
 function ConditionNode({ data }: { data: any }) {
   return (
     <div className="px-4 py-3 shadow-md rounded-md bg-white border-2 border-purple-500 min-w-[200px]">
+      <Handle type="target" position={Position.Top} className="w-3 h-3" />
       <div className="flex items-center gap-2">
         <GitBranch className="w-4 h-4 text-purple-500" />
         <div className="font-bold text-sm">{data.label}</div>
@@ -394,6 +401,8 @@ function ConditionNode({ data }: { data: any }) {
       <div className="text-xs text-gray-500 mt-1 capitalize">
         {data.conditionType?.replace('_', ' ')}
       </div>
+      <Handle type="source" position={Position.Left} id="yes" className="w-3 h-3" />
+      <Handle type="source" position={Position.Right} id="no" className="w-3 h-3" />
     </div>
   );
 }
@@ -401,6 +410,7 @@ function ConditionNode({ data }: { data: any }) {
 function ABSplitNode({ data }: { data: any }) {
   return (
     <div className="px-4 py-3 shadow-md rounded-md bg-white border-2 border-green-500 min-w-[200px]">
+      <Handle type="target" position={Position.Top} className="w-3 h-3" />
       <div className="flex items-center gap-2">
         <GitBranch className="w-4 h-4 text-green-500" />
         <div className="font-bold text-sm">{data.label}</div>
@@ -408,6 +418,8 @@ function ABSplitNode({ data }: { data: any }) {
       <div className="text-xs text-gray-500 mt-1">
         A: {data.variantAPercentage}% / B: {100 - data.variantAPercentage}%
       </div>
+      <Handle type="source" position={Position.Left} id="variant-a" className="w-3 h-3" />
+      <Handle type="source" position={Position.Right} id="variant-b" className="w-3 h-3" />
     </div>
   );
 }
@@ -415,6 +427,7 @@ function ABSplitNode({ data }: { data: any }) {
 function GoalCheckNode({ data }: { data: any }) {
   return (
     <div className="px-4 py-3 shadow-md rounded-md bg-white border-2 border-teal-500 min-w-[200px]">
+      <Handle type="target" position={Position.Top} className="w-3 h-3" />
       <div className="flex items-center gap-2">
         <Target className="w-4 h-4 text-teal-500" />
         <div className="font-bold text-sm">{data.label}</div>
@@ -422,6 +435,8 @@ function GoalCheckNode({ data }: { data: any }) {
       <div className="text-xs text-gray-500 mt-1 capitalize">
         {data.goalType?.replace('_', ' ')}
       </div>
+      <Handle type="source" position={Position.Left} id="goal-met" className="w-3 h-3" />
+      <Handle type="source" position={Position.Right} id="goal-not-met" className="w-3 h-3" />
     </div>
   );
 }
@@ -429,6 +444,7 @@ function GoalCheckNode({ data }: { data: any }) {
 function ExitNode({ data }: { data: any }) {
   return (
     <div className="px-4 py-3 shadow-md rounded-md bg-white border-2 border-red-500 min-w-[200px]">
+      <Handle type="target" position={Position.Top} className="w-3 h-3" />
       <div className="flex items-center gap-2">
         <XCircle className="w-4 h-4 text-red-500" />
         <div className="font-bold text-sm">{data.label}</div>

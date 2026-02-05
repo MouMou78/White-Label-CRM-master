@@ -2038,3 +2038,4 @@
 
 ## Visual Sequence Builder Fixes
 - [x] Fix mini-map in visual sequence builder - not displaying node thumbnails properly
+- [x] Add connection handles to nodes so users can drag arrows to connect them

@@ -1963,7 +1963,21 @@
 - [x] Handle API rate limits and errors
 
 ## Production Deployment
-- [ ] Create final checkpoint before publishing
+- [x] Create final checkpoint before publishing
 - [ ] Publish to 1twentyinternal.com domain
 - [ ] Verify production deployment
 - [ ] Test all features in production
+
+## Branding Updates
+- [ ] Change app title from "KompassCRM" to "1twenty CRM"
+- [ ] Update favicon to match 1twenty branding
+
+## Production Data Cleanup
+- [x] Create database cleanup script to remove test data
+- [x] Clear test contacts, companies, deals, and activities
+- [x] Help user set up their account and log out guest session
+
+## Remove Guest Login
+- [x] Disable guest login feature completely
+- [x] Force proper authentication for all users
+- [x] Fix logout functionality

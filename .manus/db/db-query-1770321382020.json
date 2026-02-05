@@ -1,0 +1,35 @@
+{
+  "query": "SHOW CREATE TABLE users",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2QkRhwd4AVTLhHG.a0950ca1ba2f --database TQEsx2HByTQrcAiUBn2kww --execute SHOW CREATE TABLE users",
+  "rows": [
+    {
+      "Table": "users",
+      "Create Table": "CREATE TABLE `users` ("
+    }
+  ],
+  "messages": [
+    "  `id` int(11) NOT NULL AUTO_INCREMENT,",
+    "  `tenantId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `openId` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,",
+    "  `name` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `email` varchar(320) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `passwordHash` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `loginMethod` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `role` enum('owner','collaborator','restricted','admin','user') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'user',",
+    "  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,",
+    "  `lastSignedIn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,",
+    "  `twoFactorSecret` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `twoFactorEnabled` tinyint(1) NOT NULL DEFAULT '0',",
+    "  `backupCodes` json DEFAULT NULL,",
+    "  `passwordResetToken` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,",
+    "  `passwordResetExpires` timestamp NULL DEFAULT NULL,",
+    "  `disabled` tinyint(1) NOT NULL DEFAULT '0',",
+    "  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,",
+    "  UNIQUE KEY `users_openId_unique` (`openId`)",
+    ") ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci"
+  ],
+  "stdout": "Table\tCreate Table\nusers\tCREATE TABLE `users` (\n  `id` int(11) NOT NULL AUTO_INCREMENT,\n  `tenantId` varchar(36) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `openId` varchar(64) COLLATE utf8mb4_unicode_ci NOT NULL,\n  `name` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `email` varchar(320) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `passwordHash` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `loginMethod` varchar(64) COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `role` enum('owner','collaborator','restricted','admin','user') COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT 'user',\n  `createdAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `updatedAt` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,\n  `lastSignedIn` timestamp NOT NULL DEFAULT CURRENT_TIMESTAMP,\n  `twoFactorSecret` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `twoFactorEnabled` tinyint(1) NOT NULL DEFAULT '0',\n  `backupCodes` json DEFAULT NULL,\n  `passwordResetToken` text COLLATE utf8mb4_unicode_ci DEFAULT NULL,\n  `passwordResetExpires` timestamp NULL DEFAULT NULL,\n  `disabled` tinyint(1) NOT NULL DEFAULT '0',\n  PRIMARY KEY (`id`) /*T![clustered_index] CLUSTERED */,\n  UNIQUE KEY `users_openId_unique` (`openId`)\n) ENGINE=InnoDB DEFAULT CHARSET=utf8mb4 COLLATE=utf8mb4_unicode_ci\n",
+  "stderr": "",
+  "execution_time_ms": 422
+}

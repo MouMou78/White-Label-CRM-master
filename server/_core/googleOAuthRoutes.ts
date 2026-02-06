@@ -27,13 +27,20 @@ export function registerGoogleOAuthRoutes(app: Express) {
   app.get("/api/oauth/google", async (req: Request, res: Response) => {
     try {
       const tenantId = req.query.tenantId as string;
+      const requestHost = req.get("host");
+      
+      console.log(`[Google OAuth Start] Request host: ${requestHost}, tenantId: ${tenantId || 'MISSING'}`);
+      
       if (!tenantId) {
+        console.error("[Google OAuth Start] tenantId is missing from request");
         return res.status(400).json({ error: "tenantId is required" });
       }
 
       // Generate secure state parameter
       const state = generateOAuthState();
       oauthStates.set(state, { tenantId, createdAt: Date.now() });
+      
+      console.log(`[Google OAuth Start] Generated state: ${state}, stored tenantId: ${tenantId}`);
 
       // Determine redirect URI based on current host
       const protocol = req.protocol;
@@ -72,7 +79,12 @@ export function registerGoogleOAuthRoutes(app: Express) {
 
       // Verify state parameter
       const stateData = oauthStates.get(state);
+      const requestHost = req.get("host");
+      
+      console.log(`[Google OAuth Callback] Request host: ${requestHost}, state: ${state}, stateData found: ${!!stateData}`);
+      
       if (!stateData) {
+        console.error(`[Google OAuth Callback] Invalid or expired state: ${state}`);
         return res.status(400).json({ error: "Invalid or expired state parameter" });
       }
 
@@ -80,6 +92,7 @@ export function registerGoogleOAuthRoutes(app: Express) {
       oauthStates.delete(state);
 
       const { tenantId } = stateData;
+      console.log(`[Google OAuth Callback] Restored tenantId from state: ${tenantId}`);
 
       // Determine redirect URI (must match the one used in authorization request)
       const protocol = req.protocol;
@@ -145,7 +158,8 @@ export function registerGoogleOAuthRoutes(app: Express) {
         });
       }
 
-      console.log(`[Google OAuth] Successfully connected Google Calendar for tenant ${tenantId}`);
+      console.log(`[Google OAuth Callback] Successfully connected Google Calendar for tenant ${tenantId}`);
+      console.log(`[Google OAuth Callback] Redirecting to /integrations?google_connected=true`);
 
       // Redirect back to integrations page with success message
       res.redirect("/integrations?google_connected=true");

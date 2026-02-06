@@ -1855,7 +1855,7 @@ Generate a subject line and email body. Format your response as JSON with "subje
         }
         
         try {
-          const response = await axios.get("https://api.amplemarket.com/v1/users", {
+          const response = await axios.get("https://api.amplemarket.com/users", {
             headers: { "X-Api-Key": apiKey },
           });
           return response.data.users?.map((u: any) => ({
@@ -1885,7 +1885,7 @@ Generate a subject line and email body. Format your response as JSON with "subje
         }
         
         try {
-          const response = await axios.get("https://api.amplemarket.com/v1/lists", {
+          const response = await axios.get("https://api.amplemarket.com/lists", {
             headers: { "X-Api-Key": apiKey },
           });
           return response.data.lists?.map((l: any) => ({
@@ -1915,7 +1915,7 @@ Generate a subject line and email body. Format your response as JSON with "subje
         }
         
         try {
-          const response = await axios.get("https://api.amplemarket.com/v1/sequences", {
+          const response = await axios.get("https://api.amplemarket.com/sequences", {
             headers: { "X-Api-Key": apiKey },
           });
           return response.data.sequences?.map((s: any) => ({

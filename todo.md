@@ -2154,3 +2154,18 @@
 - [x] Add calendar widget to Home dashboard
 - [x] Handle connection status and errors
 - [x] Display upcoming events with details (time, location, attendees)
+
+## Amplemarket API Endpoint Fixes (Feb 6)
+- [x] Update getAmplemarketUsers to use correct API endpoint
+- [x] Update getAmplemarketLists to use correct API endpoint
+- [x] Update getAmplemarketSequences to use correct API endpoint
+- [ ] Test sync configuration dropdowns populate correctly (requires publish)
+- [ ] Test webhook integration with sample events (requires publish)
+- [ ] Verify webhook events are stored in database (requires publish)
+
+## Google OAuth Tenant ID Fix (Feb 6)
+- [x] Add comprehensive logging to OAuth start endpoint
+- [x] Add comprehensive logging to OAuth callback endpoint
+- [x] Log request host, tenantId, and state values
+- [ ] Test Google OAuth flow and collect logs (requires publish)
+- [ ] Verify tenant_id is correctly restored in callback (requires publish)

@@ -40,21 +40,21 @@ export function AmplemarketConfigDialog({ open, onOpenChange, currentConfig, onS
     retry: false,
   });
 
-  const { data: amplemarketLists, isLoading: loadingLists, error: listsError } = trpc.integrations.getAmplemarketLists.useQuery(
-    selectedUserEmail ? { userEmail: selectedUserEmail } : undefined,
+  // Fetch user-scoped lists and sequences
+  const { data: userScope, isLoading: loadingScope, error: scopeError } = trpc.integrations.getAmplemarketUserScope.useQuery(
+    { userEmail: selectedUserEmail! },
     {
-      enabled: open,
+      enabled: open && !!selectedUserEmail,
       retry: false,
     }
   );
 
-  const { data: amplemarketSequences, isLoading: loadingSequences, error: sequencesError } = trpc.integrations.getAmplemarketSequences.useQuery(
-    selectedUserEmail ? { userEmail: selectedUserEmail } : undefined,
-    {
-      enabled: open,
-      retry: false,
-    }
-  );
+  const amplemarketLists = userScope?.lists || [];
+  const amplemarketSequences = userScope?.sequences || [];
+  const loadingLists = loadingScope;
+  const loadingSequences = loadingScope;
+  const listsError = scopeError;
+  const sequencesError = scopeError;
 
   // Fetch cached list counts
   const { data: cachedCounts } = trpc.integrations.getAmplemarketListCounts.useQuery(
@@ -250,6 +250,18 @@ export function AmplemarketConfigDialog({ open, onOpenChange, currentConfig, onS
                       </div>
                     ))}
                   </>
+                ) : !selectedUserEmail ? (
+                  <Alert>
+                    <AlertDescription>
+                      Please select an Amplemarket user above to view their lists.
+                    </AlertDescription>
+                  </Alert>
+                ) : amplemarketLists.length === 0 ? (
+                  <Alert>
+                    <AlertDescription>
+                      No lists found for this user. Amplemarket does not provide user-level ownership for lists/sequences. Choose scope manually or select a different user.
+                    </AlertDescription>
+                  </Alert>
                 ) : listsError ? (
                   <p className="text-sm text-destructive">Failed to load lists</p>
                 ) : (

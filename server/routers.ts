@@ -1831,6 +1831,18 @@ Generate a subject line and email body. Format your response as JSON with "subje
           });
         }
         
+        // Comprehensive logging of sync scope
+        console.log('[Amplemarket Sync] Starting sync with scope:', {
+          tenantId: ctx.user.tenantId,
+          integrationId: amplemarketIntegration.id,
+          amplemarketUserId,
+          amplemarketUserEmail,
+          listIds: selectedLists,
+          listCount: selectedLists.length,
+          sequenceIds: config?.selectedSequences || [],
+          sequenceCount: (config?.selectedSequences || []).length,
+        });
+        
         const dbInstance = await db.getDb();
         return syncAmplemarket(
           dbInstance,
@@ -2020,6 +2032,45 @@ Generate a subject line and email body. Format your response as JSON with "subje
             message: `Failed to fetch Amplemarket sequences: ${error.response?.data?.message || error.message}` 
           });
         }
+      }),
+
+    // Amplemarket User Scope
+    getAmplemarketUserScope: protectedProcedure
+      .input(z.object({
+        userEmail: z.string(),
+      }))
+      .query(async ({ input, ctx }) => {
+        const { getAmplemarketUserScope } = await import('./amplemarketUserScope');
+        
+        // Get Amplemarket integration
+        const integrations = await db.getIntegrationsByTenant(ctx.user.tenantId);
+        const amplemarketIntegration = integrations.find(i => i.provider === 'amplemarket');
+        
+        if (!amplemarketIntegration) {
+          throw new TRPCError({ code: 'NOT_FOUND', message: 'Amplemarket integration not found' });
+        }
+        
+        const configStr = typeof amplemarketIntegration.config === 'string' 
+          ? amplemarketIntegration.config 
+          : JSON.stringify(amplemarketIntegration.config);
+        const config = JSON.parse(configStr);
+        if (!config.apiKey) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'Amplemarket API key not configured' });
+        }
+        
+        console.log('[Amplemarket User Scope] Request:', {
+          tenantId: ctx.user.tenantId,
+          userEmail: input.userEmail,
+        });
+        
+        const scope = await getAmplemarketUserScope(config.apiKey, input.userEmail);
+        
+        console.log('[Amplemarket User Scope] Response:', {
+          listIds: scope.listIds.length,
+          sequenceIds: scope.sequenceIds.length,
+        });
+        
+        return scope;
       }),
 
     // Amplemarket Sync Operations

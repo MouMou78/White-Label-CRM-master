@@ -2286,3 +2286,14 @@
 - [x] Add fallback rollback mode when no sync log exists (deletes all Amplemarket records)
 - [x] Ensure future syncs create sync logs with full tracking
 - [ ] Verify rollback removes records and UI reflects changes
+
+## Amplemarket User-Scoped View Implementation
+- [x] Examine Amplemarket API responses to determine user linkage (owner, created_by fields)
+- [x] Create GET /api/integrations/amplemarket/user-scope endpoint
+- [x] Return sequence_ids[] and list_ids[] linked to selected user
+- [x] Update UI to filter lists/sequences by user scope
+- [x] Add empty state when no user linkage can be determined
+- [x] Add guardrail: prevent sync if scope set is empty
+- [x] Add comprehensive logging (tenant_id, amplemarket_user_id, list_ids count, sequence_ids count)
+- [x] Test user switching produces different lists/sequences
+- [x] Verify sync only imports data from user's scope set

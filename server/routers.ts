@@ -3422,6 +3422,21 @@ Generate a subject line and email body. Format your response as JSON with "subje
         const { generateFollowUpTasks } = await import("./calendar-sync");
         return generateFollowUpTasks(input.eventId, input.taskTemplates);
       }),
+    
+    getUpcomingEvents: protectedProcedure
+      .input(z.object({
+        maxResults: z.number().optional().default(10),
+      }))
+      .query(async ({ input, ctx }) => {
+        const { getUpcomingEvents } = await import("./googleCalendar");
+        return getUpcomingEvents(ctx.user!.tenantId, input.maxResults);
+      }),
+    
+    getStatus: protectedProcedure
+      .query(async ({ ctx }) => {
+        const { getCalendarStatus } = await import("./googleCalendar");
+        return getCalendarStatus(ctx.user!.tenantId);
+      }),
   }),
   
   documents: router({
@@ -4462,5 +4477,52 @@ Generate a subject line and email body. Format your response as JSON with "subje
         return improveEmail(input);
       }),
   }),
+
+  webhooks: router({
+    listEvents: protectedProcedure
+      .input(z.object({
+        limit: z.number().optional().default(50),
+        status: z.enum(["processed", "failed", "pending"]).optional(),
+      }))
+      .query(async ({ input, ctx }) => {
+        const dbInstance = await db.getDb();
+        if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+        
+        const { webhookEvents } = await import("../drizzle/schema");
+        const { eq, desc } = await import("drizzle-orm");
+        
+        let query = dbInstance
+          .select()
+          .from(webhookEvents)
+          .where(eq(webhookEvents.tenantId, ctx.user!.tenantId))
+          .orderBy(desc(webhookEvents.createdAt))
+          .limit(input.limit);
+        
+        const events = await query;
+        return events;
+      }),
+    
+    getStats: protectedProcedure
+      .query(async ({ ctx }) => {
+        const dbInstance = await db.getDb();
+        if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+        
+        const { webhookEvents } = await import("../drizzle/schema");
+        const { eq, isNotNull, isNull, sql } = await import("drizzle-orm");
+        
+        const allEvents = await dbInstance
+          .select()
+          .from(webhookEvents)
+          .where(eq(webhookEvents.tenantId, ctx.user!.tenantId));
+        
+        const total = allEvents.length;
+        const processed = allEvents.filter(e => e.processedAt).length;
+        const failed = allEvents.filter(e => e.error).length;
+        const pending = allEvents.filter(e => !e.processedAt && !e.error).length;
+        
+        return { total, processed, failed, pending };
+      }),
+  }),
+
 });
 export type AppRouter = typeof appRouter;

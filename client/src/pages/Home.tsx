@@ -3,6 +3,7 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Button } from "@/components/ui/button";
 import { Loader2, CheckCircle2, Clock, Users } from "lucide-react";
 import { Link } from "wouter";
+import CalendarEventsWidget from "@/components/CalendarEventsWidget";
 
 export default function Home() {
   const { data, isLoading } = trpc.home.dashboard.useQuery();
@@ -66,6 +67,8 @@ export default function Home() {
       </div>
 
       <div className="grid gap-6 md:grid-cols-2">
+        <CalendarEventsWidget />
+
         <Card id="today-actions">
           <CardHeader>
             <CardTitle>Today's Actions</CardTitle>

@@ -54,6 +54,7 @@ import Campaigns from "./pages/Campaigns";
 import UserManagement from "./pages/UserManagement";
 import Accounts from "./pages/Accounts";
 import Settings from "./pages/Settings";
+import WebhookMonitor from "./pages/WebhookMonitor";
 
 import Onboarding from "./pages/Onboarding";
 import ContactMerge from "./pages/ContactMerge";
@@ -162,6 +163,12 @@ function Router() {
       <Route path="/integrations">
         <DashboardLayout>
           <Integrations />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/webhooks">
+        <DashboardLayout>
+          <WebhookMonitor />
         </DashboardLayout>
       </Route>
       

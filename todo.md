@@ -2125,3 +2125,32 @@
 - [x] Implement async processing queue
 - [x] Write vitest tests for webhook handling
 - [x] Create sample curl test commands for each event type
+
+## Webhook Monitoring Dashboard (Feb 6, 2026)
+- [ ] Create webhook monitoring page UI with event list
+- [ ] Add backend API to fetch webhook events with pagination
+- [ ] Display webhook event details (payload, headers, status)
+- [ ] Show webhook processing stats (success/failure rates)
+- [ ] Add error filtering and search functionality
+
+## Google Calendar Event Sync (Feb 6, 2026)
+- [ ] Implement Google Calendar API service using stored OAuth tokens
+- [ ] Create backend API to fetch upcoming calendar events
+- [ ] Add calendar events widget to CRM dashboard
+- [ ] Display event details (title, time, attendees, location)
+- [ ] Add token refresh handling for expired access tokens
+
+## Webhook Monitoring Dashboard (Completed Feb 6)
+- [x] Create webhook monitoring dashboard page
+- [x] Add backend API for listing webhook events
+- [x] Add backend API for webhook statistics
+- [x] Add route to App.tsx for /webhooks
+
+## Google Calendar Event Sync (Completed Feb 6)
+- [x] Create Google Calendar service module
+- [x] Implement token auto-refresh logic
+- [x] Add calendar API endpoints to routers
+- [x] Create CalendarEventsWidget component
+- [x] Add calendar widget to Home dashboard
+- [x] Handle connection status and errors
+- [x] Display upcoming events with details (time, location, attendees)

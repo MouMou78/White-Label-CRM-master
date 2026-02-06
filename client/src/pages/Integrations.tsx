@@ -4,14 +4,16 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
-import { Loader2, Link as LinkIcon, CheckCircle2, XCircle } from "lucide-react";
+import { Loader2, Link as LinkIcon, CheckCircle2, XCircle, Settings } from "lucide-react";
 import { useState } from "react";
 import { toast } from "sonner";
+import { AmplemarketConfigDialog } from "@/components/AmplemarketConfigDialog";
 
 export default function Integrations() {
   const { data: integrations, isLoading, refetch } = trpc.integrations.list.useQuery();
   const [amplemarketKey, setAmplemarketKey] = useState("");
   const [apolloKey, setApolloKey] = useState("");
+  const [showAmplemarketConfig, setShowAmplemarketConfig] = useState(false);
   
   const connectAmplemarket = trpc.integrations.connectAmplemarket.useMutation({
     onSuccess: () => {
@@ -224,21 +226,29 @@ export default function Integrations() {
                         )}
                       </p>
                     </div>
-                    <Button 
-                      className="w-full" 
-                      variant="default"
-                      onClick={() => syncAmplemarket.mutate()}
-                      disabled={syncAmplemarket.isPending}
-                    >
-                      {syncAmplemarket.isPending ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Syncing...
-                        </>
-                      ) : (
-                        "Sync Now"
-                      )}
-                    </Button>
+                    <div className="grid grid-cols-2 gap-2">
+                      <Button 
+                        variant="default"
+                        onClick={() => syncAmplemarket.mutate()}
+                        disabled={syncAmplemarket.isPending}
+                      >
+                        {syncAmplemarket.isPending ? (
+                          <>
+                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                            Syncing...
+                          </>
+                        ) : (
+                          "Sync Now"
+                        )}
+                      </Button>
+                      <Button 
+                        variant="outline"
+                        onClick={() => setShowAmplemarketConfig(true)}
+                      >
+                        <Settings className="w-4 h-4 mr-2" />
+                        Configure
+                      </Button>
+                    </div>
                     <div className="grid grid-cols-2 gap-2">
                       <Button variant="outline" asChild className="w-full">
                         <a href="/amplemarket/accounts">View Accounts</a>
@@ -381,6 +391,13 @@ export default function Integrations() {
           </Card>
         </div>
       )}
+
+      <AmplemarketConfigDialog
+        open={showAmplemarketConfig}
+        onOpenChange={setShowAmplemarketConfig}
+        currentConfig={amplemarketIntegration?.config}
+        onSave={refetch}
+      />
     </div>
   );
 }

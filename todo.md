@@ -2062,3 +2062,11 @@
 - [x] Debug why Amplemarket data isn't flowing in after API key connection
 - [x] Check API connection and data sync functionality
 - [x] Verify data mapping and storage
+
+## Amplemarket Advanced Sync Features
+- [x] Add user account selection - choose which Amplemarket user account to sync from
+- [x] Implement automatic sync scheduler (hourly/daily options)
+- [x] Build selective sync filters UI (choose lists, sequences, segments)
+- [x] Add conflict resolution logic for duplicate contacts
+- [x] Add merge strategy options (keep CRM data, keep Amplemarket data, manual review)
+- [x] Show sync preview before applying changes

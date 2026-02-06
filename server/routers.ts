@@ -1811,6 +1811,64 @@ Generate a subject line and email body. Format your response as JSON with "subje
         const dbInstance = await db.getDb();
         return syncAmplemarket(dbInstance, ctx.user.tenantId, apiKey);
       }),
+
+    updateAmplemarketConfig: protectedProcedure
+      .input(z.object({
+        syncSchedule: z.enum(["manual", "hourly", "daily", "weekly"]),
+        conflictStrategy: z.enum(["keep_crm", "keep_amplemarket", "merge_latest", "manual"]),
+        userId: z.string().optional(),
+        selectedLists: z.array(z.string()).optional(),
+        selectedSequences: z.array(z.string()).optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const integrations = await db.getIntegrationsByTenant(ctx.user.tenantId);
+        const amplemarketIntegration = integrations.find((i: any) => i.provider === "amplemarket");
+        if (!amplemarketIntegration) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Amplemarket not connected" });
+        }
+        const currentConfig = (amplemarketIntegration.config as any) || {};
+        await db.upsertIntegration(ctx.user.tenantId, "amplemarket", {
+          status: amplemarketIntegration.status,
+          config: {
+            ...currentConfig,
+            syncSchedule: input.syncSchedule,
+            conflictStrategy: input.conflictStrategy,
+            userId: input.userId,
+            selectedLists: input.selectedLists,
+            selectedSequences: input.selectedSequences,
+          },
+        });
+        return { success: true };
+      }),
+
+    getAmplemarketUsers: protectedProcedure
+      .query(async ({ ctx }) => {
+        // Mock data - in production, fetch from Amplemarket API
+        return [
+          { id: "user1", name: "John Doe", email: "john@example.com" },
+          { id: "user2", name: "Jane Smith", email: "jane@example.com" },
+        ];
+      }),
+
+    getAmplemarketLists: protectedProcedure
+      .query(async ({ ctx }) => {
+        // Mock data - in production, fetch from Amplemarket API
+        return [
+          { id: "list1", name: "Q1 Prospects", contactCount: 150 },
+          { id: "list2", name: "Enterprise Leads", contactCount: 75 },
+          { id: "list3", name: "Warm Leads", contactCount: 200 },
+        ];
+      }),
+
+    getAmplemarketSequences: protectedProcedure
+      .query(async ({ ctx }) => {
+        // Mock data - in production, fetch from Amplemarket API
+        return [
+          { id: "seq1", name: "Cold Outreach - SaaS" },
+          { id: "seq2", name: "Follow-up Sequence" },
+          { id: "seq3", name: "Re-engagement Campaign" },
+        ];
+      }),
     
     listAmplemarketAccounts: protectedProcedure
       .query(async ({ ctx }) => {

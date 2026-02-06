@@ -21,11 +21,20 @@ export class AmplemarketClient {
     // Add request interceptor for logging
     this.client.interceptors.request.use(
       (config) => {
-        console.log("[Amplemarket API] Outbound Request:", {
+        const correlationId = `AM-${Date.now()}-${Math.random().toString(36).substr(2, 9)}`;
+        (config as any).correlationId = correlationId;
+        
+        const baseUrl = this.client.defaults.baseURL || "";
+        const fullPath = config.url?.startsWith("http") ? config.url : `${baseUrl}${config.url || ""}`;
+        
+        console.log(`[Amplemarket API] [${correlationId}] OUTBOUND REQUEST:`, {
           method: config.method?.toUpperCase(),
-          path: config.url, // Path only, no secrets
-          authMethod: "Authorization: Bearer", // Header name only
-          hasApiKey: !!this.apiKey, // Boolean, not the value
+          fullUrl: fullPath,
+          path: config.url,
+          queryParams: config.params,
+          requestBody: config.data ? JSON.stringify(config.data).substring(0, 500) : undefined,
+          authMethod: "Authorization: Bearer",
+          hasApiKey: !!this.apiKey,
           contentType: config.headers["Content-Type"],
         });
         return config;
@@ -39,30 +48,38 @@ export class AmplemarketClient {
     // Add response interceptor for logging
     this.client.interceptors.response.use(
       (response) => {
-        console.log("[Amplemarket API] Response:", {
+        const correlationId = (response.config as any).correlationId || "unknown";
+        console.log(`[Amplemarket API] [${correlationId}] RESPONSE SUCCESS:`, {
           status: response.status,
+          statusText: response.statusText,
           path: response.config.url,
           dataKeys: Object.keys(response.data || {}),
+          dataPreview: JSON.stringify(response.data).substring(0, 500),
         });
         return response;
       },
       (error) => {
+        const correlationId = (error.config as any)?.correlationId || "unknown";
+        const method = error.config?.method?.toUpperCase() || "GET";
+        const fullPath = error.config?.url || "unknown";
+        const baseUrl = this.client.defaults.baseURL || "";
+        const absoluteUrl = fullPath.startsWith("http") ? fullPath : `${baseUrl}${fullPath}`;
+        const status = error.response?.status;
+        
+        console.error(`[Amplemarket API] [${correlationId}] RESPONSE ERROR:`, {
+          status,
+          statusText: error.response?.statusText,
+          method,
+          fullUrl: absoluteUrl,
+          path: fullPath,
+          queryParams: error.config?.params,
+          requestBody: error.config?.data,
+          responseBody: error.response?.data,
+          responseHeaders: error.response?.headers,
+        });
+        
         // Enhanced 404 logging per Amplemarket support requirements
-        if (error.response?.status === 404) {
-          const fullPath = error.config?.url || "unknown";
-          const method = error.config?.method?.toUpperCase() || "GET";
-          const baseUrl = this.client.defaults.baseURL || "";
-          const absoluteUrl = fullPath.startsWith("http") ? fullPath : `${baseUrl}${fullPath}`;
-          
-          console.error("[Amplemarket API] 404 ERROR - Endpoint does not exist:", {
-            fullPath: absoluteUrl,
-            method,
-            statusText: error.response?.statusText,
-            responseBody: error.response?.data,
-            message: `The endpoint ${absoluteUrl} does not exist or is not accessible with current credentials`
-          });
-          
-          // Wrap error with clear message
+        if (status === 404) {
           const enhancedError = new Error(
             `Amplemarket endpoint does not exist: ${method} ${absoluteUrl}. ` +
             `Please verify the API endpoint with Amplemarket support. ` +
@@ -70,6 +87,17 @@ export class AmplemarketClient {
           );
           (enhancedError as any).originalError = error;
           (enhancedError as any).status = 404;
+          return Promise.reject(enhancedError);
+        }
+        
+        // Enhanced 400 logging for invalid requests
+        if (status === 400) {
+          const enhancedError = new Error(
+            `Amplemarket rejected the request (400): ${JSON.stringify(error.response?.data)}. ` +
+            `Request: ${method} ${absoluteUrl} with params ${JSON.stringify(error.config?.params)}`
+          );
+          (enhancedError as any).originalError = error;
+          (enhancedError as any).status = 400;
           return Promise.reject(enhancedError);
         }
         

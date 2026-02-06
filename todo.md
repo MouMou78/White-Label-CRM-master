@@ -2402,3 +2402,14 @@
 - [x] Add diagnostic message when kept_owner_match=0 but fetched_total>0
 - [ ] Test sync with ianm@1twentyconsultancy.com without selecting lists
 - [ ] Verify non-zero fetched_total and kept_owner_match in sync summary
+
+## Fix Amplemarket Sync 400 Error
+
+- [x] Add comprehensive request/response logging with correlation IDs
+- [x] Log base URL, path, method, query params, request body for each call
+- [x] Log response status code and body from Amplemarket
+- [ ] Capture exact failing request with all details
+- [ ] Identify which parameter is invalid from Amplemarket error response
+- [ ] Fix invalid parameter (pagination, type filter, user_id, etc.)
+- [ ] Add parameter validation before making requests
+- [ ] Test sync and verify 200 response

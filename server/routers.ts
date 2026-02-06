@@ -2141,6 +2141,36 @@ Generate a subject line and email body. Format your response as JSON with "subje
         };
       }),
 
+    cleanupWrongOwnerImports: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const integrations = await db.getIntegrationsByTenant(ctx.user.tenantId);
+        const amplemarketIntegration = integrations.find((i: any) => i.provider === "amplemarket");
+        if (!amplemarketIntegration) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Amplemarket integration not found" });
+        }
+        
+        const config = amplemarketIntegration.config as any;
+        if (!config?.amplemarketUserEmail) {
+          throw new TRPCError({ code: "BAD_REQUEST", message: "Amplemarket user email not configured" });
+        }
+        
+        const { cleanupWrongOwnerImports } = await import('./amplemarketCleanup');
+        const dbInstance = await db.getDb();
+        const result = await cleanupWrongOwnerImports(
+          dbInstance,
+          ctx.user.tenantId,
+          amplemarketIntegration.id,
+          config.amplemarketUserEmail
+        );
+        
+        return {
+          success: true,
+          deletedContacts: result.deletedContacts,
+          deletedAccounts: result.deletedAccounts,
+          message: `Cleaned up wrong-owner imports: deleted ${result.deletedContacts} contacts and ${result.deletedAccounts} accounts`
+        };
+      }),
+
     deleteAllAmplemarketData: protectedProcedure
       .mutation(async ({ ctx }) => {
         const integrations = await db.getIntegrationsByTenant(ctx.user.tenantId);

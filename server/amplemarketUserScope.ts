@@ -26,7 +26,25 @@ export async function getAmplemarketUserScope(
   let userLists: any[] = [];
   try {
     const listsResponse = await axios.get(`${AMPLEMARKET_API_BASE}/lead-lists`, { headers });
-    const allLists = listsResponse.data.leadLists || listsResponse.data;
+    
+    // Normalize API response - handle different response structures
+    let allLists: any[];
+    if (Array.isArray(listsResponse.data)) {
+      allLists = listsResponse.data;
+    } else if (listsResponse.data?.leadLists && Array.isArray(listsResponse.data.leadLists)) {
+      allLists = listsResponse.data.leadLists;
+    } else if (listsResponse.data?.data && Array.isArray(listsResponse.data.data)) {
+      allLists = listsResponse.data.data;
+    } else if (listsResponse.data?.lists && Array.isArray(listsResponse.data.lists)) {
+      allLists = listsResponse.data.lists;
+    } else {
+      console.error("[Amplemarket User Scope] Unexpected lists response format:", {
+        responseKeys: Object.keys(listsResponse.data || {}),
+        isArray: Array.isArray(listsResponse.data),
+        sample: JSON.stringify(listsResponse.data).substring(0, 200)
+      });
+      throw new Error("Failed to load lists due to unexpected response format.");
+    }
     
     // Filter lists: owned by user OR shared
     userLists = allLists.filter((list: any) => 
@@ -51,7 +69,23 @@ export async function getAmplemarketUserScope(
   let userSequences: any[] = [];
   try {
     const sequencesResponse = await axios.get(`${AMPLEMARKET_API_BASE}/sequences`, { headers });
-    const allSequences = sequencesResponse.data.sequences || sequencesResponse.data;
+    
+    // Normalize API response - handle different response structures
+    let allSequences: any[];
+    if (Array.isArray(sequencesResponse.data)) {
+      allSequences = sequencesResponse.data;
+    } else if (sequencesResponse.data?.sequences && Array.isArray(sequencesResponse.data.sequences)) {
+      allSequences = sequencesResponse.data.sequences;
+    } else if (sequencesResponse.data?.data && Array.isArray(sequencesResponse.data.data)) {
+      allSequences = sequencesResponse.data.data;
+    } else {
+      console.error("[Amplemarket User Scope] Unexpected sequences response format:", {
+        responseKeys: Object.keys(sequencesResponse.data || {}),
+        isArray: Array.isArray(sequencesResponse.data),
+        sample: JSON.stringify(sequencesResponse.data).substring(0, 200)
+      });
+      throw new Error("Failed to load sequences due to unexpected response format.");
+    }
     
     // Filter sequences: created by user
     userSequences = allSequences.filter((seq: any) => 

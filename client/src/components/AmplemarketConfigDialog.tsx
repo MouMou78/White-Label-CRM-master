@@ -259,7 +259,7 @@ export function AmplemarketConfigDialog({ open, onOpenChange, currentConfig, onS
                 ) : amplemarketLists.length === 0 ? (
                   <Alert>
                     <AlertDescription>
-                      No lists found for this user. Amplemarket does not provide user-level ownership for lists/sequences. Choose scope manually or select a different user.
+                      Lists and sequences are workspace-level. Contact sync is scoped by the selected Amplemarket owner.
                     </AlertDescription>
                   </Alert>
                 ) : listsError ? (

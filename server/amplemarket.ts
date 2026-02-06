@@ -101,6 +101,9 @@ export async function syncAmplemarketContacts(
   let createdCount = 0;
   let updatedCount = 0;
   let skippedCount = 0;
+  let fetchedTotal = 0;
+  let keptMatchingOwner = 0;
+  let discardedOtherOwners = 0;
   const syncStartTime = new Date();
   
   // Fail-fast validation: lists must be selected (no workspace-wide pulls)
@@ -130,10 +133,36 @@ export async function syncAmplemarketContacts(
       });
 
       const leadsList = response.data.leads || [];
+      fetchedTotal += leadsList.length;
       
       for (const lead of leadsList) {
         // Skip if no email
-        if (!lead.email) continue;
+        if (!lead.email) {
+          skippedCount++;
+          continue;
+        }
+        
+        // CRITICAL: Filter by owner email - only import contacts owned by selected user
+        if (!lead.owner) {
+          console.warn("[Amplemarket Sync] Lead missing owner field:", {
+            leadEmail: lead.email,
+            leadId: lead.id,
+            availableFields: Object.keys(lead)
+          });
+          throw new Error(`Amplemarket lead ${lead.email} is missing owner field. Cannot determine ownership. Aborting sync.`);
+        }
+        
+        if (lead.owner !== amplemarketUserEmail) {
+          discardedOtherOwners++;
+          console.log("[Amplemarket Sync] Skipping lead - wrong owner:", {
+            leadEmail: lead.email,
+            leadOwner: lead.owner,
+            expectedOwner: amplemarketUserEmail
+          });
+          continue;
+        }
+        
+        keptMatchingOwner++;
         
         // Check if person already exists by email
         const [existingPerson] = await db
@@ -229,6 +258,9 @@ export async function syncAmplemarketContacts(
   }
   
   console.log("[Amplemarket Sync] Sync completed:", {
+    fetchedTotal,
+    keptMatchingOwner,
+    discardedOtherOwners,
     createdCount,
     updatedCount,
     skippedCount,
@@ -236,7 +268,14 @@ export async function syncAmplemarketContacts(
     duration: `${(new Date().getTime() - syncStartTime.getTime()) / 1000}s`
   });
   
-  return { createdCount, updatedCount, skippedCount };
+  return { 
+    createdCount, 
+    updatedCount, 
+    skippedCount,
+    fetchedTotal,
+    keptMatchingOwner,
+    discardedOtherOwners
+  };
 }
 
 /**
@@ -289,6 +328,9 @@ export async function syncAmplemarket(
         contactsCreated: syncResult.createdCount,
         contactsUpdated: syncResult.updatedCount,
         contactsSkipped: syncResult.skippedCount,
+        contactsFetched: syncResult.fetchedTotal,
+        contactsKept: syncResult.keptMatchingOwner,
+        contactsDiscarded: syncResult.discardedOtherOwners,
       })
       .where(eq(amplemarketSyncLogs.id, syncLogId));
 
@@ -306,6 +348,9 @@ export async function syncAmplemarket(
       contactsCreated: syncResult.createdCount,
       contactsUpdated: syncResult.updatedCount,
       contactsSkipped: syncResult.skippedCount,
+      contactsFetched: syncResult.fetchedTotal,
+      contactsKept: syncResult.keptMatchingOwner,
+      contactsDiscarded: syncResult.discardedOtherOwners,
       totalSynced: syncResult.createdCount + syncResult.updatedCount
     };
   } catch (error: any) {

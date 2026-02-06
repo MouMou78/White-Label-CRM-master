@@ -2297,3 +2297,16 @@
 - [x] Add comprehensive logging (tenant_id, amplemarket_user_id, list_ids count, sequence_ids count)
 - [x] Test user switching produces different lists/sequences
 - [x] Verify sync only imports data from user's scope set
+
+## Amplemarket Owner-Based Scoping Fix
+- [ ] Fix allLists.filter type error with proper response normalization (Array.isArray check)
+- [ ] Update error messages to not blame API key for client-side type errors
+- [ ] Remove false assumption about list/sequence user ownership from UI
+- [ ] Update UI copy to reflect owner-based scoping at contact level
+- [ ] Implement server-side contact filtering by contact.owner email
+- [ ] Fail sync if owner field missing in API payload
+- [ ] Add read scoping to filter contacts by amplemarket_user_email
+- [ ] Add cleanup endpoint POST /api/integrations/amplemarket/cleanup-wrong-owner
+- [ ] Update sync logging with fetched_total, kept_matching_owner, discarded_other_owners counts
+- [ ] Show workspace lists/sequences without blocking on user selection
+- [ ] Test owner-based scoping with actual sync

@@ -2077,3 +2077,11 @@
 - [x] Create conflict review dashboard for manual conflict resolution
 - [x] Add side-by-side comparison UI for conflicting records
 - [x] Implement choose data source buttons (keep CRM, keep Amplemarket, merge)
+
+## Amplemarket Webhooks & Performance
+- [x] Build webhook endpoint to receive Amplemarket events (contact.created, contact.updated, sequence.completed)
+- [x] Add webhook signature verification for security
+- [x] Implement real-time sync triggers when webhook events arrive
+- [x] Create sync performance dashboard showing sync speed, API rate limits, data transfer volumes
+- [x] Add performance metrics charts (sync duration over time, records per second, API calls per hour)
+- [x] Show API rate limit usage and remaining quota

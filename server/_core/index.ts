@@ -44,6 +44,9 @@ async function startServer() {
   // Email tracking endpoints
   const trackingRouter = (await import("../tracking-routes")).default;
   app.use("/api", trackingRouter);
+  // Webhook endpoints
+  const { handleAmplemarketWebhook } = await import("../webhooks/amplemarket");
+  app.post("/api/webhooks/amplemarket", handleAmplemarketWebhook);
   // tRPC API
   app.use(
     "/api/trpc",

@@ -14,6 +14,7 @@ import PublicLeadCapture from "./pages/PublicLeadCapture";
 import Integrations from "./pages/Integrations";
 import SyncHistory from "./pages/SyncHistory";
 import ConflictReview from "./pages/ConflictReview";
+import SyncPerformance from "./pages/SyncPerformance";
 import Funnel from "./pages/Funnel";
 import Analytics from "./pages/Analytics";
 import Dashboard from "./pages/Dashboard";
@@ -177,6 +178,12 @@ function Router() {
       <Route path="/conflict-review">
         <DashboardLayout>
           <ConflictReview />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/sync-performance">
+        <DashboardLayout>
+          <SyncPerformance />
         </DashboardLayout>
       </Route>
       

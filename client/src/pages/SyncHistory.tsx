@@ -44,6 +44,9 @@ export default function SyncHistory() {
         </div>
         <div className="flex gap-2">
           <Button variant="outline" asChild>
+            <a href="/sync-performance">Performance</a>
+          </Button>
+          <Button variant="outline" asChild>
             <a href="/conflict-review">Review Conflicts</a>
           </Button>
           <Button onClick={() => refetch()} variant="outline">

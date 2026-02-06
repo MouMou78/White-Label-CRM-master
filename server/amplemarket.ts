@@ -195,28 +195,77 @@ export async function syncAmplemarketContacts(
         console.log(`[Amplemarket Sync] Fetched ${leads.length} leads from list`);
         idsScannedTotal += leads.length;
         
-        // Log first 3 leads from first list as raw samples
+        // Log first 3 leads from first list - SHOW ALL FIELDS TO IDENTIFY CONTACT ID
         if (listsScanned === 1 && leads.length > 0) {
           const sampleSize = Math.min(3, leads.length);
           console.log(`[Amplemarket Sync] ===== RAW LEAD SAMPLES from /lead-lists/${list.id} (first ${sampleSize}) =====`);
+          console.log("CRITICAL: We need to identify which field contains the contact ID that /contacts endpoint accepts");
+          console.log("Candidate fields: id, contact_id, contact.id, person.id, prospect.id, prospect_id, etc.");
+          console.log("");
+          
           for (let i = 0; i < sampleSize; i++) {
             const lead = leads[i];
-            const redactedSample: any = {
-              id: lead.id,
-            };
             
-            // Include owner-related fields
-            const ownerFields = ['owner', 'owner_email', 'user', 'assigned_to', 'created_by'];
-            for (const field of ownerFields) {
+            // Show ALL top-level keys first
+            console.log(`Lead ${i + 1} - ALL KEYS:`);
+            console.log(Object.keys(lead));
+            console.log("");
+            
+            // Show ALL ID-related fields (full structure)
+            const idFields = ['id', 'contact_id', 'person_id', 'prospect_id', 'lead_id', 'contact', 'person', 'prospect'];
+            const idSample: any = {};
+            for (const field of idFields) {
               if (lead[field] !== undefined) {
-                redactedSample[field] = lead[field];
+                idSample[field] = lead[field];
               }
             }
             
-            console.log(`Lead ${i + 1}:`);
-            console.log(JSON.stringify(redactedSample, null, 2));
+            console.log(`Lead ${i + 1} - ID-RELATED FIELDS:`);
+            console.log(JSON.stringify(idSample, null, 2));
+            console.log("");
           }
           console.log("[Amplemarket Sync] ===== END RAW LEAD SAMPLES =====");
+          console.log("");
+          
+          // Test which ID field /contacts endpoint accepts
+          console.log("[Amplemarket Sync] ===== TESTING ID FIELDS WITH /contacts/{id} =====");
+          const testLead = leads[0];
+          const candidateFields = [
+            { name: 'id', value: testLead.id },
+            { name: 'contact_id', value: testLead.contact_id },
+            { name: 'person_id', value: testLead.person_id },
+            { name: 'prospect_id', value: testLead.prospect_id },
+            { name: 'contact.id', value: testLead.contact?.id },
+            { name: 'person.id', value: testLead.person?.id },
+            { name: 'prospect.id', value: testLead.prospect?.id },
+          ];
+          
+          for (const candidate of candidateFields) {
+            if (!candidate.value) {
+              console.log(`Field "${candidate.name}": NOT PRESENT`);
+              continue;
+            }
+            
+            try {
+              console.log(`Testing field "${candidate.name}" with value "${candidate.value}"...`);
+              const testResponse = await (client as any).client.get(`/contacts/${candidate.value}`);
+              const contact = testResponse.data.contact || testResponse.data;
+              
+              if (contact && contact.email) {
+                console.log(`✓ SUCCESS! Field "${candidate.name}" returns valid contact:`);
+                console.log(`  Contact ID: ${contact.id}`);
+                console.log(`  Email: ${contact.email}`);
+                console.log(`  This is the correct field to use for hydration.`);
+                break; // Found the correct field
+              } else {
+                console.log(`✗ Field "${candidate.name}" returned data but no email field`);
+              }
+            } catch (error: any) {
+              console.log(`✗ Field "${candidate.name}" failed: ${error.response?.status || error.message}`);
+            }
+          }
+          console.log("[Amplemarket Sync] ===== END ID FIELD TESTING =====");
+          console.log("");
         }
         
         // Collect ALL lead IDs without filtering (owner filtering happens after hydration)

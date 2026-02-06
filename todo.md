@@ -2496,3 +2496,11 @@
 - [x] Add hydration proof logging: batch size, serialized query string, response.contacts.length
 - [ ] Test hydration with one batch and verify non-zero contacts returned
 - [ ] Run full sync and verify kept_owner_match > 0 and created/updated > 0
+
+## Fix ID Type Mismatch in /contacts Hydration
+
+- [x] Inspect /lead-lists/{id} payload structure and log ALL available ID fields (id, contact_id, contact.id, person.id, prospect.id, etc.)
+- [x] Test candidate ID fields with GET /contacts/{id} to find which returns contact data
+- [ ] Update ID collection logic to extract correct contact ID field instead of blindly using item.id
+- [ ] Add guardrail to fail if contact ID field is missing from lead items
+- [ ] Run sync and verify hydration returns non-zero contacts with correct IDs

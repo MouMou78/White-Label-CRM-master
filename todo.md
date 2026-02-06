@@ -2195,3 +2195,13 @@
 - [x] Improve frontend error messaging for 401 responses
 - [x] Test with curl command using stored API key
 - [x] Verify users, lists, and sequences endpoints all return 200
+
+## Google Calendar Events Fetching Fix
+- [x] Add comprehensive logging to Google Calendar API calls (endpoint, method, status, body, token presence, refresh status)
+- [x] Fix Calendar API endpoint to use correct URL with 'primary' calendar
+- [x] Add required parameters (timeMin, singleEvents, orderBy, maxResults)
+- [x] Implement token refresh logic before API calls
+- [x] Add proper Authorization header with Bearer token
+- [x] Verify granted scopes include calendar.readonly
+- [x] Map API errors (401/403/404) to actionable UI messages
+- [x] Test that events load immediately after connecting calendar

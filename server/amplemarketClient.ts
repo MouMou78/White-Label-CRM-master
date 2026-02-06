@@ -99,13 +99,7 @@ export class AmplemarketClient {
     return response.data;
   }
 
-  /**
-   * Get accounts from Amplemarket
-   */
-  async getAccounts(params?: { limit?: number; offset?: number }) {
-    const response = await this.client.get("/accounts", { params });
-    return response.data;
-  }
+
 }
 
 /**

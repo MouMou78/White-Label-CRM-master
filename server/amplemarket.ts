@@ -6,71 +6,69 @@ import { eq, and } from "drizzle-orm";
 const AMPLEMARKET_API_BASE = "https://api.amplemarket.com/v1";
 
 /**
- * Sync accounts from Amplemarket
+ * Create or update account from contact company data
  */
-export async function syncAmplemarketAccounts(db: any, tenantId: string, apiKey: string) {
+async function syncAccountFromContact(db: any, tenantId: string, contact: any): Promise<string | null> {
+  // Skip if no company domain
+  if (!contact.company_domain) {
+    return null;
+  }
+
   try {
-    const response = await axios.get(`${AMPLEMARKET_API_BASE}/accounts`, {
-      headers: { "X-Api-Key": apiKey },
-      params: {
-        per_page: 100,
-        page: 1,
+    // Check if account already exists by domain
+    const [existingAccount] = await db
+      .select()
+      .from(accounts)
+      .where(and(
+        eq(accounts.tenantId, tenantId),
+        eq(accounts.domain, contact.company_domain)
+      ))
+      .limit(1);
+
+    const accountData = {
+      name: contact.company_name || contact.company_domain,
+      domain: contact.company_domain,
+      industry: contact.industry || null,
+      employees: contact.company_size ? parseInt(contact.company_size) : null,
+      revenue: null,
+      technologies: null,
+      headquarters: contact.location || null,
+      foundingYear: null,
+      lastFundingRound: null,
+      firstContacted: null,
+      linkedinUrl: contact.company_linkedin_url || null,
+      enrichmentSource: "amplemarket",
+      enrichmentSnapshot: {
+        company_name: contact.company_name,
+        company_domain: contact.company_domain,
+        industry: contact.industry,
+        company_size: contact.company_size,
+        location: contact.location,
       },
-    });
+      updatedAt: new Date(),
+    };
 
-    const accountsList = response.data.accounts || [];
-    let syncedCount = 0;
-
-    for (const ampAccount of accountsList) {
-      // Check if account already exists by domain
-      const [existingAccount] = await db
-        .select()
-        .from(accounts)
-        .where(and(
-          eq(accounts.tenantId, tenantId),
-          eq(accounts.domain, ampAccount.domain)
-        ))
-        .limit(1);
-
-      const accountData = {
-        name: ampAccount.name || ampAccount.company_name,
-        domain: ampAccount.domain,
-        industry: ampAccount.industry,
-        employees: ampAccount.employees || ampAccount.employee_count,
-        revenue: ampAccount.revenue,
-        technologies: ampAccount.technologies ? JSON.parse(JSON.stringify(ampAccount.technologies)) : null,
-        headquarters: ampAccount.headquarters || ampAccount.location,
-        foundingYear: ampAccount.founding_year ? parseInt(ampAccount.founding_year) : null,
-        lastFundingRound: ampAccount.last_funding_round,
-        firstContacted: ampAccount.first_contacted ? new Date(ampAccount.first_contacted) : null,
-        linkedinUrl: ampAccount.linkedin_url,
-        enrichmentSource: "amplemarket",
-        enrichmentSnapshot: ampAccount,
-        updatedAt: new Date(),
-      };
-
-      if (existingAccount) {
-        // Update existing account
-        await db
-          .update(accounts)
-          .set(accountData)
-          .where(eq(accounts.id, existingAccount.id));
-      } else {
-        // Create new account
-        await db.insert(accounts).values({
-          id: nanoid(),
-          tenantId,
-          ...accountData,
-          createdAt: new Date(),
-        });
-      }
-      syncedCount++;
+    if (existingAccount) {
+      // Update existing account
+      await db
+        .update(accounts)
+        .set(accountData)
+        .where(eq(accounts.id, existingAccount.id));
+      return existingAccount.id;
+    } else {
+      // Create new account
+      const accountId = nanoid();
+      await db.insert(accounts).values({
+        id: accountId,
+        tenantId,
+        ...accountData,
+        createdAt: new Date(),
+      });
+      return accountId;
     }
-
-    return syncedCount;
   } catch (error: any) {
-    console.error("Error syncing Amplemarket accounts:", error.message);
-    throw new Error(`Failed to sync Amplemarket accounts: ${error.message}`);
+    console.error("Error syncing account from contact:", error.message);
+    return null;
   }
 }
 
@@ -80,7 +78,7 @@ export async function syncAmplemarketAccounts(db: any, tenantId: string, apiKey:
 export async function syncAmplemarketContacts(db: any, tenantId: string, apiKey: string) {
   try {
     const response = await axios.get(`${AMPLEMARKET_API_BASE}/contacts`, {
-      headers: { "X-Api-Key": apiKey },
+      headers: { "Authorization": `Bearer ${apiKey}` },
       params: {
         per_page: 100,
         page: 1,
@@ -101,22 +99,8 @@ export async function syncAmplemarketContacts(db: any, tenantId: string, apiKey:
         ))
         .limit(1);
 
-      // Find or create linked account
-      let accountId = null;
-      if (contact.company_domain) {
-        const [account] = await db
-          .select()
-          .from(accounts)
-          .where(and(
-            eq(accounts.tenantId, tenantId),
-            eq(accounts.domain, contact.company_domain)
-          ))
-          .limit(1);
-        
-        if (account) {
-          accountId = account.id;
-        }
-      }
+      // Create or update account from contact company data
+      const accountId = await syncAccountFromContact(db, tenantId, contact);
 
       const personData = {
         accountId,
@@ -190,10 +174,9 @@ export async function syncAmplemarketContacts(db: any, tenantId: string, apiKey:
 }
 
 /**
- * Full Amplemarket sync: accounts + contacts
+ * Full Amplemarket sync: contacts (accounts are derived from contact company data)
  */
 export async function syncAmplemarket(db: any, tenantId: string, apiKey: string) {
-  const accountsSynced = await syncAmplemarketAccounts(db, tenantId, apiKey);
   const contactsSynced = await syncAmplemarketContacts(db, tenantId, apiKey);
 
   // Update last synced timestamp
@@ -205,5 +188,5 @@ export async function syncAmplemarket(db: any, tenantId: string, apiKey: string)
       eq(integrations.provider, "amplemarket")
     ));
 
-  return { accountsSynced, contactsSynced, totalSynced: accountsSynced + contactsSynced };
+  return { accountsSynced: 0, contactsSynced, totalSynced: contactsSynced };
 }

@@ -2229,3 +2229,13 @@
 - [x] Add loading states and error handling for all new features
 - [x] Create /amplemarket/sync route and page
 - [ ] Test all features end-to-end
+
+## Amplemarket Accounts Sync 404 Fix
+- [x] Capture failing request URL, method, status, response body from browser network logs
+- [x] Add comprehensive server-side logging for Amplemarket API calls
+- [x] Verify Amplemarket API documentation for correct company/accounts endpoint
+- [x] Determine if /accounts endpoint exists or if we need to use /companies or derive from prospects
+- [x] Fix API client to use correct endpoint path (removed non-existent /accounts endpoint)
+- [x] Update sync logic to derive accounts from contact company data
+- [x] Test sync and verify all requests return 200
+- [x] Confirm no requests to non-existent endpoints

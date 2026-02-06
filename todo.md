@@ -2108,3 +2108,9 @@
 - [x] Update AmplemarketPeople sync button to use config dialog
 - [x] Ensure all Amplemarket sync buttons follow configuration rules
 - [x] Improve logo visibility in dark mode with increased brightness and contrast
+
+## New Bugs Reported (Feb 6, 2026)
+- [x] Fix Amplemarket API routing error: "no Route matched with those values"
+- [x] Fix "Failed to load lists" error in Amplemarket config dialog
+- [x] Fix "Failed to load sequences" error in Amplemarket config dialog
+- [ ] Fix Google OAuth error (bottom right notification)

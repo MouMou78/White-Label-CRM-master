@@ -1332,6 +1332,7 @@ export const activities = mysqlTable("activities", {
   title: varchar("title", { length: 500 }).notNull(),
   description: text("description"),
   metadata: json("metadata"), // Type-specific data
+  externalSource: varchar("externalSource", { length: 100 }), // e.g., amplemarket, google, manual
   timestamp: timestamp("timestamp").defaultNow().notNull(),
 }, (table) => ({
   personIdx: index("activities_person_idx").on(table.personId),

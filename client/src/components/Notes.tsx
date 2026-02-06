@@ -25,6 +25,12 @@ export default function Notes({ entityType, entityId }: NotesProps) {
   const createNoteMutation = trpc.notes.create.useMutation({
     onSuccess: () => {
       utils.notes.contextual.invalidate({ entityType, entityId });
+      // Invalidate activities cache to show new note in timeline
+      if (entityType === 'contact') {
+        utils.activities.getByPerson.invalidate({ personId: entityId });
+      } else if (entityType === 'account') {
+        utils.activities.getByAccount.invalidate({ accountId: entityId });
+      }
       setNewNote("");
     },
   });

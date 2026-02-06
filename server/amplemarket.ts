@@ -82,6 +82,7 @@ export async function syncAmplemarketContacts(
   apiKey: string,
   amplemarketUserId: string,
   amplemarketUserEmail: string,
+  syncScope: string = 'all_user_contacts',
   selectedListIds: string[] = []
 ) {
   // Fail-fast validation: user must be selected
@@ -95,6 +96,7 @@ export async function syncAmplemarketContacts(
     amplemarketUserId,
     amplemarketUserEmail,
     amplemarketUserEmailNormalized: amplemarketUserEmail.toLowerCase().trim(),
+    syncScope,
     selectedListIds: selectedListIds.length,
     selectedListIdsArray: selectedListIds
   });
@@ -108,9 +110,19 @@ export async function syncAmplemarketContacts(
   let discardedOtherOwners = 0;
   const syncStartTime = new Date();
   
-  // Fail-fast validation: lists must be selected (no workspace-wide pulls)
-  if (selectedListIds.length === 0) {
-    throw new Error("No lists selected for sync. Please select specific lists in the configuration to prevent workspace-wide data pulls.");
+  // Validation based on sync scope
+  if (syncScope === 'lists' && selectedListIds.length === 0) {
+    throw new Error("No lists selected for sync. Please select at least one list or switch scope to 'All contacts for selected user'.");
+  }
+  
+  // For all_user_contacts mode, we'll fetch all contacts and filter by owner
+  if (syncScope === 'all_user_contacts') {
+    // TODO: Implement workspace-wide contact fetch with owner filtering
+    // For now, we'll use the existing list-based approach as fallback
+    console.warn("[Amplemarket Sync] all_user_contacts mode not yet implemented, falling back to list-based sync");
+    if (selectedListIds.length === 0) {
+      throw new Error("all_user_contacts sync mode is not yet implemented. Please select specific lists for now.");
+    }
   }
   
   // Fetch contacts from each selected list
@@ -321,6 +333,7 @@ export async function syncAmplemarket(
   apiKey: string,
   amplemarketUserId: string,
   amplemarketUserEmail: string,
+  syncScope: string = 'all_user_contacts',
   selectedListIds: string[] = []
 ) {
   const syncStartTime = new Date();
@@ -349,6 +362,7 @@ export async function syncAmplemarket(
       apiKey,
       amplemarketUserId,
       amplemarketUserEmail,
+      syncScope,
       selectedListIds
     );
 

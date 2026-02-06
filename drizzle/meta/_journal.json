@@ -295,6 +295,13 @@
       "when": 1770398270251,
       "tag": "0041_ambiguous_red_skull",
       "breakpoints": true
+    },
+    {
+      "idx": 42,
+      "version": "5",
+      "when": 1770398835565,
+      "tag": "0042_ordinary_starbolt",
+      "breakpoints": true
     }
   ]
 }

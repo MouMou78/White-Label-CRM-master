@@ -1723,12 +1723,29 @@ export async function createNote(data: {
   const db = await getDb();
   if (!db) throw new Error("Database not available");
   
-  const { notes } = await import("../drizzle/schema");
+  const { notes, activities } = await import("../drizzle/schema");
   const id = nanoid();
   
+  // Insert note
   await db.insert(notes).values({
     id,
     ...data,
+  });
+  
+  // Insert activity record for timeline
+  const activityId = nanoid();
+  await db.insert(activities).values({
+    id: activityId,
+    tenantId: data.tenantId,
+    personId: data.entityType === 'contact' ? data.entityId : null,
+    accountId: data.entityType === 'account' ? data.entityId : null,
+    userId: data.createdBy,
+    activityType: 'note',
+    title: `Note added by ${data.createdByName}`,
+    description: data.content,
+    metadata: { noteId: id, entityType: data.entityType, entityId: data.entityId },
+    externalSource: 'manual',
+    timestamp: new Date(),
   });
   
   const result = await db.select().from(notes)

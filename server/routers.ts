@@ -1824,10 +1824,12 @@ Generate a subject line and email body. Format your response as JSON with "subje
             message: "Amplemarket user must be selected before syncing. Please select a user in the configuration." 
           });
         }
-        if (selectedLists.length === 0) {
+        // Validate based on sync scope
+        const syncScope = config?.syncScope || 'all_user_contacts';
+        if (syncScope === 'lists' && selectedLists.length === 0) {
           throw new TRPCError({ 
             code: "BAD_REQUEST", 
-            message: "No lists selected for sync. Please select specific lists in the configuration." 
+            message: "No lists selected for sync. Please select at least one list or switch scope to 'All contacts for selected user'." 
           });
         }
         
@@ -1851,6 +1853,7 @@ Generate a subject line and email body. Format your response as JSON with "subje
           apiKey,
           amplemarketUserId,
           amplemarketUserEmail,
+          syncScope,
           selectedLists
         );
       }),
@@ -1859,6 +1862,7 @@ Generate a subject line and email body. Format your response as JSON with "subje
       .input(z.object({
         syncSchedule: z.enum(["manual", "hourly", "daily", "weekly"]),
         conflictStrategy: z.enum(["keep_crm", "keep_amplemarket", "merge_latest", "manual"]),
+        syncScope: z.enum(["all_user_contacts", "lists", "sequences"]).optional(),
         amplemarketUserId: z.string().optional(),
         amplemarketUserEmail: z.string().optional(),
         selectedLists: z.array(z.string()).optional(),
@@ -1875,6 +1879,7 @@ Generate a subject line and email body. Format your response as JSON with "subje
           ...currentConfig,
           syncSchedule: input.syncSchedule,
           conflictStrategy: input.conflictStrategy,
+          syncScope: input.syncScope || 'all_user_contacts',
           amplemarketUserId: input.amplemarketUserId,
           amplemarketUserEmail: input.amplemarketUserEmail,
           selectedLists: input.selectedLists,

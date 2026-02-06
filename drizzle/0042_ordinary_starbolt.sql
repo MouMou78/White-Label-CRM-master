@@ -1,0 +1,1 @@
+ALTER TABLE `activities` ADD `externalSource` varchar(100);

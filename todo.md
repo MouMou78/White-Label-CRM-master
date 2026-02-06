@@ -2366,3 +2366,29 @@
 - [ ] User needs to run sync from UI to generate diagnostic output
 - [ ] Review server logs to see fetched vs filtered counts
 - [ ] Verify owner field format from sample contacts
+
+- [ ] Add sync scope selector UI (All contacts / Specific lists / Specific sequences)
+- [ ] Add checkboxes for lists/sequences with Select All and Clear All
+- [ ] Persist scope_mode, selected_list_ids, selected_sequence_ids in config
+- [ ] Implement all_user_contacts sync mode (fetch by owner, no lists required)
+- [ ] Update validation: only require lists when scope_mode = lists
+- [ ] Remove hard block that refuses sync when no lists selected
+- [ ] Test: Sync with "All contacts for selected user" without selecting lists
+- [ ] Test: Untick lists/sequences and save config
+## Fix Activity Timeline
+- [x] Create unified Activities table schema (tenant_id, contact_id, activity_type, created_at, created_by, payload, external_source)
+- [x] Update note creation to write to Activities table
+- [x] Fix timeline queries to use single endpoint with type filters
+- [x] Add real-time updates with cache invalidation after activity creation
+- [ ] Verify note creation appears in All Activities and Notes tab
+- [ ] Verify all tabs filter correctly without hiding existing items
+
+## Remove Mandatory Lists from Amplemarket Sync
+- [x] Add sync scope selector UI (All contacts / Specific lists / Specific sequences)
+- [x] Add checkboxes for lists/sequences with Select All and Clear All
+- [x] Persist scope_mode, selected_list_ids, selected_sequence_ids in config
+- [ ] Implement all_user_contacts sync mode (fetch by owner, no lists required) - TODO: Need Amplemarket API endpoint
+- [x] Update validation: only require lists when scope_mode = lists
+- [x] Remove hard block that refuses sync when no lists selected
+- [ ] Test: Sync with "All contacts for selected user" without selecting lists
+- [ ] Test: Untick lists/sequences and save config

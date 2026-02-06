@@ -19,6 +19,7 @@ interface AmplemarketConfigDialogProps {
 export function AmplemarketConfigDialog({ open, onOpenChange, currentConfig, onSave }: AmplemarketConfigDialogProps) {
   const [syncSchedule, setSyncSchedule] = useState(currentConfig?.syncSchedule || "manual");
   const [conflictStrategy, setConflictStrategy] = useState(currentConfig?.conflictStrategy || "keep_crm");
+  const [syncScope, setSyncScope] = useState(currentConfig?.syncScope || "all_user_contacts");
   const [selectedUserId, setSelectedUserId] = useState(currentConfig?.userId || "");
   const [selectedUserEmail, setSelectedUserEmail] = useState<string | undefined>(undefined);
   const [selectedLists, setSelectedLists] = useState<string[]>(currentConfig?.selectedLists || []);
@@ -80,6 +81,7 @@ export function AmplemarketConfigDialog({ open, onOpenChange, currentConfig, onS
     updateConfig.mutate({
       syncSchedule,
       conflictStrategy,
+      syncScope,
       amplemarketUserId: selectedUserId,
       amplemarketUserEmail: selectedUser?.email || '',
       selectedLists,
@@ -165,6 +167,24 @@ export function AmplemarketConfigDialog({ open, onOpenChange, currentConfig, onS
             </p>
           </div>
 
+          {/* Sync Scope */}
+          <div className="space-y-2">
+            <Label>Sync Scope</Label>
+            <Select value={syncScope} onValueChange={setSyncScope}>
+              <SelectTrigger>
+                <SelectValue />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="all_user_contacts">All contacts for selected user (recommended)</SelectItem>
+                <SelectItem value="lists">Specific lists</SelectItem>
+                <SelectItem value="sequences">Specific sequences</SelectItem>
+              </SelectContent>
+            </Select>
+            <p className="text-xs text-muted-foreground">
+              Choose whether to sync all contacts owned by the selected user, or only contacts from specific lists/sequences
+            </p>
+          </div>
+
           {/* Sync Schedule */}
           <div className="space-y-2">
             <Label>Sync Schedule</Label>
@@ -204,8 +224,9 @@ export function AmplemarketConfigDialog({ open, onOpenChange, currentConfig, onS
           </div>
 
           {/* List Selection */}
+          {syncScope === 'lists' && (
           <div className="space-y-2">
-            <Label>Sync Specific Lists (Optional)</Label>
+            <Label>Select Lists</Label>
             {loadingLists ? (
               <div className="flex items-center justify-center p-4 border rounded-lg">
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -270,13 +291,15 @@ export function AmplemarketConfigDialog({ open, onOpenChange, currentConfig, onS
               </div>
             )}
             <p className="text-xs text-muted-foreground">
-              Leave empty to sync all lists, or select specific lists
+              Select at least one list to sync contacts from
             </p>
           </div>
+          )}
 
           {/* Sequence Selection */}
+          {syncScope === 'sequences' && (
           <div className="space-y-2">
-            <Label>Sync Specific Sequences (Optional)</Label>
+            <Label>Select Sequences</Label>
             {loadingSequences ? (
               <div className="flex items-center justify-center p-4 border rounded-lg">
                 <Loader2 className="w-4 h-4 animate-spin mr-2" />
@@ -325,9 +348,10 @@ export function AmplemarketConfigDialog({ open, onOpenChange, currentConfig, onS
               </div>
             )}
             <p className="text-xs text-muted-foreground">
-              Leave empty to sync all sequences, or select specific ones
+              Select at least one sequence to sync contacts from
             </p>
           </div>
+          )}
         </div>
 
         <DialogFooter>

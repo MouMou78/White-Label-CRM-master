@@ -2239,3 +2239,12 @@
 - [x] Update sync logic to derive accounts from contact company data
 - [x] Test sync and verify all requests return 200
 - [x] Confirm no requests to non-existent endpoints
+
+## Amplemarket Sync 404 Debugging
+- [x] Capture frontend network request (URL, method, status, response body)
+- [x] Add server-side logging for outbound Amplemarket API calls (full URL path, method, status, response)
+- [x] Test Amplemarket /contacts endpoint with curl - confirmed 404, endpoint requires contact IDs
+- [x] Identify if 404 is from our backend route or Amplemarket API - confirmed Amplemarket API
+- [x] Fix root cause - changed from /contacts to /lead-lists/{id} to fetch leads from selected lists
+- [x] Add clear error messaging showing exact endpoint that failed
+- [ ] Verify sync returns 200 from both our backend and Amplemarket

@@ -1809,8 +1809,9 @@ Generate a subject line and email body. Format your response as JSON with "subje
         }
         const apiKey = (amplemarketIntegration.config as any)?.apiKey;
         if (!apiKey) throw new TRPCError({ code: "BAD_REQUEST", message: "Amplemarket API key not found" });
+        const selectedLists = (amplemarketIntegration.config as any)?.selectedLists || [];
         const dbInstance = await db.getDb();
-        return syncAmplemarket(dbInstance, ctx.user.tenantId, apiKey);
+        return syncAmplemarket(dbInstance, ctx.user.tenantId, apiKey, selectedLists);
       }),
 
     updateAmplemarketConfig: protectedProcedure

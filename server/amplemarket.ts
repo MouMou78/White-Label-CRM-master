@@ -3,7 +3,7 @@ import { nanoid } from "nanoid";
 import { accounts, people, integrations } from "../drizzle/schema";
 import { eq, and } from "drizzle-orm";
 
-const AMPLEMARKET_API_BASE = "https://api.amplemarket.com/v1";
+const AMPLEMARKET_API_BASE = "https://api.amplemarket.com";
 
 /**
  * Create or update account from contact company data
@@ -73,111 +73,148 @@ async function syncAccountFromContact(db: any, tenantId: string, contact: any): 
 }
 
 /**
- * Sync contacts from Amplemarket with all fields
+ * Sync contacts from Amplemarket lead lists
  */
-export async function syncAmplemarketContacts(db: any, tenantId: string, apiKey: string) {
-  try {
-    const response = await axios.get(`${AMPLEMARKET_API_BASE}/contacts`, {
+export async function syncAmplemarketContacts(db: any, tenantId: string, apiKey: string, selectedListIds: string[] = []) {
+  let totalSyncedCount = 0;
+  
+  // If no lists selected, fetch all lists
+  if (selectedListIds.length === 0) {
+    const listsUrl = `${AMPLEMARKET_API_BASE}/lead-lists`;
+    console.log("[Amplemarket Sync] Fetching all lists:", { url: listsUrl });
+    
+    const listsResponse = await axios.get(listsUrl, {
       headers: { "Authorization": `Bearer ${apiKey}` },
-      params: {
-        per_page: 100,
-        page: 1,
-      },
     });
-
-    const contactsList = response.data.contacts || [];
-    let syncedCount = 0;
-
-    for (const contact of contactsList) {
-      // Check if person already exists by email
-      const [existingPerson] = await db
-        .select()
-        .from(people)
-        .where(and(
-          eq(people.tenantId, tenantId),
-          eq(people.primaryEmail, contact.email)
-        ))
-        .limit(1);
-
-      // Create or update account from contact company data
-      const accountId = await syncAccountFromContact(db, tenantId, contact);
-
-      const personData = {
-        accountId,
-        fullName: `${contact.first_name || ""} ${contact.last_name || ""}`.trim() || contact.email,
-        firstName: contact.first_name,
-        lastName: contact.last_name,
-        primaryEmail: contact.email,
-        companyName: contact.company_name,
-        companyDomain: contact.company_domain,
-        companySize: contact.company_size,
-        roleTitle: contact.title,
-        simplifiedTitle: contact.simplified_title,
-        phone: contact.phone_number,
-        manuallyAddedNumber: contact.manually_added_number,
-        manuallyAddedNumberDncStatus: contact.manually_added_number_dnc_status,
-        sourcedNumber: contact.sourced_number,
-        sourcedNumberDncStatus: contact.sourced_number_dnc_status,
-        mobileNumber: contact.mobile_number,
-        mobileNumberDncStatus: contact.mobile_number_dnc_status,
-        workNumber: contact.work_number,
-        workNumberDncStatus: contact.work_number_dnc_status,
-        city: contact.city,
-        state: contact.state,
-        country: contact.country,
-        location: contact.location,
-        linkedinUrl: contact.linkedin_url,
-        industry: contact.industry,
-        status: contact.status,
-        numberOfOpens: contact.number_of_opens || 0,
-        label: contact.label,
-        meetingBooked: contact.meeting_booked || false,
-        owner: contact.owner,
-        sequenceName: contact.sequence_name,
-        sequenceTemplateName: contact.sequence_template_name,
-        savedSearchOrLeadListName: contact.saved_search_or_lead_list_name,
-        mailbox: contact.mailbox,
-        contactUrl: contact.contact_url,
-        replied: contact.replied || false,
-        lastStageExecuted: contact.last_stage_executed,
-        lastStageExecutedAt: contact.last_stage_executed_at ? new Date(contact.last_stage_executed_at) : null,
-        notes: contact.notes,
-        enrichmentSource: "amplemarket",
-        enrichmentSnapshot: contact,
-        enrichmentLastSyncedAt: new Date(),
-        updatedAt: new Date(),
-      };
-
-      if (existingPerson) {
-        // Update existing person
-        await db
-          .update(people)
-          .set(personData)
-          .where(eq(people.id, existingPerson.id));
-      } else {
-        // Create new person
-        await db.insert(people).values({
-          id: nanoid(),
-          tenantId,
-          ...personData,
-          createdAt: new Date(),
-        });
-      }
-      syncedCount++;
-    }
-
-    return syncedCount;
-  } catch (error: any) {
-    console.error("Error syncing Amplemarket contacts:", error.message);
-    throw new Error(`Failed to sync Amplemarket contacts: ${error.message}`);
+    
+    selectedListIds = listsResponse.data.lead_lists?.map((list: any) => list.id) || [];
+    console.log("[Amplemarket Sync] Found lists:", { count: selectedListIds.length });
   }
+  
+  // Fetch contacts from each selected list
+  for (const listId of selectedListIds) {
+    const requestUrl = `${AMPLEMARKET_API_BASE}/lead-lists/${listId}`;
+    console.log("[Amplemarket Sync] Fetching list:", {
+      url: requestUrl,
+      method: "GET",
+      listId,
+      hasApiKey: !!apiKey
+    });
+    
+    try {
+      const response = await axios.get(requestUrl, {
+        headers: { "Authorization": `Bearer ${apiKey}` },
+      });
+      
+      console.log("[Amplemarket Sync] List Response:", {
+        status: response.status,
+        listName: response.data?.name,
+        leadsCount: response.data?.leads?.length || 0
+      });
+
+      const leadsList = response.data.leads || [];
+      
+      for (const lead of leadsList) {
+        // Skip if no email
+        if (!lead.email) continue;
+        
+        // Check if person already exists by email
+        const [existingPerson] = await db
+          .select()
+          .from(people)
+          .where(and(
+            eq(people.tenantId, tenantId),
+            eq(people.primaryEmail, lead.email)
+          ))
+          .limit(1);
+
+        // Create or update account from lead company data
+        const accountId = await syncAccountFromContact(db, tenantId, lead);
+
+        const personData = {
+          accountId,
+          fullName: `${lead.first_name || ""} ${lead.last_name || ""}`.trim() || lead.email,
+          firstName: lead.first_name,
+          lastName: lead.last_name,
+          primaryEmail: lead.email,
+          companyName: lead.company_name,
+          companyDomain: lead.company_domain,
+          companySize: null,
+          roleTitle: lead.title,
+          simplifiedTitle: null,
+          phone: lead.phone_numbers?.[0]?.number || null,
+          manuallyAddedNumber: null,
+          manuallyAddedNumberDncStatus: null,
+          sourcedNumber: null,
+          sourcedNumberDncStatus: null,
+          mobileNumber: null,
+          mobileNumberDncStatus: null,
+          workNumber: null,
+          workNumberDncStatus: null,
+          city: null,
+          state: null,
+          country: null,
+          location: null,
+          linkedinUrl: lead.linkedin_url,
+          industry: lead.industry,
+          status: null,
+          numberOfOpens: 0,
+          label: null,
+          meetingBooked: false,
+          owner: null,
+          sequenceName: null,
+          sequenceTemplateName: null,
+          savedSearchOrLeadListName: null,
+          mailbox: null,
+          contactUrl: null,
+          replied: false,
+          lastStageExecuted: null,
+          lastStageExecutedAt: null,
+          notes: null,
+          enrichmentSource: "amplemarket",
+          enrichmentSnapshot: lead,
+          enrichmentLastSyncedAt: new Date(),
+          updatedAt: new Date(),
+        };
+
+        if (existingPerson) {
+          // Update existing person
+          await db
+            .update(people)
+            .set(personData)
+            .where(eq(people.id, existingPerson.id));
+        } else {
+          // Create new person
+          await db.insert(people).values({
+            id: nanoid(),
+            tenantId,
+            ...personData,
+            createdAt: new Date(),
+          });
+        }
+        totalSyncedCount++;
+      }
+    } catch (error: any) {
+      console.error("[Amplemarket Sync] Error fetching list:", {
+        listId,
+        url: requestUrl,
+        status: error.response?.status,
+        statusText: error.response?.statusText,
+        responseBody: error.response?.data,
+        message: error.message
+      });
+      // Continue with next list instead of failing entire sync
+    }
+  }
+  
+  return totalSyncedCount;
 }
 
 /**
  * Full Amplemarket sync: contacts (accounts are derived from contact company data)
  */
-export async function syncAmplemarket(db: any, tenantId: string, apiKey: string) {
-  const contactsSynced = await syncAmplemarketContacts(db, tenantId, apiKey);
+export async function syncAmplemarket(db: any, tenantId: string, apiKey: string, selectedListIds: string[] = []) {
+  const contactsSynced = await syncAmplemarketContacts(db, tenantId, apiKey, selectedListIds);
 
   // Update last synced timestamp
   await db

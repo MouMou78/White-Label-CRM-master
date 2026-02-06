@@ -267,6 +267,13 @@
       "when": 1770323273557,
       "tag": "0037_silent_jackpot",
       "breakpoints": true
+    },
+    {
+      "idx": 38,
+      "version": "5",
+      "when": 1770378154228,
+      "tag": "0038_confused_dragon_man",
+      "breakpoints": true
     }
   ]
 }

@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE `webhookEvents` (\n\t`id` varchar(36) NOT NULL,\n\t`tenantId` varchar(36) NOT NULL,\n\t`provider` varchar(50) NOT NULL,\n\t`eventType` varchar(100) NOT NULL,\n\t`payload` json NOT NULL,\n\t`headers` json,\n\t`processedAt` timestamp,\n\t`error` text,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT `webhookEvents_id` PRIMARY KEY(`id`)\n);\n\nCREATE INDEX `webhook_events_tenant_idx` ON `webhookEvents` (`tenantId`);\nCREATE INDEX `webhook_events_provider_idx` ON `webhookEvents` (`provider`);\nCREATE INDEX `webhook_events_created_idx` ON `webhookEvents` (`createdAt`);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2QkRhwd4AVTLhHG.a0950ca1ba2f --database TQEsx2HByTQrcAiUBn2kww --execute CREATE TABLE `webhookEvents` (\n\t`id` varchar(36) NOT NULL,\n\t`tenantId` varchar(36) NOT NULL,\n\t`provider` varchar(50) NOT NULL,\n\t`eventType` varchar(100) NOT NULL,\n\t`payload` json NOT NULL,\n\t`headers` json,\n\t`processedAt` timestamp,\n\t`error` text,\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\tCONSTRAINT `webhookEvents_id` PRIMARY KEY(`id`)\n);\n\nCREATE INDEX `webhook_events_tenant_idx` ON `webhookEvents` (`tenantId`);\nCREATE INDEX `webhook_events_provider_idx` ON `webhookEvents` (`provider`);\nCREATE INDEX `webhook_events_created_idx` ON `webhookEvents` (`createdAt`);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 8900
+}

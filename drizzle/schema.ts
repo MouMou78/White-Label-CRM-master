@@ -1332,3 +1332,23 @@ export const activities = mysqlTable("activities", {
 
 export type Activity = typeof activities.$inferSelect;
 export type InsertActivity = typeof activities.$inferInsert;
+
+// Webhook Events (for audit and debugging)
+export const webhookEvents = mysqlTable("webhookEvents", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  tenantId: varchar("tenantId", { length: 36 }).notNull(),
+  provider: varchar("provider", { length: 50 }).notNull(), // amplemarket, apollo, etc.
+  eventType: varchar("eventType", { length: 100 }).notNull(), // reply, sequence_stage, workflow_send_json
+  payload: json("payload").notNull(), // Raw webhook payload
+  headers: json("headers"), // Request headers
+  processedAt: timestamp("processedAt"),
+  error: text("error"), // Error message if processing failed
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+}, (table) => ({
+  tenantIdx: index("webhook_events_tenant_idx").on(table.tenantId),
+  providerIdx: index("webhook_events_provider_idx").on(table.provider),
+  createdIdx: index("webhook_events_created_idx").on(table.createdAt),
+}));
+
+export type WebhookEvent = typeof webhookEvents.$inferSelect;
+export type InsertWebhookEvent = typeof webhookEvents.$inferInsert;

@@ -2114,3 +2114,14 @@
 - [x] Fix "Failed to load lists" error in Amplemarket config dialog
 - [x] Fix "Failed to load sequences" error in Amplemarket config dialog
 - [ ] Fix Google OAuth error (bottom right notification)
+
+## Amplemarket Webhook Implementation (Feb 6, 2026)
+- [x] Create POST /api/webhooks/amplemarket endpoint with security middleware
+- [x] Implement event type detection (reply, sequence stage, workflow)
+- [x] Build contact upsert logic based on contact.id or email
+- [x] Create activity records with external_id for idempotency
+- [x] Map webhook labels/tags to CRM contact status
+- [x] Add webhook event logging to database
+- [x] Implement async processing queue
+- [x] Write vitest tests for webhook handling
+- [x] Create sample curl test commands for each event type

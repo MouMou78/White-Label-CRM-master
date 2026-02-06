@@ -1321,6 +1321,51 @@ export const appRouter = router({
   }),
   
   amplemarket: router({
+    // Lead procedures
+    listLeads: protectedProcedure
+      .input(z.object({
+        ownerEmail: z.string().optional(),
+        source: z.string().optional(),
+        limit: z.number().optional(),
+        offset: z.number().optional(),
+      }))
+      .query(async ({ input, ctx }) => {
+        return db.getLeads(ctx.user.tenantId, input);
+      }),
+    
+    getLeadById: protectedProcedure
+      .input(z.object({ leadId: z.string() }))
+      .query(async ({ input, ctx }) => {
+        return db.getLeadById(ctx.user.tenantId, input.leadId);
+      }),
+    
+    searchLeads: protectedProcedure
+      .input(z.object({
+        searchTerm: z.string(),
+        ownerEmail: z.string().optional(),
+        limit: z.number().optional(),
+      }))
+      .query(async ({ input, ctx }) => {
+        return db.searchLeads(ctx.user.tenantId, input.searchTerm, {
+          ownerEmail: input.ownerEmail,
+          limit: input.limit,
+        });
+      }),
+    
+    getLeadCountByOwner: protectedProcedure
+      .input(z.object({ ownerEmail: z.string() }))
+      .query(async ({ input, ctx }) => {
+        return db.getLeadCountByOwner(ctx.user.tenantId, input.ownerEmail);
+      }),
+    
+    deleteLead: protectedProcedure
+      .input(z.object({ leadId: z.string() }))
+      .mutation(async ({ input, ctx }) => {
+        await db.deleteLead(ctx.user.tenantId, input.leadId);
+        return { success: true };
+      }),
+    
+    // Account procedures
     getAccountById: protectedProcedure
       .input(z.object({ accountId: z.string() }))
       .query(async ({ input, ctx }) => {

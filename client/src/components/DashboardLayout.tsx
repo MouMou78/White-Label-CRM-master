@@ -64,6 +64,7 @@ const settingsItems = [
 ];
 
 const amplemarketItems = [
+  { icon: Target, label: "Leads", path: "/amplemarket/leads" },
   { icon: Building2, label: "Accounts", path: "/amplemarket/accounts" },
   { icon: UserCircle, label: "People", path: "/amplemarket/people" },
 ];

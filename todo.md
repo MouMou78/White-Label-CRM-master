@@ -2513,3 +2513,27 @@
 - [x] Update UI copy: "Amplemarket leads" + document API limitation
 - [x] Add guardrail preventing future /contacts hydration attempts
 - [x] Test sync and verify non-zero imports with owner filtering working
+
+## Implement Lead Entity (Canonical Amplemarket Data Model)
+
+- [ ] Create Lead schema with required fields (tenant_id, source, amplemarket_lead_id, owner_email, email, first_name, last_name, company, title, synced_at)
+- [ ] Generate and apply migration for leads table
+- [ ] Update amplemarketSyncFromLeads to target Lead table instead of Contact/Person
+- [ ] Create Lead database helpers (getLeads, getLeadById, upsertLead, etc.)
+- [ ] Add Lead tRPC procedures (leads.list, leads.getById, leads.search, leads.filter)
+- [ ] Create Lead UI page with list view, filters, and search
+- [ ] Add "Convert to Contact" action (optional, future feature)
+- [ ] Test sync and verify leads imported correctly with owner filtering
+
+## Amplemarket Lead Entity Implementation
+- [x] Create Lead schema with all required fields (tenant_id, source, sourceType, amplemarket_lead_id, owner_email, email, first_name, last_name, company, title, synced_at, linkedin_url, list_ids, sequence_ids)
+- [x] Generate and apply Lead table migration
+- [x] Update amplemarketSyncFromLeads to target Lead table instead of Person/Contact table
+- [x] Create Lead database helpers (getLeads, getLeadById, searchLeads, getLeadCountByOwner, deleteLead)
+- [x] Add Lead tRPC procedures (listLeads, getLeadById, searchLeads, getLeadCountByOwner, deleteLead)
+- [x] Create AmplemarketLeads UI page with filters and search
+- [x] Add Leads navigation link to sidebar under Amplemarket section
+- [x] Write and pass unit tests for Lead CRUD operations
+- [ ] Test end-to-end Amplemarket sync with real credentials
+- [ ] Verify leads are imported correctly with owner filtering
+- [ ] Optional: Implement "Convert Lead to Contact" feature for manual promotion

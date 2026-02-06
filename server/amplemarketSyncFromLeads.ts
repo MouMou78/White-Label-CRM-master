@@ -1,5 +1,5 @@
 // db is passed as parameter
-import { accounts, people, integrations, amplemarketSyncLogs } from "../drizzle/schema";
+import { accounts, people, integrations, amplemarketSyncLogs, leads } from "../drizzle/schema";
 import { eq, and } from "drizzle-orm";
 import { nanoid } from "nanoid";
 import { TRPCError } from "@trpc/server";
@@ -127,85 +127,49 @@ export async function syncAmplemarketFromLeads(
           
           leadsMatchingOwner++;
           
-          // Check if person already exists by email
-          const [existingPerson] = await db
+          // Check if lead already exists by amplemarket_lead_id
+          const [existingLead] = await db
             .select()
-            .from(people)
+            .from(leads)
             .where(and(
-              eq(people.tenantId, tenantId),
-              eq(people.primaryEmail, lead.email)
+              eq(leads.tenantId, tenantId),
+              eq(leads.amplemarketLeadId, lead.id)
             ))
             .limit(1);
           
-          // Create or update account from lead company data
-          let accountId = null;
-          if (lead.company_name) {
-            const [existingAccount] = await db
-              .select()
-              .from(accounts)
-              .where(and(
-                eq(accounts.tenantId, tenantId),
-                eq(accounts.name, lead.company_name)
-              ))
-              .limit(1);
-            
-            if (existingAccount) {
-              accountId = existingAccount.id;
-            } else {
-              const [newAccount] = await db
-                .insert(accounts)
-                .values({
-                  id: nanoid(),
-                  tenantId,
-                  name: lead.company_name,
-                  domain: lead.company_domain || null,
-                  industry: lead.industry || null,
-                })
-                .returning();
-              accountId = newAccount.id;
-            }
-          }
-          
-          const personData = {
-            accountId,
-            fullName: `${lead.first_name || ""} ${lead.last_name || ""}`.trim() || lead.email,
-            firstName: lead.first_name,
-            lastName: lead.last_name,
-            primaryEmail: lead.email,
-            companyName: lead.company_name,
-            companyDomain: lead.company_domain,
-            roleTitle: lead.title,
-            phone: lead.phone_numbers?.[0]?.number || null,
-            linkedinUrl: lead.linkedin_url,
-            industry: lead.industry,
-            // Source attribution
-            tags: JSON.stringify({
-              source: 'amplemarket',
-              source_type: 'lead',
-              amplemarket_lead_id: lead.id,
-              amplemarket_owner: leadOwnerEmail,
-              synced_at: new Date().toISOString(),
-            }),
+          const leadData = {
+            source: 'amplemarket' as const,
+            sourceType: 'lead' as const,
+            amplemarketLeadId: lead.id,
+            ownerEmail: leadOwnerEmail,
+            email: lead.email,
+            firstName: lead.first_name || null,
+            lastName: lead.last_name || null,
+            company: lead.company_name || null,
+            title: lead.title || null,
+            linkedinUrl: lead.linkedin_url || null,
+            listIds: [list.id], // Track which list this lead came from
+            syncedAt: new Date(),
           };
           
-          if (existingPerson) {
-            // Update existing person
+          if (existingLead) {
+            // Update existing lead
             await db
-              .update(people)
+              .update(leads)
               .set({
-                ...personData,
+                ...leadData,
                 updatedAt: new Date(),
               })
-              .where(eq(people.id, existingPerson.id));
+              .where(eq(leads.id, existingLead.id));
             contactsUpdated++;
           } else {
-            // Create new person
+            // Create new lead
             await db
-              .insert(people)
+              .insert(leads)
               .values({
                 id: nanoid(),
                 tenantId,
-                ...personData,
+                ...leadData,
                 createdAt: new Date(),
                 updatedAt: new Date(),
               });

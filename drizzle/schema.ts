@@ -1429,3 +1429,45 @@ export const amplemarketSyncLogs = mysqlTable("amplemarketSyncLogs", {
 
 export type AmplemarketSyncLog = typeof amplemarketSyncLogs.$inferSelect;
 export type InsertAmplemarketSyncLog = typeof amplemarketSyncLogs.$inferInsert;
+
+/**
+ * Leads table - Canonical entity for Amplemarket list leads
+ * Separate from Contacts to reflect Amplemarket API reality
+ */
+export const leads = mysqlTable("leads", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  tenantId: varchar("tenantId", { length: 36 }).notNull(),
+  
+  // Source attribution
+  source: varchar("source", { length: 50 }).notNull(), // 'amplemarket'
+  sourceType: varchar("sourceType", { length: 50 }).notNull(), // 'lead'
+  amplemarketLeadId: varchar("amplemarketLeadId", { length: 255 }),
+  
+  // Owner info
+  ownerEmail: varchar("ownerEmail", { length: 320 }),
+  
+  // Lead data
+  email: varchar("email", { length: 320 }).notNull(),
+  firstName: varchar("firstName", { length: 255 }),
+  lastName: varchar("lastName", { length: 255 }),
+  company: varchar("company", { length: 255 }),
+  title: varchar("title", { length: 255 }),
+  
+  // Optional fields
+  linkedinUrl: text("linkedinUrl"),
+  listIds: json("listIds").$type<string[]>(),
+  sequenceIds: json("sequenceIds").$type<string[]>(),
+  
+  // Metadata
+  syncedAt: timestamp("syncedAt").defaultNow().notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  tenantIdx: index("tenant_idx").on(table.tenantId),
+  emailIdx: index("email_idx").on(table.email),
+  ownerEmailIdx: index("owner_email_idx").on(table.ownerEmail),
+  amplemarketLeadIdIdx: unique("amplemarket_lead_id_unique").on(table.tenantId, table.amplemarketLeadId),
+}));
+
+export type Lead = typeof leads.$inferSelect;
+export type InsertLead = typeof leads.$inferInsert;

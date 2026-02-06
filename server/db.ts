@@ -2805,3 +2805,167 @@ export async function getLatestSyncStatus(tenantId: string) {
 
   return results[0] || null;
 }
+
+/**
+ * ============================================
+ * LEAD HELPERS (Amplemarket canonical entity)
+ * ============================================
+ */
+
+/**
+ * Get all leads for a tenant with optional filtering
+ */
+export async function getLeads(
+  tenantId: string,
+  options: {
+    ownerEmail?: string;
+    source?: string;
+    limit?: number;
+    offset?: number;
+  } = {}
+) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { leads } = await import("../drizzle/schema");
+  const { like } = await import("drizzle-orm");
+
+  let conditions = [eq(leads.tenantId, tenantId)];
+
+  if (options.ownerEmail) {
+    conditions.push(eq(leads.ownerEmail, options.ownerEmail));
+  }
+
+  if (options.source) {
+    conditions.push(eq(leads.source, options.source));
+  }
+
+  let baseQuery = db
+    .select()
+    .from(leads)
+    .where(and(...conditions))
+    .orderBy(desc(leads.syncedAt));
+
+  if (options.limit && options.offset) {
+    return await baseQuery.limit(options.limit).offset(options.offset);
+  } else if (options.limit) {
+    return await baseQuery.limit(options.limit);
+  } else if (options.offset) {
+    return await baseQuery.offset(options.offset);
+  }
+
+  return await baseQuery;
+}
+
+/**
+ * Get a single lead by ID
+ */
+export async function getLeadById(
+  tenantId: string,
+  leadId: string
+) {
+  const db = await getDb();
+  if (!db) return null;
+
+  const { leads } = await import("../drizzle/schema");
+
+  const [lead] = await db
+    .select()
+    .from(leads)
+    .where(and(
+      eq(leads.tenantId, tenantId),
+      eq(leads.id, leadId)
+    ))
+    .limit(1);
+
+  return lead || null;
+}
+
+/**
+ * Search leads by email, name, or company
+ */
+export async function searchLeads(
+  tenantId: string,
+  searchTerm: string,
+  options: {
+    ownerEmail?: string;
+    limit?: number;
+  } = {}
+) {
+  const db = await getDb();
+  if (!db) return [];
+
+  const { leads } = await import("../drizzle/schema");
+  const { like } = await import("drizzle-orm");
+
+  const searchPattern = `%${searchTerm}%`;
+  
+  let conditions = [
+    eq(leads.tenantId, tenantId),
+    or(
+      like(leads.email, searchPattern),
+      like(leads.firstName, searchPattern),
+      like(leads.lastName, searchPattern),
+      like(leads.company, searchPattern)
+    )
+  ];
+
+  if (options.ownerEmail) {
+    conditions.push(eq(leads.ownerEmail, options.ownerEmail));
+  }
+
+  let baseQuery = db
+    .select()
+    .from(leads)
+    .where(and(...conditions))
+    .orderBy(desc(leads.syncedAt));
+
+  if (options.limit) {
+    return await baseQuery.limit(options.limit);
+  }
+
+  return await baseQuery;
+}
+
+/**
+ * Get lead count by owner
+ */
+export async function getLeadCountByOwner(
+  tenantId: string,
+  ownerEmail: string
+) {
+  const db = await getDb();
+  if (!db) return 0;
+
+  const { leads } = await import("../drizzle/schema");
+
+  const result = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(leads)
+    .where(and(
+      eq(leads.tenantId, tenantId),
+      eq(leads.ownerEmail, ownerEmail)
+    ));
+
+  return result[0]?.count || 0;
+}
+
+/**
+ * Delete a lead
+ */
+export async function deleteLead(
+  tenantId: string,
+  leadId: string
+) {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const { leads } = await import("../drizzle/schema");
+
+  await db
+    .delete(leads)
+    .where(and(
+      eq(leads.tenantId, tenantId),
+      eq(leads.id, leadId)
+    ));
+}

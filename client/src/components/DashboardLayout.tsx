@@ -63,11 +63,7 @@ const settingsItems = [
   { icon: Target, label: "Lead Scoring", path: "/scoring-settings" },
 ];
 
-const amplemarketItems = [
-  { icon: Target, label: "Leads", path: "/amplemarket/leads" },
-  { icon: Building2, label: "Accounts", path: "/amplemarket/accounts" },
-  { icon: UserCircle, label: "People", path: "/amplemarket/people" },
-];
+// Amplemarket removed per user request
 
 const SIDEBAR_WIDTH_KEY = "sidebar-width";
 const DEFAULT_WIDTH = 280;
@@ -343,34 +339,7 @@ function DashboardLayoutContent({
                   </SidebarMenuSub>
                 </details>
               </SidebarMenuItem>
-              
-              {/* Amplemarket Submenu */}
-              <SidebarMenuItem>
-                <details className="group/amplemarket">
-                  <summary className="flex items-center gap-2 h-10 px-2 rounded-md hover:bg-accent transition-colors cursor-pointer list-none">
-                    <Building2 className="h-4 w-4" />
-                    <span className="flex-1 font-normal">Amplemarket</span>
-                    <ChevronDown className="h-4 w-4 transition-transform group-open/amplemarket:rotate-180" />
-                  </summary>
-                  <SidebarMenuSub className="ml-4 mt-1">
-                    {amplemarketItems.map(item => {
-                      const isActive = location === item.path;
-                      return (
-                        <SidebarMenuSubItem key={item.path}>
-                          <SidebarMenuSubButton
-                            isActive={isActive}
-                            onClick={() => setLocation(item.path)}
-                            className="h-9"
-                          >
-                            <item.icon className={`h-4 w-4 ${isActive ? "text-primary" : ""}`} />
-                            <span>{item.label}</span>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      );
-                    })}
-                  </SidebarMenuSub>
-                </details>
-              </SidebarMenuItem>
+              {/* Amplemarket removed per user request */}
 
               {/* Settings Submenu */}
               <SidebarMenuItem>

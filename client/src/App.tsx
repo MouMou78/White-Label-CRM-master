@@ -21,10 +21,7 @@ import Dashboard from "./pages/Dashboard";
 import Reports from "./pages/Reports";
 import Assistant from "./pages/Assistant";
 import AIAssistant from "./pages/AIAssistant";
-import AmplemarketAccounts from "./pages/AmplemarketAccounts";
-import AmplemarketPeople from "./pages/AmplemarketPeople";
-import AmplemarketLeads from "./pages/AmplemarketLeads";
-import { AmplemarketSync } from "./pages/AmplemarketSync";
+// Amplemarket removed per user request
 import AccountDetail from "./pages/AccountDetail";
 import AccountDetailPage from "./pages/AccountDetailPage";
 
@@ -192,29 +189,7 @@ function Router() {
         </DashboardLayout>
       </Route>
       
-      <Route path="/amplemarket/accounts">
-        <DashboardLayout>
-          <AmplemarketAccounts />
-        </DashboardLayout>
-      </Route>
-      
-      <Route path="/amplemarket/people">
-        <DashboardLayout>
-          <AmplemarketPeople />
-        </DashboardLayout>
-      </Route>
-      
-      <Route path="/amplemarket/leads">
-        <DashboardLayout>
-          <AmplemarketLeads />
-        </DashboardLayout>
-      </Route>
-      
-      <Route path="/amplemarket/sync">
-        <DashboardLayout>
-          <AmplemarketSync />
-        </DashboardLayout>
-      </Route>
+      {/* Amplemarket routes removed per user request */}
       
       <Route path="/accounts/:id">
         {(params) => (

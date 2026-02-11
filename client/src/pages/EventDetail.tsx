@@ -133,11 +133,11 @@ export default function EventDetail({ eventId }: EventDetailProps) {
             <div className="pt-4 border-t">
               <p className="text-sm font-medium mb-2">QR Code</p>
               <div className="flex items-center justify-center p-6 bg-muted rounded-lg">
-                <div className="w-48 h-48 bg-white flex items-center justify-center">
-                  <p className="text-xs text-muted-foreground text-center">
-                    QR Code generation<br />coming soon
-                  </p>
-                </div>
+                <img 
+                  src={`https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(publicUrl)}`}
+                  alt="QR Code for event"
+                  className="w-48 h-48 bg-white p-2 rounded"
+                />
               </div>
             </div>
           </CardContent>

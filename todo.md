@@ -2605,3 +2605,24 @@
 - [x] Update backend context to return mock user for unauthenticated requests
 - [x] Update protected procedures to allow guest access
 - [x] Test backend returns mock user without authentication
+
+## Fix Event QR Code and Public URL
+- [ ] Fix event public URL generation (currently shows "Event not found")
+- [ ] Fix QR code generation for events
+- [ ] Test public event form access
+
+## Add Merge and Import to Accounts Page
+- [ ] Add Merge button to Accounts page (copy from People page)
+- [ ] Add Import button to Accounts page (copy from People page)
+- [ ] Implement merge functionality for accounts
+- [ ] Implement import functionality for accounts
+
+## Remove ALL Amplemarket Integration
+- [ ] Remove Amplemarket from sidebar navigation
+- [ ] Remove Amplemarket from Integrations page
+- [ ] Remove Amplemarket routes from App.tsx
+- [ ] Remove Amplemarket database tables (leads, sync logs, config)
+- [ ] Remove Amplemarket backend routers and procedures
+- [ ] Remove Amplemarket client pages and components
+- [ ] Remove Amplemarket dependencies from package.json
+- [ ] Test CRM works without Amplemarket

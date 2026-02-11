@@ -7,7 +7,6 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Link as LinkIcon, CheckCircle2, XCircle, Settings } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
-import { AmplemarketConfigDialog } from "@/components/AmplemarketConfigDialog";
 
 export default function Integrations() {
   const { data: integrations, isLoading, refetch } = trpc.integrations.list.useQuery();
@@ -34,21 +33,9 @@ export default function Integrations() {
       window.history.replaceState({}, '', '/integrations');
     }
   }, [refetch]);
-  const [amplemarketKey, setAmplemarketKey] = useState("");
+  
   const [apolloKey, setApolloKey] = useState("");
-  const [showAmplemarketConfig, setShowAmplemarketConfig] = useState(false);
-  
-  const connectAmplemarket = trpc.integrations.connectAmplemarket.useMutation({
-    onSuccess: () => {
-      toast.success("Amplemarket connected successfully");
-      setAmplemarketKey("");
-      refetch();
-    },
-    onError: () => {
-      toast.error("Failed to connect Amplemarket");
-    },
-  });
-  
+
   const connectApollo = trpc.integrations.connectApollo.useMutation({
     onSuccess: () => {
       toast.success("Apollo.io connected successfully");
@@ -60,80 +47,6 @@ export default function Integrations() {
     },
   });
   
-  const syncApolloContacts = trpc.integrations.syncApolloContacts.useMutation({
-    onSuccess: (data) => {
-      toast.success(`Synced ${data.syncedCount} contacts from Apollo.io`);
-    },
-    onError: () => {
-      toast.error("Failed to sync Apollo contacts");
-    },
-  });
-  
-  const syncApolloEngagements = trpc.integrations.syncApolloEngagements.useMutation({
-    onSuccess: (data) => {
-      toast.success(`Synced ${data.totalSynced} engagements (${data.callsSynced} calls, ${data.emailsSynced} emails)`);
-    },
-    onError: () => {
-      toast.error("Failed to sync Apollo engagements");
-    },
-  });
-
-  const syncAmplemarket = trpc.integrations.syncAmplemarket.useMutation({
-    onSuccess: (data: any) => {
-      if (!data.summary) {
-        toast.error('Sync response malformed');
-        return;
-      }
-      
-      const s = data.summary;
-      const total = s.created + s.updated;
-      
-      // Build diagnostic message
-      let message = `Synced ${total} leads (${s.created} created, ${s.updated} updated)`;
-      
-      // Add diagnostics
-      const diagnostics = [
-        `Lists: ${s.lists_scanned}`,
-        `Leads seen: ${s.lead_items_seen}`,
-        `Sender match: ${s.sender_match}/${s.lead_items_seen}`,
-      ];
-      
-      if (s.sender_mismatch > 0) {
-        diagnostics.push(`Sender mismatch: ${s.sender_mismatch}`);
-      }
-      if (s.sender_missing > 0) {
-        diagnostics.push(`Missing sender: ${s.sender_missing}`);
-      }
-      
-      message += ` | ${diagnostics.join(', ')}`;
-      
-      // Show sample lead if available
-      if (data.sample?.lead) {
-        const lead = data.sample.lead;
-        const fieldPath = data.sample.sender_field_path || 'unknown';
-        message += ` | Sample: ${lead.first_name} ${lead.last_name} (${lead.sender_email}) via ${fieldPath}`;
-        
-        // Show all discovered sender field paths
-        if (data.sample.all_sender_field_paths && data.sample.all_sender_field_paths.length > 0) {
-          message += ` | Fields found: ${data.sample.all_sender_field_paths.join(', ')}`;
-        }
-      }
-      
-      toast.success(message, { duration: 10000 });
-      refetch();
-    },
-    onError: (error) => {
-      toast.error(`Failed to sync Amplemarket: ${error.message}`);
-    },
-  });
-
-  const handleConnectAmplemarket = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!amplemarketKey.trim()) return;
-    
-    await connectAmplemarket.mutateAsync({ apiKey: amplemarketKey });
-  };
-  
   const handleConnectApollo = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!apolloKey.trim()) return;
@@ -142,7 +55,6 @@ export default function Integrations() {
   };
 
   const googleIntegration = integrations?.find((i) => i.provider === "google");
-  const amplemarketIntegration = integrations?.find((i) => i.provider === "amplemarket");
   const whatsappIntegration = integrations?.find((i) => i.provider === "whatsapp");
   const apolloIntegration = integrations?.find((i) => i.provider === "apollo");
 
@@ -226,122 +138,6 @@ export default function Integrations() {
             </CardContent>
           </Card>
 
-          <Card>
-            <CardHeader>
-              <div className="flex items-center justify-between">
-                <div>
-                  <CardTitle>Amplemarket</CardTitle>
-                  <CardDescription>Sales engagement platform</CardDescription>
-                </div>
-                {amplemarketIntegration?.status === "connected" ? (
-                  <Badge variant="default" className="gap-1">
-                    <CheckCircle2 className="w-3 h-3" />
-                    Connected
-                  </Badge>
-                ) : (
-                  <Badge variant="secondary" className="gap-1">
-                    <XCircle className="w-3 h-3" />
-                    Disconnected
-                  </Badge>
-                )}
-              </div>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <p className="text-sm text-muted-foreground">
-                  Track outbound sequences, email replies, and call activity from Amplemarket.
-                </p>
-                
-                <div className="space-y-2">
-                  <p className="text-sm font-medium">Features:</p>
-                  <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-                    <li>Sequence tracking</li>
-                    <li>Email reply detection</li>
-                    <li>Call logging</li>
-                    <li>Webhook support</li>
-                  </ul>
-                </div>
-
-                {amplemarketIntegration?.status !== "connected" && (
-                  <form onSubmit={handleConnectAmplemarket} className="space-y-3">
-                    <div className="space-y-2">
-                      <Label htmlFor="apiKey">API Key</Label>
-                      <Input
-                        id="apiKey"
-                        type="password"
-                        placeholder="Enter your Amplemarket API key"
-                        value={amplemarketKey}
-                        onChange={(e) => setAmplemarketKey(e.target.value)}
-                      />
-                    </div>
-                    <Button
-                      type="submit"
-                      className="w-full"
-                      disabled={!amplemarketKey.trim() || connectAmplemarket.isPending}
-                    >
-                      {connectAmplemarket.isPending ? (
-                        <>
-                          <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                          Connecting...
-                        </>
-                      ) : (
-                        <>
-                          <LinkIcon className="w-4 h-4 mr-2" />
-                          Connect Amplemarket
-                        </>
-                      )}
-                    </Button>
-                  </form>
-                )}
-
-                {amplemarketIntegration?.status === "connected" && (
-                  <div className="space-y-3">
-                    <div className="p-3 bg-green-50 dark:bg-green-950 border border-green-200 dark:border-green-800 rounded-lg">
-                      <p className="text-sm text-green-800 dark:text-green-200">
-                        Amplemarket is connected.
-                        {amplemarketIntegration.lastSyncedAt && (
-                          <span className="block mt-1 text-xs">
-                            Last synced: {new Date(amplemarketIntegration.lastSyncedAt).toLocaleString()}
-                          </span>
-                        )}
-                      </p>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Button 
-                        variant="default"
-                        onClick={() => syncAmplemarket.mutate()}
-                        disabled={syncAmplemarket.isPending}
-                      >
-                        {syncAmplemarket.isPending ? (
-                          <>
-                            <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                            Syncing...
-                          </>
-                        ) : (
-                          "Sync Now"
-                        )}
-                      </Button>
-                      <Button 
-                        variant="outline"
-                        onClick={() => setShowAmplemarketConfig(true)}
-                      >
-                        <Settings className="w-4 h-4 mr-2" />
-                        Configure
-                      </Button>
-                    </div>
-                    <div className="grid grid-cols-2 gap-2">
-                      <Button variant="outline" asChild className="w-full">
-                        <a href="/amplemarket/accounts">View Accounts</a>
-                      </Button>
-                      <Button variant="outline" asChild className="w-full">
-                        <a href="/amplemarket/people">View People</a>
-                      </Button>
-                    </div>
-                  </div>
-                )}
-              </div>
-            </CardContent>
-          </Card>
 
           <Card>
             <CardHeader>
@@ -471,13 +267,6 @@ export default function Integrations() {
           </Card>
         </div>
       )}
-
-      <AmplemarketConfigDialog
-        open={showAmplemarketConfig}
-        onOpenChange={setShowAmplemarketConfig}
-        currentConfig={amplemarketIntegration?.config}
-        onSave={refetch}
-      />
     </div>
   );
 }

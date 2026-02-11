@@ -12,8 +12,8 @@ export default function PublicLeadCapture() {
   const [, params] = useRoute("/public/e/:slug");
   const slug = params?.slug || "";
   
-  // For now, we'll need to get tenant ID somehow - in real app this would be from domain or URL
-  const [tenantId] = useState("demo-tenant");
+  // Use default tenant for guest access
+  const [tenantId] = useState("default-tenant");
   const [formData, setFormData] = useState<Record<string, string>>({});
   const [submitted, setSubmitted] = useState(false);
 

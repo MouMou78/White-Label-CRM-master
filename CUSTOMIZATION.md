@@ -8,18 +8,40 @@ The CRM supports customizable branding through environment variables that can be
 
 ### Updating the Logo
 
-**Current Status:** The `VITE_APP_LOGO` environment variable contains a broken image URL from the previous "1twenty" branding.
+**Current Status:** The `VITE_APP_LOGO` environment variable contains a broken image URL from the previous "1twenty" branding, causing a black box to appear in the sidebar.
 
-**To fix this:**
+**Step-by-Step Instructions:**
 
-1. Open the Management UI (click the panel icon in the top-right of the chat interface)
-2. Navigate to **Settings** → **Secrets**
-3. Find the `VITE_APP_LOGO` entry
-4. **Option A (Use text logo):** Clear the value completely to use the default gradient text logo
-5. **Option B (Use custom logo):** Replace with a valid image URL (must start with `https://`)
-   - Recommended: Upload your logo to S3 using `manus-upload-file` and use the returned URL
-   - Image should be optimized for 32px height (will auto-scale width)
-   - Supported formats: PNG, SVG, JPG, WebP
+1. **Open the Management UI**
+   - Click the panel/grid icon in the top-right corner of the Manus chat interface
+   - Or click the "Dashboard" button on any checkpoint card
+
+2. **Navigate to Settings → Secrets**
+   - In the Management UI, click "Settings" in the left sidebar
+   - Click "Secrets" in the settings sub-navigation
+
+3. **Update VITE_APP_LOGO**
+   - Find the `VITE_APP_LOGO` entry in the secrets list
+   - Click the edit/pencil icon next to it
+   
+   **Option A (Recommended - Use text logo):**
+   - Clear the value completely (delete the entire URL)
+   - Click "Save"
+   - The CRM will display a gradient text logo using your VITE_APP_TITLE
+   
+   **Option B (Use custom logo image):**
+   - Upload your logo file using the command: `manus-upload-file /path/to/your/logo.png`
+   - Copy the returned CDN URL (starts with `https://`)
+   - Paste the URL into the VITE_APP_LOGO field
+   - Click "Save"
+   - Image recommendations:
+     * Optimized for 32px height (width auto-scales)
+     * Transparent background (PNG or SVG)
+     * Supported formats: PNG, SVG, JPG, WebP
+
+4. **Refresh the preview**
+   - The logo should update automatically
+   - If not, refresh the preview panel in the Management UI
 
 **Logo Fallback Behavior:**
 - If `VITE_APP_LOGO` is empty or invalid, the CRM displays a gradient text logo using `VITE_APP_TITLE`
@@ -27,19 +49,35 @@ The CRM supports customizable branding through environment variables that can be
 
 ### Updating the Application Title
 
-**Current Value:** `1twentyCRM`
+**Current Value:** `1twentyCRM` (from previous branding)
 
-**To customize:**
+**Step-by-Step Instructions:**
 
-1. Open the Management UI → **Settings** → **Secrets**
-2. Find the `VITE_APP_TITLE` entry
-3. Update to your preferred branding (e.g., "White Label CRM", "My Company CRM", etc.)
-4. This title appears in:
+1. **Open the Management UI → Settings → Secrets**
+   - Same navigation as above: Management UI → Settings → Secrets
+
+2. **Update VITE_APP_TITLE**
+   - Find the `VITE_APP_TITLE` entry in the secrets list
+   - Click the edit/pencil icon next to it
+   - Replace `1twentyCRM` with your preferred branding:
+     * `White Label CRM` (generic white-label)
+     * `[Your Company] CRM` (branded for your company)
+     * `CRM` (minimal)
+   - Click "Save"
+
+3. **Where this title appears:**
    - Browser tab title
-   - Sidebar logo (when no image logo is set)
-   - Default fallback text
+   - Sidebar logo text (when no image logo is set or image fails to load)
+   - Default fallback text throughout the application
 
-**Recommended Value:** `White Label CRM` or your company name
+4. **Refresh the preview**
+   - The title should update in the browser tab and sidebar
+   - Refresh the preview panel if needed
+
+**Recommended Values:**
+- For white-label template: `White Label CRM`
+- For your business: `[Your Company Name] CRM`
+- For minimal branding: `CRM`
 
 ## Navigation Customization
 

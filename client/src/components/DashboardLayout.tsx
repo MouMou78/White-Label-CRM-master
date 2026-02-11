@@ -298,33 +298,7 @@ function DashboardLayoutContent({
                 );
               })}
               
-              {/* Engagement Submenu */}
-              <SidebarMenuItem>
-                <details className="group/engagement">
-                  <summary className="flex items-center gap-2 h-10 px-2 rounded-md hover:bg-accent transition-colors cursor-pointer list-none">
-                    <Send className="h-4 w-4" />
-                    <span className="flex-1 font-normal">Engagement</span>
-                    <ChevronDown className="h-4 w-4 transition-transform group-open/engagement:rotate-180" />
-                  </summary>
-                  <SidebarMenuSub className="ml-4 mt-1">
-                    {engagementItems.map(item => {
-                      const isActive = location === item.path;
-                      return (
-                        <SidebarMenuSubItem key={item.path}>
-                          <SidebarMenuSubButton
-                            isActive={isActive}
-                            onClick={() => setLocation(item.path)}
-                            className="h-9"
-                          >
-                            <item.icon className={`h-4 w-4 ${isActive ? "text-primary" : ""}`} />
-                            <span>{item.label}</span>
-                          </SidebarMenuSubButton>
-                        </SidebarMenuSubItem>
-                      );
-                    })}
-                  </SidebarMenuSub>
-                </details>
-              </SidebarMenuItem>
+              {/* Engagement section removed - no items available */}
 
               {/* Insights Submenu */}
               <SidebarMenuItem>

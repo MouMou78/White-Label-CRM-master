@@ -2674,3 +2674,8 @@
 - [x] Remove Execution History from Engagement menu (placeholder content)
 - [x] Create CUSTOMIZATION.md with instructions for updating VITE_APP_LOGO and VITE_APP_TITLE
 - [ ] Note: VITE_APP_LOGO and VITE_APP_TITLE must be updated by user via Management UI Settings
+
+## Remove Empty Navigation Sections
+- [x] Remove empty Engagement section from DashboardLayout (no items remaining)
+- [x] Update CUSTOMIZATION.md with step-by-step branding update instructions
+- [ ] Note: User must manually update VITE_APP_LOGO and VITE_APP_TITLE via Management UI (see CUSTOMIZATION.md)

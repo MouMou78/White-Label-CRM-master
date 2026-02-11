@@ -2585,3 +2585,10 @@
 - [ ] Update session management for email/password auth
 - [ ] Test login with demo account
 - [ ] Remove OAuth-related environment variables and dependencies
+
+## Remove Login Requirements
+- [x] Update authentication context to bypass login requirement
+- [x] Update App.tsx to remove auth checks and redirect logic
+- [x] Create default guest user for unauthenticated access
+- [x] Update backend to allow unauthenticated requests
+- [x] Test CRM access without login

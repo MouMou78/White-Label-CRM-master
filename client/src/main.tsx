@@ -11,6 +11,11 @@ import "./index.css";
 const queryClient = new QueryClient();
 
 const redirectToLoginIfUnauthorized = (error: unknown) => {
+  // Disabled - no longer redirecting to login
+  // Users can access the CRM without authentication
+  return;
+  
+  /* Original code:
   if (!(error instanceof TRPCClientError)) return;
   if (typeof window === "undefined") return;
 
@@ -19,6 +24,7 @@ const redirectToLoginIfUnauthorized = (error: unknown) => {
   if (!isUnauthorized) return;
 
   window.location.href = getLoginUrl();
+  */
 };
 
 queryClient.getQueryCache().subscribe(event => {

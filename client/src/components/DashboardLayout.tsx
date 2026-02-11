@@ -91,21 +91,19 @@ export default function DashboardLayout({
     localStorage.setItem(SIDEBAR_WIDTH_KEY, sidebarWidth.toString());
   }, [sidebarWidth]);
 
-  // Check if user has completed onboarding
+  // Skip onboarding check - allow direct access
   useEffect(() => {
-    if (user && !loading) {
-      const onboardingCompleted = localStorage.getItem("onboarding_completed");
-      if (!onboardingCompleted) {
-        setLocation("/onboarding");
-      }
-    }
-  }, [user, loading, setLocation]);
+    // Onboarding disabled - users go straight to dashboard
+    localStorage.setItem("onboarding_completed", "true");
+  }, []);
 
-  // Authentication required - no guest access
+  // Skip authentication check - allow guest access
   if (loading) {
     return <DashboardLayoutSkeleton />
   }
 
+  // Removed authentication gate - users can access without login
+  /*
   if (!user) {
     return (
       <div className="flex items-center justify-center min-h-screen">
@@ -131,6 +129,7 @@ export default function DashboardLayout({
       </div>
     );
   }
+  */
 
   return (
     <SidebarProvider

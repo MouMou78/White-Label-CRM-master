@@ -9,7 +9,11 @@ import { useState, useEffect } from "react";
 import { toast } from "sonner";
 
 export default function Integrations() {
-  const { data: integrations, isLoading, refetch } = trpc.integrations.list.useQuery();
+  // Integrations router removed with Amplemarket integration
+  // const { data: integrations, isLoading, refetch } = trpc.integrations.list.useQuery();
+  const integrations: any[] = [];
+  const isLoading = false;
+  const refetch = () => {};
   
   // Handle OAuth callback messages
   useEffect(() => {
@@ -36,22 +40,43 @@ export default function Integrations() {
   
   const [apolloKey, setApolloKey] = useState("");
 
-  const connectApollo = trpc.integrations.connectApollo.useMutation({
-    onSuccess: () => {
-      toast.success("Apollo.io connected successfully");
-      setApolloKey("");
-      refetch();
+  // const connectApollo = trpc.integrations.connectApollo.useMutation({
+  //   onSuccess: () => {
+  //     toast.success("Apollo.io connected successfully");
+  //     setApolloKey("");
+  //     refetch();
+  //   },
+  //   onError: () => {
+  //     toast.error("Failed to connect Apollo.io");
+  //   },
+  // });
+  const connectApollo = {
+    mutateAsync: async () => {
+      toast.info("Apollo integration is not available");
     },
-    onError: () => {
-      toast.error("Failed to connect Apollo.io");
-    },
-  });
+    isPending: false,
+  };
   
   const handleConnectApollo = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!apolloKey.trim()) return;
     
-    await connectApollo.mutateAsync({ apiKey: apolloKey });
+    await connectApollo.mutateAsync();
+  };
+
+  // Apollo sync mutations removed with Amplemarket integration
+  const syncApolloContacts = {
+    mutate: () => {
+      toast.info("Apollo sync feature is not available");
+    },
+    isPending: false,
+  };
+
+  const syncApolloEngagements = {
+    mutate: () => {
+      toast.info("Apollo sync feature is not available");
+    },
+    isPending: false,
   };
 
   const googleIntegration = integrations?.find((i) => i.provider === "google");

@@ -7,19 +7,29 @@ import { Loader2, CheckCircle2, ArrowRight } from "lucide-react";
 import { toast } from "sonner";
 
 export default function ConflictReview() {
-  const { data: conflicts, isLoading, refetch } = trpc.integrations.getConflicts.useQuery();
-  const resolveConflict = trpc.integrations.resolveConflict.useMutation({
-    onSuccess: () => {
-      toast.success("Conflict resolved");
-      refetch();
+  // Integrations router removed with Amplemarket integration
+  // const { data: conflicts, isLoading, refetch } = trpc.integrations.getConflicts.useQuery();
+  // const resolveConflict = trpc.integrations.resolveConflict.useMutation({
+  //   onSuccess: () => {
+  //     toast.success("Conflict resolved");
+  //     refetch();
+  //   },
+  //   onError: (error: any) => {
+  //     toast.error(`Failed to resolve conflict: ${error.message}`);
+  //   },
+  // });
+  const conflicts: any[] = [];
+  const isLoading = false;
+  const refetch = () => {};
+  const resolveConflict = {
+    mutate: () => {
+      toast.info("Conflict resolution is not available");
     },
-    onError: (error: any) => {
-      toast.error(`Failed to resolve conflict: ${error.message}`);
-    },
-  });
+    isPending: false,
+  };
 
   const handleResolve = (conflictId: string, choice: "crm" | "amplemarket" | "merge") => {
-    resolveConflict.mutate({ conflictId, choice });
+    resolveConflict.mutate();
   };
 
   return (

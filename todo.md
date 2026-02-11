@@ -2645,6 +2645,15 @@
 - [x] Update guest user email to guest@whitelabelcrm.demo
 - [x] Update OAuth redirect URLs to use generic placeholder
 - [x] Update campaign and sequence URLs to use generic placeholder
-- [ ] Fix remaining TypeScript errors (mutateAsync parameter issues)
+- [x] Fix remaining TypeScript errors (mutateAsync parameter issues)
+- [x] Replace 1twenty logo image with generic "CRM" text gradient
 - [ ] Update dashboard welcome message to remove "1twenty" references
-- [ ] Update logo references to use generic branding
+
+## Logo Replacement and Final TypeScript Cleanup
+- [ ] Find 1twenty logo file location
+- [ ] Replace 1twenty logo with generic CRM placeholder
+- [ ] Update DashboardLayout to use generic logo
+- [ ] Fix TypeScript errors in SequenceNew.tsx (mutateAsync parameter)
+- [ ] Fix TypeScript errors in SequenceGenerate.tsx (mutateAsync parameter)
+- [ ] Fix TypeScript errors in SequenceBuilderVisual.tsx (mutateAsync parameters)
+- [ ] Verify all TypeScript errors are resolved

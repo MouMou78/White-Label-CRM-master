@@ -7,10 +7,13 @@ import { useState } from "react";
 import { Link } from "wouter";
 
 export default function ActivityFeed() {
-  const { data: activities, isLoading } = trpc.activityFeed.list.useQuery();
+  // ActivityFeed router removed with Amplemarket integration
+  // const { data: activities, isLoading } = trpc.activityFeed.list.useQuery();
+  const activities: any[] = [];
+  const isLoading = false;
   const [searchQuery, setSearchQuery] = useState("");
 
-  const filteredActivities = activities?.filter((activity) =>
+  const filteredActivities = activities?.filter((activity: any) =>
     activity.personName?.toLowerCase().includes(searchQuery.toLowerCase()) ||
     activity.description?.toLowerCase().includes(searchQuery.toLowerCase())
   );
@@ -111,7 +114,7 @@ export default function ActivityFeed() {
             </div>
           ) : filteredActivities && filteredActivities.length > 0 ? (
             <div className="space-y-3">
-              {filteredActivities.map((activity) => (
+              {filteredActivities.map((activity: any) => (
                 <div
                   key={activity.id}
                   className="flex items-start gap-3 p-3 md:p-4 border rounded-lg hover:bg-accent transition-colors"

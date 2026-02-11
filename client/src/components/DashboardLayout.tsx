@@ -257,7 +257,9 @@ function DashboardLayoutContent({
               </button>
               {!isCollapsed ? (
                 <div className="flex items-center justify-center min-w-0 flex-1">
-                  <img src="https://files.manuscdn.com/user_upload_by_module/session_file/310519663306545399/bAnPKgcDFtgkNbmT.png" alt="White Label Consultancy" className="h-20 w-auto object-contain dark:brightness-200 dark:contrast-150 dark:saturate-110" />
+                  <div className="text-xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                    CRM
+                  </div>
                 </div>
               ) : null}
             </div>

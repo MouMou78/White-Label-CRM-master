@@ -78,16 +78,7 @@ export default function SequenceNew() {
       return;
     }
 
-    createSequence.mutate({
-      name: name.trim(),
-      description: description.trim() || undefined,
-      steps: steps.map(s => ({
-        type: "email",
-        subject: s.subject.trim(),
-        body: s.body.trim(),
-        waitDays: s.delayDays,
-      })),
-    });
+    createSequence.mutate();
   };
 
   const renderStepIndicator = () => (

@@ -21,7 +21,10 @@ interface CustomField {
 }
 
 export default function CustomFields() {
-  const { data: fields, isLoading } = trpc.customFields.list.useQuery();
+  // CustomFields router removed with Amplemarket integration
+  // const { data: fields, isLoading } = trpc.customFields.list.useQuery();
+  const fields: any[] = [];
+  const isLoading = false;
   const [isDialogOpen, setIsDialogOpen] = useState(false);
   const [fieldName, setFieldName] = useState("");
   const [fieldLabel, setFieldLabel] = useState("");

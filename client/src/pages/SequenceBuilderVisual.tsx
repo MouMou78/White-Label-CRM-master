@@ -76,9 +76,9 @@ export default function SequenceBuilderVisual() {
     };
 
     if (sequenceId) {
-      await updateMutation.mutateAsync({ id: sequenceId, ...sequenceData });
+      await updateMutation.mutateAsync();
     } else {
-      await createMutation.mutateAsync(sequenceData);
+      await createMutation.mutateAsync();
     }
   };
 

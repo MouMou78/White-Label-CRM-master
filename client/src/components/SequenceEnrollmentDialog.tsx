@@ -23,24 +23,32 @@ export function SequenceEnrollmentDialog({
   const [selectedSequenceId, setSelectedSequenceId] = useState<string | null>(null);
 
   const utils = trpc.useUtils();
-  const { data: sequences = [] } = trpc.sequences.list.useQuery();
+  // Sequences router removed with Amplemarket integration
+  // const { data: sequences = [] } = trpc.sequences.list.useQuery();
+  const sequences: any[] = [];
 
-  const enrollPeople = trpc.sequences.enrollPeople.useMutation({
-    onSuccess: () => {
-      utils.people.list.invalidate();
-      onSuccess?.();
-      onOpenChange(false);
-      toast.success(`Enrolled ${selectedIds.length} contact(s) in sequence`);
-      setSelectedSequenceId(null);
+  // const enrollPeople = trpc.sequences.enrollPeople.useMutation({
+  //   onSuccess: () => {
+  //     utils.people.list.invalidate();
+  //     onSuccess?.();
+  //     onOpenChange(false);
+  //     toast.success(`Enrolled ${selectedIds.length} contact(s) in sequence`);
+  //     setSelectedSequenceId(null);
+  //   },
+  //   onError: (error: any) => {
+  //     toast.error(`Failed to enroll: ${error.message}`);
+  //   },
+  // });
+  const enrollPeople = {
+    mutate: () => {
+      toast.info("Sequences feature is not available");
     },
-    onError: (error) => {
-      toast.error(`Failed to enroll: ${error.message}`);
-    },
-  });
+    isPending: false,
+  };
 
   const handleEnroll = () => {
     if (!selectedSequenceId) return;
-    enrollPeople.mutate({ personIds: selectedIds, sequenceId: selectedSequenceId });
+    enrollPeople.mutate();
   };
 
   const getStatusColor = (status: string) => {
@@ -68,7 +76,7 @@ export function SequenceEnrollmentDialog({
           <div className="space-y-2">
             <Label>Select Email Sequence</Label>
             <div className="grid gap-2 max-h-[400px] overflow-y-auto">
-              {sequences.map((sequence) => (
+              {sequences.map((sequence: any) => (
                 <button
                   key={sequence.id}
                   type="button"

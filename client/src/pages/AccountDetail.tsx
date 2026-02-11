@@ -11,20 +11,24 @@ export default function AccountDetail() {
   const accountId = params.id;
   const [, navigate] = useLocation();
 
-  const { data: account, isLoading } = trpc.amplemarket.getAccountById.useQuery(
-    { accountId: accountId! },
-    { enabled: !!accountId }
-  );
-
-  const { data: contacts } = trpc.amplemarket.getContactsByAccount.useQuery(
-    { accountId: accountId! },
-    { enabled: !!accountId }
-  );
-
-  const { data: activities, isLoading: activitiesLoading } = trpc.amplemarket.getAccountActivities.useQuery(
-    { accountId: accountId! },
-    { enabled: !!accountId }
-  );
+  // Amplemarket router removed per user request
+  // const { data: account, isLoading } = trpc.amplemarket.getAccountById.useQuery(
+  //   { accountId: accountId! },
+  //   { enabled: !!accountId }
+  // );
+  // const { data: contacts } = trpc.amplemarket.getContactsByAccount.useQuery(
+  //   { accountId: accountId! },
+  //   { enabled: !!accountId }
+  // );
+  // const { data: activities, isLoading: activitiesLoading } = trpc.amplemarket.getAccountActivities.useQuery(
+  //   { accountId: accountId! },
+  //   { enabled: !!accountId }
+  // );
+  const account: any = null;
+  const isLoading = false;
+  const contacts: any[] = [];
+  const activities: any[] = [];
+  const activitiesLoading = false;
 
   if (isLoading) {
     return (
@@ -202,7 +206,7 @@ export default function AccountDetail() {
                     <h3 className="font-semibold mb-4">Decision Makers</h3>
                     {contacts && contacts.length > 0 ? (
                       <div className="space-y-4">
-                        {contacts.map((contact) => (
+                        {contacts.map((contact: any) => (
                           <Link
                             key={contact.id}
                             href={`/people/${contact.id}`}

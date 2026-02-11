@@ -44,15 +44,7 @@ export default function SequenceGenerate() {
       return;
     }
 
-    await generateMutation.mutateAsync({
-      sequenceName,
-      productDescription,
-      targetAudience,
-      valueProposition,
-      numberOfSteps: parseInt(numberOfSteps),
-      tone,
-      additionalContext,
-    });
+    await generateMutation.mutateAsync();
   };
 
   return (

@@ -2626,3 +2626,9 @@
 - [ ] Remove Amplemarket client pages and components
 - [ ] Remove Amplemarket dependencies from package.json
 - [ ] Test CRM works without Amplemarket
+
+## Fix Google Calendar Error on People Page
+- [ ] Identify where calendar events query is failing
+- [ ] Update backend to return empty array when Google Calendar not connected instead of throwing error
+- [ ] Update frontend to handle missing calendar integration gracefully
+- [ ] Test People page loads without errors when Google Calendar disconnected

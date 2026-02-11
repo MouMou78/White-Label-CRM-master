@@ -49,12 +49,12 @@ export async function getUpcomingEvents(
     );
 
     if (!googleIntegration) {
-      throw new Error("Google Calendar not connected");
+      return [];
     }
 
     const config = googleIntegration.config as any;
     if (!config?.accessToken) {
-      throw new Error("No access token found");
+      return [];
     }
 
     // Verify scope includes calendar.readonly

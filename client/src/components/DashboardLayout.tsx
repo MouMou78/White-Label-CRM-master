@@ -42,14 +42,14 @@ const menuItems = [
   { icon: Sparkles, label: "AI Assistant", path: "/ai-assistant" },
 ];
 
-const engagementItems = [
-  // Sequences and Email Generator removed - features not available
+const engagementItems: typeof menuItems = [
+  // All engagement features removed - not available in white-label template
   // { icon: Mail, label: "Sequences", path: "/sequences" },
   // { icon: Wand2, label: "Email Generator", path: "/email-generator" },
-  { icon: Zap, label: "Automation", path: "/automation" },
-  { icon: Workflow, label: "Workflow Automation", path: "/workflow-automation" },
-  { icon: Store, label: "Templates Marketplace", path: "/templates-marketplace" },
-  { icon: History, label: "Execution History", path: "/rule-execution-history" },
+  // { icon: Zap, label: "Automation", path: "/automation" },
+  // { icon: Workflow, label: "Workflow Automation", path: "/workflow-automation" },
+  // { icon: Store, label: "Templates Marketplace", path: "/templates-marketplace" },
+  // { icon: History, label: "Execution History", path: "/rule-execution-history" },
 ];
 
 const insightsItems = [

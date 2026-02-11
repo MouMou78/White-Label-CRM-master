@@ -2666,3 +2666,11 @@
 - [x] Remove non-functional Amplemarket-related pages from navigation
 - [x] Clean up Settings submenu to remove integration pages that don't work
 - [ ] Note: VITE_APP_LOGO contains broken image URL - users can update via Management UI Settings
+
+## Final Branding and Navigation Cleanup
+- [x] Remove Automation page from Engagement menu (placeholder content)
+- [x] Remove Workflow Automation page from Engagement menu (placeholder content)
+- [x] Remove Templates Marketplace page from Engagement menu (placeholder content)
+- [x] Remove Execution History from Engagement menu (placeholder content)
+- [x] Create CUSTOMIZATION.md with instructions for updating VITE_APP_LOGO and VITE_APP_TITLE
+- [ ] Note: VITE_APP_LOGO and VITE_APP_TITLE must be updated by user via Management UI Settings

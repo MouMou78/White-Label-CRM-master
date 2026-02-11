@@ -43,8 +43,9 @@ const menuItems = [
 ];
 
 const engagementItems = [
-  { icon: Mail, label: "Sequences", path: "/sequences" },
-  { icon: Wand2, label: "Email Generator", path: "/email-generator" },
+  // Sequences and Email Generator removed - features not available
+  // { icon: Mail, label: "Sequences", path: "/sequences" },
+  // { icon: Wand2, label: "Email Generator", path: "/email-generator" },
   { icon: Zap, label: "Automation", path: "/automation" },
   { icon: Workflow, label: "Workflow Automation", path: "/workflow-automation" },
   { icon: Store, label: "Templates Marketplace", path: "/templates-marketplace" },
@@ -58,8 +59,9 @@ const insightsItems = [
 ];
 
 const settingsItems = [
-  { icon: Settings, label: "Integrations", path: "/integrations" },
-  { icon: Sliders, label: "Custom Fields", path: "/custom-fields" },
+  // Integrations and Custom Fields removed - features not available
+  // { icon: Settings, label: "Integrations", path: "/integrations" },
+  // { icon: Sliders, label: "Custom Fields", path: "/custom-fields" },
   { icon: Target, label: "Lead Scoring", path: "/scoring-settings" },
 ];
 
@@ -186,6 +188,7 @@ function DashboardLayoutContent({
   const { state, toggleSidebar } = useSidebar();
   const isCollapsed = state === "collapsed";
   const [isResizing, setIsResizing] = useState(false);
+  const [logoError, setLogoError] = useState(false);
   const sidebarRef = useRef<HTMLDivElement>(null);
   const activeMenuItem = menuItems.find(item => item.path === location);
   const isMobile = useIsMobile();
@@ -257,9 +260,18 @@ function DashboardLayoutContent({
               </button>
               {!isCollapsed ? (
                 <div className="flex items-center justify-center min-w-0 flex-1">
-                  <div className="text-xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
-                    CRM
-                  </div>
+                  {import.meta.env.VITE_APP_LOGO && import.meta.env.VITE_APP_LOGO.startsWith('http') && !logoError ? (
+                    <img 
+                      src={import.meta.env.VITE_APP_LOGO} 
+                      alt="Logo" 
+                      className="h-8 w-auto object-contain" 
+                      onError={() => setLogoError(true)}
+                    />
+                  ) : (
+                    <div className="text-xl font-bold tracking-tight bg-gradient-to-r from-blue-600 to-purple-600 bg-clip-text text-transparent">
+                      {import.meta.env.VITE_APP_TITLE || "CRM"}
+                    </div>
+                  )}
                 </div>
               ) : null}
             </div>

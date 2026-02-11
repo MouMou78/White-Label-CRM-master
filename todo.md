@@ -2657,3 +2657,12 @@
 - [ ] Fix TypeScript errors in SequenceGenerate.tsx (mutateAsync parameter)
 - [ ] Fix TypeScript errors in SequenceBuilderVisual.tsx (mutateAsync parameters)
 - [ ] Verify all TypeScript errors are resolved
+
+## Dashboard and Navigation Cleanup
+- [x] Update dashboard welcome message from "Welcome to CRM Template" to generic customizable text
+- [x] Create customizable logo component that supports environment variable (VITE_APP_LOGO)
+- [x] Remove Sequences page from navigation (feature not available)
+- [x] Remove Email Generator page from navigation (feature not available)
+- [x] Remove non-functional Amplemarket-related pages from navigation
+- [x] Clean up Settings submenu to remove integration pages that don't work
+- [ ] Note: VITE_APP_LOGO contains broken image URL - users can update via Management UI Settings

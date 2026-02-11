@@ -52,8 +52,11 @@ import EmailAccounts from "./pages/EmailAccounts";
 import Campaigns from "./pages/Campaigns";
 import UserManagement from "./pages/UserManagement";
 import Accounts from "./pages/Accounts";
+import AccountMerge from "./pages/AccountMerge";
+import AccountImport from "./pages/AccountImport";
 import Settings from "./pages/Settings";
 import WebhookMonitor from "./pages/WebhookMonitor";
+import BookDemo from "./pages/BookDemo";
 
 import Onboarding from "./pages/Onboarding";
 import ContactMerge from "./pages/ContactMerge";
@@ -108,6 +111,24 @@ function Router() {
       <Route path="/accounts">
         <DashboardLayout>
           <Accounts />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/accounts/merge">
+        <DashboardLayout>
+          <AccountMerge />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/accounts/import">
+        <DashboardLayout>
+          <AccountImport />
+        </DashboardLayout>
+      </Route>
+      
+      <Route path="/calendar/book">
+        <DashboardLayout>
+          <BookDemo />
         </DashboardLayout>
       </Route>
       

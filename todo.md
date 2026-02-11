@@ -2685,3 +2685,52 @@
 - [x] Display simple "CRM" text without gradient or styling
 - [x] Remove dependency on VITE_APP_LOGO environment variable
 - [x] Remove unused logoError state
+
+## GitHub Export
+- [x] Check if MouMou78/White-Label-CRM-master repository exists
+- [x] Configure git remote to point to the repository
+- [x] Push all code to the GitHub repository
+- [x] Verify the export was successful
+
+## Navigation Collapse Fix
+- [x] Add e.stopPropagation() to Insights submenu item click handlers
+- [x] Add e.stopPropagation() to Settings submenu item click handlers
+- [ ] Test that expanded sections stay open when clicking submenu items
+
+## Book Demo Feature
+- [x] Create demo_bookings table in database schema
+- [x] Add getDemoBookingsByManagerAndDate function to db.ts
+- [x] Add createDemoBooking function to db.ts
+- [x] Add demo booking endpoints to calendar router (getAvailability, bookDemo, listManagers)
+- [x] Add getUsersByRoles function to db.ts
+- [x] Install react-calendar package
+- [x] Create BookDemo.tsx component with manager dropdown
+- [x] Add calendar widget with weekends disabled
+- [x] Implement time slot grid showing available 30-minute slots
+- [x] Add booking summary card with Meet link
+- [x] Implement availability logic (9 AM - 5 PM, 35-minute intervals)
+- [x] Auto-generate Google Meet links for bookings
+- [x] Add /calendar/book route to App.tsx
+- [ ] Test complete booking flow
+
+## Account Merge and Import Feature
+- [x] Merge and Import buttons already exist in Accounts.tsx header
+- [x] Create AccountMerge.tsx with duplicate detection
+- [x] Implement side-by-side field comparison in AccountMerge
+- [x] Add smart merging with field selection
+- [x] Implement automatic transfer of contacts and deals
+- [x] Create AccountImport.tsx with CSV upload
+- [x] Add drag-and-drop CSV upload
+- [x] Implement auto-parsing and column detection
+- [x] Add smart field mapping for accounts
+- [x] Implement preview before import
+- [x] Add duplicate skipping based on account name
+- [x] Add progress tracking for import
+- [x] Create accounts.merge endpoint in routers.ts
+- [x] Create accounts.parseCSV endpoint in routers.ts
+- [x] Create accounts.importAccounts endpoint in routers.ts
+- [x] Add mergeAccounts and import functions to db.ts
+- [x] Add /accounts/merge route to App.tsx
+- [x] Add /accounts/import route to App.tsx
+- [ ] Test account merge flow
+- [ ] Test account import flow

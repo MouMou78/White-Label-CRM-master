@@ -11,7 +11,8 @@ import {
   events, Event, InsertEvent,
   integrations, Integration, InsertIntegration,
   syncHistory, SyncHistory, InsertSyncHistory,
-  aiConversations
+  aiConversations,
+  demoBookings, DemoBooking, InsertDemoBooking
 } from "../drizzle/schema";
 import { nanoid } from "nanoid";
 
@@ -2968,4 +2969,157 @@ export async function deleteLead(
       eq(leads.tenantId, tenantId),
       eq(leads.id, leadId)
     ));
+}
+
+// ============ DEMO BOOKINGS ============
+
+/**
+ * Get demo bookings for a sales manager on a specific date
+ */
+export async function getDemoBookingsByManagerAndDate(
+  tenantId: string,
+  salesManagerId: string,
+  startDate: Date,
+  endDate: Date
+): Promise<DemoBooking[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db
+    .select()
+    .from(demoBookings)
+    .where(
+      and(
+        eq(demoBookings.tenantId, tenantId),
+        eq(demoBookings.salesManagerId, salesManagerId),
+        sql`${demoBookings.startTime} >= ${startDate}`,
+        sql`${demoBookings.startTime} < ${endDate}`
+      )
+    )
+    .orderBy(asc(demoBookings.startTime));
+
+  return result;
+}
+
+/**
+ * Create a new demo booking
+ */
+export async function createDemoBooking(
+  data: Omit<InsertDemoBooking, "id">
+): Promise<DemoBooking> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  const id = nanoid();
+  await db.insert(demoBookings).values({ id, ...data });
+
+  const result = await db
+    .select()
+    .from(demoBookings)
+    .where(eq(demoBookings.id, id))
+    .limit(1);
+
+  return result[0]!;
+}
+
+/**
+ * Get all users with specific roles (for manager dropdown)
+ */
+export async function getUsersByRoles(
+  tenantId: string,
+  roles: string[]
+): Promise<User[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db
+    .select()
+    .from(users)
+    .where(
+      and(
+        eq(users.tenantId, tenantId),
+        sql`${users.role} IN (${sql.join(roles.map(r => sql.raw(`'${r}'`)), sql`, `)})`
+      )
+    )
+    .orderBy(asc(users.name));
+
+  return result;
+}
+
+// ============ ACCOUNT MERGE ============
+
+/**
+ * Merge two accounts - transfer all related data and delete source
+ */
+export async function mergeAccounts(
+  tenantId: string,
+  sourceId: string,
+  targetId: string,
+  mergedFields: Partial<Account>
+): Promise<{ success: boolean; contactsTransferred: number; dealsTransferred: number }> {
+  const db = await getDb();
+  if (!db) throw new Error("Database not available");
+
+  // Verify both accounts exist and belong to tenant
+  const [sourceAccount, targetAccount] = await Promise.all([
+    db.select().from(accounts).where(and(eq(accounts.id, sourceId), eq(accounts.tenantId, tenantId))).limit(1),
+    db.select().from(accounts).where(and(eq(accounts.id, targetId), eq(accounts.tenantId, tenantId))).limit(1)
+  ]);
+
+  if (!sourceAccount[0] || !targetAccount[0]) {
+    throw new Error("Source or target account not found");
+  }
+
+  // Update target account with merged fields
+  await db
+    .update(accounts)
+    .set({ ...mergedFields, updatedAt: new Date() })
+    .where(eq(accounts.id, targetId));
+
+  // Transfer all people (contacts) from source to target
+  const contactsResult = await db
+    .update(people)
+    .set({ accountId: targetId })
+    .where(and(eq(people.tenantId, tenantId), eq(people.accountId, sourceId)));
+
+  // Count transferred contacts
+  const contactsTransferred = await db
+    .select({ count: sql<number>`count(*)` })
+    .from(people)
+    .where(and(eq(people.tenantId, tenantId), eq(people.accountId, targetId)));
+
+  // Delete source account
+  await db
+    .delete(accounts)
+    .where(and(eq(accounts.id, sourceId), eq(accounts.tenantId, tenantId)));
+
+  return {
+    success: true,
+    contactsTransferred: contactsTransferred[0]?.count || 0,
+    dealsTransferred: 0 // No deals table in current schema
+  };
+}
+
+/**
+ * Find potential duplicate accounts by name
+ */
+export async function findDuplicateAccounts(
+  tenantId: string,
+  accountName: string
+): Promise<Account[]> {
+  const db = await getDb();
+  if (!db) return [];
+
+  const result = await db
+    .select()
+    .from(accounts)
+    .where(
+      and(
+        eq(accounts.tenantId, tenantId),
+        sql`LOWER(${accounts.name}) = LOWER(${accountName})`
+      )
+    )
+    .limit(10);
+
+  return result;
 }

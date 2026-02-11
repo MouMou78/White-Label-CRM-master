@@ -2089,6 +2089,93 @@ export const appRouter = router({
         await db.deleteAccount(input.id);
         return { success: true };
       }),
+
+    merge: protectedProcedure
+      .input(z.object({
+        sourceId: z.string(),
+        targetId: z.string(),
+        mergedFields: z.record(z.string(), z.any()),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        return db.mergeAccounts(
+          ctx.user.tenantId,
+          input.sourceId,
+          input.targetId,
+          input.mergedFields
+        );
+      }),
+
+    parseCSV: protectedProcedure
+      .input(z.object({ csvContent: z.string() }))
+      .mutation(async ({ input }) => {
+        const lines = input.csvContent.trim().split('\n');
+        if (lines.length < 2) {
+          throw new TRPCError({ code: 'BAD_REQUEST', message: 'CSV must have at least a header row and one data row' });
+        }
+
+        const headers = lines[0].split(',').map(h => h.trim());
+        const preview = lines.slice(1, 6).map(line => {
+          const values = line.split(',').map(v => v.trim());
+          return headers.reduce((obj, header, idx) => {
+            obj[header] = values[idx] || '';
+            return obj;
+          }, {} as Record<string, string>);
+        });
+
+        return { headers, preview, totalRows: lines.length - 1 };
+      }),
+
+    importAccounts: protectedProcedure
+      .input(z.object({
+        csvContent: z.string(),
+        fieldMapping: z.record(z.string(), z.string()),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const lines = input.csvContent.trim().split('\n');
+        const headers = lines[0].split(',').map(h => h.trim());
+        
+        let imported = 0;
+        let skipped = 0;
+        const errors: string[] = [];
+        const mapping = input.fieldMapping as Record<string, string>;
+
+        for (let i = 1; i < lines.length; i++) {
+          const values = lines[i].split(',').map(v => v.trim());
+          const row = headers.reduce((obj, header, idx) => {
+            obj[header] = values[idx] || '';
+            return obj;
+          }, {} as Record<string, string>);
+
+          const name = row[mapping.name];
+          if (!name) {
+            skipped++;
+            continue;
+          }
+
+          // Check for duplicates
+          const duplicates = await db.findDuplicateAccounts(ctx.user.tenantId, name);
+          if (duplicates.length > 0) {
+            skipped++;
+            continue;
+          }
+
+          try {
+            await db.createAccount({
+              tenantId: ctx.user.tenantId,
+              name,
+              domain: mapping.domain ? row[mapping.domain] || undefined : undefined,
+              industry: mapping.industry ? row[mapping.industry] || undefined : undefined,
+              headquarters: mapping.headquarters ? row[mapping.headquarters] || undefined : undefined,
+            });
+            imported++;
+          } catch (error) {
+            errors.push(`Row ${i + 1}: ${error instanceof Error ? error.message : 'Unknown error'}`);
+            skipped++;
+          }
+        }
+
+        return { imported, skipped, errors };
+      }),
   }),
   
   forecasting: router({
@@ -2688,6 +2775,98 @@ export const appRouter = router({
       .query(async ({ ctx }) => {
         const { getCalendarStatus } = await import("./googleCalendar");
         return getCalendarStatus(ctx.user!.tenantId);
+      }),
+
+    // Demo Booking Endpoints
+    getAvailability: protectedProcedure
+      .input(z.object({
+        salesManagerId: z.string(),
+        date: z.string(), // ISO date string
+      }))
+      .query(async ({ input, ctx }) => {
+        const date = new Date(input.date);
+        const startOfDay = new Date(date);
+        startOfDay.setHours(0, 0, 0, 0);
+        const endOfDay = new Date(date);
+        endOfDay.setHours(23, 59, 59, 999);
+
+        const bookings = await db.getDemoBookingsByManagerAndDate(
+          ctx.user.tenantId,
+          input.salesManagerId,
+          startOfDay,
+          endOfDay
+        );
+
+        // Generate time slots from 9 AM to 5 PM with 35-minute intervals (30 min demo + 5 min buffer)
+        const WORKING_HOURS = { start: 9, end: 17 };
+        const SLOT_INTERVAL = 35; // 30 min demo + 5 min buffer
+        const slots: { time: string; available: boolean }[] = [];
+
+        for (let hour = WORKING_HOURS.start; hour < WORKING_HOURS.end; hour++) {
+          for (let minute = 0; minute < 60; minute += SLOT_INTERVAL) {
+            const slotStart = new Date(date);
+            slotStart.setHours(hour, minute, 0, 0);
+            const slotEnd = new Date(slotStart);
+            slotEnd.setMinutes(slotEnd.getMinutes() + 30); // Demo duration
+
+            // Check if this slot conflicts with any existing booking
+            const hasConflict = bookings.some(booking => {
+              const bookingStart = new Date(booking.startTime);
+              const bookingEnd = new Date(booking.endTime);
+              return (
+                (slotStart >= bookingStart && slotStart < bookingEnd) ||
+                (slotEnd > bookingStart && slotEnd <= bookingEnd) ||
+                (slotStart <= bookingStart && slotEnd >= bookingEnd)
+              );
+            });
+
+            const timeString = `${hour.toString().padStart(2, '0')}:${minute.toString().padStart(2, '0')}`;
+            slots.push({ time: timeString, available: !hasConflict });
+          }
+        }
+
+        return { slots, existingBookings: bookings };
+      }),
+
+    bookDemo: protectedProcedure
+      .input(z.object({
+        salesManagerId: z.string(),
+        date: z.string(),
+        time: z.string(),
+        title: z.string(),
+        description: z.string().optional(),
+      }))
+      .mutation(async ({ input, ctx }) => {
+        const [hours, minutes] = input.time.split(':').map(Number);
+        const startTime = new Date(input.date);
+        startTime.setHours(hours, minutes, 0, 0);
+        const endTime = new Date(startTime);
+        endTime.setMinutes(endTime.getMinutes() + 30);
+
+        // Generate Google Meet link (simplified - in production use Google Calendar API)
+        const meetId = Math.random().toString(36).substring(2, 5) + '-' +
+                      Math.random().toString(36).substring(2, 6) + '-' +
+                      Math.random().toString(36).substring(2, 5);
+        const meetLink = `https://meet.google.com/${meetId}`;
+
+        const booking = await db.createDemoBooking({
+          tenantId: ctx.user.tenantId,
+          salesManagerId: input.salesManagerId,
+          bookedByUserId: ctx.user.id,
+          title: input.title,
+          description: input.description,
+          startTime,
+          endTime,
+          meetLink,
+        });
+
+        return booking;
+      }),
+
+    listManagers: protectedProcedure
+      .query(async ({ ctx }) => {
+        // Get users with role "admin" or "owner" (sales managers)
+        return db.getUsersByRoles(ctx.user.tenantId, ['admin', 'owner']);
       }),
   }),
   

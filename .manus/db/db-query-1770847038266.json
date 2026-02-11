@@ -1,0 +1,9 @@
+{
+  "query": "CREATE TABLE `demo_bookings` (\n\t`id` varchar(36) NOT NULL,\n\t`tenantId` varchar(36) NOT NULL,\n\t`salesManagerId` varchar(36) NOT NULL,\n\t`bookedByUserId` varchar(36) NOT NULL,\n\t`title` text NOT NULL,\n\t`description` text,\n\t`startTime` timestamp NOT NULL,\n\t`endTime` timestamp NOT NULL,\n\t`meetLink` varchar(500) NOT NULL,\n\t`status` enum('scheduled','completed','cancelled') NOT NULL DEFAULT 'scheduled',\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\t`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `demo_bookings_id` PRIMARY KEY(`id`)\n);\n\nCREATE INDEX `demo_tenant_manager_idx` ON `demo_bookings` (`tenantId`,`salesManagerId`);\nCREATE INDEX `demo_start_time_idx` ON `demo_bookings` (`startTime`);",
+  "command": "mysql --batch --raw --column-names --default-character-set=utf8mb4 --host gateway03.us-east-1.prod.aws.tidbcloud.com --port 4000 --user 2QkRhwd4AVTLhHG.a0950ca1ba2f --database TQEsx2HByTQrcAiUBn2kww --execute CREATE TABLE `demo_bookings` (\n\t`id` varchar(36) NOT NULL,\n\t`tenantId` varchar(36) NOT NULL,\n\t`salesManagerId` varchar(36) NOT NULL,\n\t`bookedByUserId` varchar(36) NOT NULL,\n\t`title` text NOT NULL,\n\t`description` text,\n\t`startTime` timestamp NOT NULL,\n\t`endTime` timestamp NOT NULL,\n\t`meetLink` varchar(500) NOT NULL,\n\t`status` enum('scheduled','completed','cancelled') NOT NULL DEFAULT 'scheduled',\n\t`createdAt` timestamp NOT NULL DEFAULT (now()),\n\t`updatedAt` timestamp NOT NULL DEFAULT (now()) ON UPDATE CURRENT_TIMESTAMP,\n\tCONSTRAINT `demo_bookings_id` PRIMARY KEY(`id`)\n);\n\nCREATE INDEX `demo_tenant_manager_idx` ON `demo_bookings` (`tenantId`,`salesManagerId`);\nCREATE INDEX `demo_start_time_idx` ON `demo_bookings` (`startTime`);",
+  "rows": [],
+  "messages": [],
+  "stdout": "",
+  "stderr": "",
+  "execution_time_ms": 2094
+}

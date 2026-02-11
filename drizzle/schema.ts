@@ -1471,3 +1471,25 @@ export const leads = mysqlTable("leads", {
 
 export type Lead = typeof leads.$inferSelect;
 export type InsertLead = typeof leads.$inferInsert;
+
+// Demo Bookings - for SDRs to book demos with sales managers
+export const demoBookings = mysqlTable("demo_bookings", {
+  id: varchar("id", { length: 36 }).primaryKey(),
+  tenantId: varchar("tenantId", { length: 36 }).notNull(),
+  salesManagerId: varchar("salesManagerId", { length: 36 }).notNull(), // Sales manager who the demo is booked with
+  bookedByUserId: varchar("bookedByUserId", { length: 36 }).notNull(), // SDR who booked the demo
+  title: text("title").notNull(),
+  description: text("description"),
+  startTime: timestamp("startTime").notNull(),
+  endTime: timestamp("endTime").notNull(),
+  meetLink: varchar("meetLink", { length: 500 }).notNull(), // Google Meet link
+  status: mysqlEnum("status", ["scheduled", "completed", "cancelled"]).default("scheduled").notNull(),
+  createdAt: timestamp("createdAt").defaultNow().notNull(),
+  updatedAt: timestamp("updatedAt").defaultNow().onUpdateNow().notNull(),
+}, (table) => ({
+  tenantManagerIdx: index("demo_tenant_manager_idx").on(table.tenantId, table.salesManagerId),
+  startTimeIdx: index("demo_start_time_idx").on(table.startTime),
+}));
+
+export type DemoBooking = typeof demoBookings.$inferSelect;
+export type InsertDemoBooking = typeof demoBookings.$inferInsert;

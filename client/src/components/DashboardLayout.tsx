@@ -306,7 +306,10 @@ function DashboardLayoutContent({
                         <SidebarMenuSubItem key={item.path}>
                           <SidebarMenuSubButton
                             isActive={isActive}
-                            onClick={() => setLocation(item.path)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setLocation(item.path);
+                            }}
                             className="h-9"
                           >
                             <item.icon className={`h-4 w-4 ${isActive ? "text-primary" : ""}`} />
@@ -335,7 +338,10 @@ function DashboardLayoutContent({
                         <SidebarMenuSubItem key={item.path}>
                           <SidebarMenuSubButton
                             isActive={isActive}
-                            onClick={() => setLocation(item.path)}
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setLocation(item.path);
+                            }}
                             className="h-9"
                           >
                             <item.icon className={`h-4 w-4 ${isActive ? "text-primary" : ""}`} />

@@ -2575,3 +2575,13 @@
 - [ ] Test: Selecting ian@joinkliq.io imports leads for that mailbox
 - [ ] Test: Selecting ianm@joinkliq.io imports different set if applicable
 - [ ] Verify: No more "sender field present 0/786" when correct sender field exists
+
+## Remove Manus OAuth and Implement Email/Password Auth
+- [ ] Disable Manus OAuth authentication flow
+- [ ] Update authentication middleware to use email/password
+- [ ] Update login page to show email/password form (remove OAuth button)
+- [ ] Update signup page to use email/password registration
+- [ ] Seed demo user (demo@whitelabelcrm.com / demo123)
+- [ ] Update session management for email/password auth
+- [ ] Test login with demo account
+- [ ] Remove OAuth-related environment variables and dependencies

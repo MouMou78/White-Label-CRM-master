@@ -7,6 +7,7 @@ import { Badge } from "@/components/ui/badge";
 import { Loader2, Link as LinkIcon, CheckCircle2, XCircle, RefreshCw } from "lucide-react";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
+import { useQueryClient } from "@tanstack/react-query";
 
 export default function Integrations() {
   // Live integrations list from the database
@@ -43,29 +44,46 @@ export default function Integrations() {
   }, [refetch]);
 
   const [apolloKey, setApolloKey] = useState("");
+  const qc = useQueryClient();
 
-  const connectApollo = {
-    mutateAsync: async () => {
-      toast.info("Apollo integration is not available yet.");
+  const connectApollo = trpc.integrations.apolloConnect.useMutation({
+    onSuccess: () => {
+      toast.success("Apollo.io connected successfully!");
+      setApolloKey("");
+      refetch();
     },
-    isPending: false,
-  };
+    onError: (err) => toast.error(err.message || "Failed to connect Apollo.io"),
+  });
+
+  const disconnectApollo = trpc.integrations.apolloDisconnect.useMutation({
+    onSuccess: () => {
+      toast.success("Apollo.io disconnected.");
+      refetch();
+    },
+    onError: () => toast.error("Failed to disconnect Apollo.io"),
+  });
 
   const handleConnectApollo = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!apolloKey.trim()) return;
-    await connectApollo.mutateAsync();
+    connectApollo.mutate({ apiKey: apolloKey });
   };
 
-  const syncApolloContacts = {
-    mutate: () => toast.info("Apollo sync is not available yet."),
-    isPending: false,
-  };
+  const syncApolloContacts = trpc.integrations.apolloSyncContacts.useMutation({
+    onSuccess: (data: any) => {
+      toast.success(`Synced ${data?.synced ?? 0} contacts from Apollo.io`);
+      refetch();
+    },
+    onError: (err) => toast.error(err.message || "Failed to sync Apollo contacts"),
+  });
 
-  const syncApolloEngagements = {
-    mutate: () => toast.info("Apollo sync is not available yet."),
-    isPending: false,
-  };
+  const syncApolloEngagements = trpc.integrations.apolloSyncEngagements.useMutation({
+    onSuccess: (data: any) => {
+      toast.success(`Synced ${(data?.callsSynced ?? 0) + (data?.emailsSynced ?? 0)} engagements from Apollo.io`);
+      refetch();
+    },
+    onError: (err) => toast.error(err.message || "Failed to sync Apollo engagements"),
+  });
 
   const googleIntegration = integrations?.find((i: any) => i.provider === "google");
   const whatsappIntegration = integrations?.find((i: any) => i.provider === "whatsapp");
@@ -240,6 +258,17 @@ export default function Integrations() {
                         <Loader2 className="w-4 h-4 mr-2 animate-spin" />
                       )}
                       Sync Engagements (Calls & Emails)
+                    </Button>
+                    <Button
+                      className="w-full"
+                      variant="destructive"
+                      onClick={() => disconnectApollo.mutate()}
+                      disabled={disconnectApollo.isPending}
+                    >
+                      {disconnectApollo.isPending && (
+                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
+                      )}
+                      Disconnect Apollo.io
                     </Button>
                   </div>
                 ) : (

@@ -12,6 +12,7 @@ import { ActivityTimeline } from "@/components/ActivityTimeline";
 import Notes from "@/components/Notes";
 import { AIEmailAssistant } from "@/components/AIEmailAssistant";
 import { EnrichmentButton } from "@/components/EnrichmentButton";
+import { ApolloEnrichButton } from "@/components/ApolloEnrichButton";
 import { toast } from "sonner";
 import { Dialog, DialogContent, DialogDescription, DialogHeader, DialogTitle, DialogTrigger } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
@@ -358,7 +359,10 @@ export default function PersonDetail({ personId }: PersonDetailProps) {
         <Card className="md:col-span-1">
           <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-4">
             <CardTitle>Contact Information</CardTitle>
-            <EnrichmentButton personId={personId} person={person} />
+            <div className="flex items-center gap-1">
+              <EnrichmentButton personId={personId} person={person} />
+              <ApolloEnrichButton personId={personId} />
+            </div>
           </CardHeader>
           <CardContent className="space-y-4">
             <div>

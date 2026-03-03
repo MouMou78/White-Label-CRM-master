@@ -4064,6 +4064,46 @@ export const appRouter = router({
     list: protectedProcedure.query(async ({ ctx }) => {
       return db.getIntegrationsByTenant(ctx.user.tenantId);
     }),
+
+    // ── Apollo.io ────────────────────────────────────────────────────────────
+    apolloConnect: protectedProcedure
+      .input(z.object({ apiKey: z.string().min(1) }))
+      .mutation(async ({ input, ctx }) => {
+        const { connectApollo } = await import("./apollo");
+        return connectApollo(ctx.user.tenantId, input.apiKey);
+      }),
+
+    apolloDisconnect: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const dbInstance = await db.getDb();
+        if (!dbInstance) throw new TRPCError({ code: "INTERNAL_SERVER_ERROR", message: "Database not available" });
+        const { integrations: integrationsTable } = await import("../drizzle/schema");
+        const { eq, and } = await import("drizzle-orm");
+        await dbInstance
+          .update(integrationsTable)
+          .set({ status: "disconnected" })
+          .where(and(eq(integrationsTable.tenantId, ctx.user.tenantId), eq(integrationsTable.provider, "apollo")));
+        return { ok: true };
+      }),
+
+    apolloSyncContacts: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const { syncApolloContacts } = await import("./apollo");
+        return syncApolloContacts(ctx.user.tenantId);
+      }),
+
+    apolloSyncEngagements: protectedProcedure
+      .mutation(async ({ ctx }) => {
+        const { syncApolloEngagements } = await import("./apollo");
+        return syncApolloEngagements(ctx.user.tenantId, ctx.user.id);
+      }),
+
+    apolloEnrichPerson: protectedProcedure
+      .input(z.object({ personId: z.string() }))
+      .mutation(async ({ input, ctx }) => {
+        const { enrichPersonWithApollo } = await import("./apollo");
+        return enrichPersonWithApollo(ctx.user.tenantId, input.personId);
+      }),
   }),
 
   webhooks: router({
